@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.iot.mapper.DeviceLogMapper">
+    
+    <resultMap type="DeviceLog" id="DeviceLogResult">
+        <result property="deviceLogId"    column="device_log_id"    />
+        <result property="logName"    column="log_name"    />
+        <result property="logType"    column="log_type"    />
+        <result property="logLevel"    column="log_level"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="deviceName"    column="device_name"    />
+        <result property="userId"    column="user_id"    />
+        <result property="userName"    column="user_name"    />
+        <result property="tenantId"    column="tenant_id"    />
+        <result property="tenantName"    column="tenant_name"    />
+        <result property="triggerSource"    column="trigger_source"    />
+        <result property="isAlert"    column="is_alert"    />
+        <result property="status"    column="status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="logValue"    column="log_value"    />
+        <result property="istop"    column="isTop"    />
+        <result property="ismonitor"    column="isMonitor"    />
+    </resultMap>
+
+    <sql id="selectDeviceLogVo">
+        select device_log_id, log_name, log_type, log_level, device_id, device_name, user_id, user_name, tenant_id, tenant_name, trigger_source, is_alert, status, create_time, remark, log_value, isTop, isMonitor from iot_device_log
+    </sql>
+
+    <select id="selectDeviceLogList" parameterType="DeviceLog" resultMap="DeviceLogResult">
+        <include refid="selectDeviceLogVo"/>
+        <where>  
+            <if test="logName != null  and logName != ''"> and log_name like concat('%', #{logName}, '%')</if>
+            <if test="logType != null "> and log_type = #{logType}</if>
+            <if test="logLevel != null "> and log_level = #{logLevel}</if>
+            <if test="deviceId != null "> and device_id = #{deviceId}</if>
+            <if test="deviceName != null  and deviceName != ''"> and device_name like concat('%', #{deviceName}, '%')</if>
+            <if test="userName != null  and userName != ''"> and user_name like concat('%', #{userName}, '%')</if>
+            <if test="tenantName != null  and tenantName != ''"> and tenant_name like concat('%', #{tenantName}, '%')</if>
+            <if test="triggerSource != null "> and trigger_source = #{triggerSource}</if>
+            <if test="isAlert != null "> and is_alert = #{isAlert}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="istop != null "> and isTop = #{istop}</if>
+            <if test="ismonitor != null "> and isMonitor = #{ismonitor}</if>
+        </where>
+        order by create_time desc
+    </select>
+    
+    <select id="selectDeviceLogByDeviceLogId" parameterType="Long" resultMap="DeviceLogResult">
+        <include refid="selectDeviceLogVo"/>
+        where device_log_id = #{deviceLogId}
+    </select>
+        
+    <insert id="insertDeviceLog" parameterType="DeviceLog">
+        insert into iot_device_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceLogId != null">device_log_id,</if>
+            <if test="logName != null and logName != ''">log_name,</if>
+            <if test="logType != null">log_type,</if>
+            <if test="logLevel != null">log_level,</if>
+            <if test="deviceId != null">device_id,</if>
+            <if test="deviceName != null and deviceName != ''">device_name,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="userName != null and userName != ''">user_name,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="tenantName != null and tenantName != ''">tenant_name,</if>
+            <if test="triggerSource != null">trigger_source,</if>
+            <if test="isAlert != null">is_alert,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+            <if test="logValue != null">log_value,</if>
+            <if test="istop != null">isTop,</if>
+            <if test="ismonitor != null">isMonitor,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceLogId != null">#{deviceLogId},</if>
+            <if test="logName != null and logName != ''">#{logName},</if>
+            <if test="logType != null">#{logType},</if>
+            <if test="logLevel != null">#{logLevel},</if>
+            <if test="deviceId != null">#{deviceId},</if>
+            <if test="deviceName != null and deviceName != ''">#{deviceName},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="userName != null and userName != ''">#{userName},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="tenantName != null and tenantName != ''">#{tenantName},</if>
+            <if test="triggerSource != null">#{triggerSource},</if>
+            <if test="isAlert != null">#{isAlert},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="logValue != null">#{logValue},</if>
+            <if test="istop != null">#{istop},</if>
+            <if test="ismonitor != null">#{ismonitor},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDeviceLog" parameterType="DeviceLog">
+        update iot_device_log
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="logName != null and logName != ''">log_name = #{logName},</if>
+            <if test="logType != null">log_type = #{logType},</if>
+            <if test="logLevel != null">log_level = #{logLevel},</if>
+            <if test="deviceId != null">device_id = #{deviceId},</if>
+            <if test="deviceName != null and deviceName != ''">device_name = #{deviceName},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="userName != null and userName != ''">user_name = #{userName},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="tenantName != null and tenantName != ''">tenant_name = #{tenantName},</if>
+            <if test="triggerSource != null">trigger_source = #{triggerSource},</if>
+            <if test="isAlert != null">is_alert = #{isAlert},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="logValue != null">log_value = #{logValue},</if>
+            <if test="istop != null">isTop = #{istop},</if>
+            <if test="ismonitor != null">isMonitor = #{ismonitor},</if>
+        </trim>
+        where device_log_id = #{deviceLogId}
+    </update>
+
+    <delete id="deleteDeviceLogByDeviceLogId" parameterType="Long">
+        delete from iot_device_log where device_log_id = #{deviceLogId}
+    </delete>
+
+    <delete id="deleteDeviceLogByDeviceLogIds" parameterType="String">
+        delete from iot_device_log where device_log_id in 
+        <foreach item="deviceLogId" collection="array" open="(" separator="," close=")">
+            #{deviceLogId}
+        </foreach>
+    </delete>
+</mapper>
