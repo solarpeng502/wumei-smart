@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import echarts from 'echarts';
+import * as echarts from 'echarts';
 import {
     loadBMap
 } from './iot/map.js'
@@ -50,7 +50,7 @@ export default {
     },
     created() {
         this.$nextTick(() => {
-            loadBMap("nAtaBg9FYzav6c8P9rF9qzsWZfT8O0PD").then(() => {
+            loadBMap().then(() => {
                 this.getmap();
 
             });
@@ -61,7 +61,7 @@ export default {
     },
     methods: {
         getmap() {
-            var myChart = this.$echarts.init(this.$refs.map);
+            var myChart = echarts.init(this.$refs.map);
             var option;
 
             var data = [{
@@ -1018,7 +1018,7 @@ export default {
                 大庆: [125.03, 46.58]
             };
             // 显示位置和大小
-            var convertData = function (data) {
+            const convertData = function (data) {
                 var res = [];
                 for (var i = 0; i < data.length; i++) {
                     var geoCoord = geoCoordMap[data[i].name];
@@ -1033,12 +1033,17 @@ export default {
                 return res;
             };
             option = {
-                backgroundColor: 'transparent',
+                title: {
+                    text: '终端设备分布和状态',
+                    subtext: 'wumei-smart open source living iot platform',
+                    sublink: 'http://www.wumei.live',
+                    left: 'center'
+                },
                 tooltip: {
                     trigger: 'item'
                 },
                 bmap: {
-                    center: [104.114129, 37.550339],
+                    center: [125, 36],
                     zoom: 5,
                     roam: true,
                     mapStyle: {
@@ -1046,21 +1051,14 @@ export default {
                                 featureType: 'water',
                                 elementType: 'all',
                                 stylers: {
-                                    color: '#044161'
+                                    color: '#a0cfff'
                                 }
                             },
                             {
                                 featureType: 'land',
                                 elementType: 'all',
                                 stylers: {
-                                    color: '#004981'
-                                }
-                            },
-                            {
-                                featureType: 'boundary',
-                                elementType: 'geometry',
-                                stylers: {
-                                    color: '#064f85'
+                                    color: '#f3f3f3'
                                 }
                             },
                             {
@@ -1072,17 +1070,9 @@ export default {
                             },
                             {
                                 featureType: 'highway',
-                                elementType: 'geometry',
+                                elementType: 'all',
                                 stylers: {
-                                    color: '#004981'
-                                }
-                            },
-                            {
-                                featureType: 'highway',
-                                elementType: 'geometry.fill',
-                                stylers: {
-                                    color: '#005b96',
-                                    lightness: 1
+                                    color: '#fdfdfd'
                                 }
                             },
                             {
@@ -1096,14 +1086,14 @@ export default {
                                 featureType: 'arterial',
                                 elementType: 'geometry',
                                 stylers: {
-                                    color: '#004981'
+                                    color: '#fefefe'
                                 }
                             },
                             {
                                 featureType: 'arterial',
                                 elementType: 'geometry.fill',
                                 stylers: {
-                                    color: '#00508b'
+                                    color: '#fefefe'
                                 }
                             },
                             {
@@ -1117,7 +1107,6 @@ export default {
                                 featureType: 'green',
                                 elementType: 'all',
                                 stylers: {
-                                    color: '#056197',
                                     visibility: 'off'
                                 }
                             },
@@ -1132,14 +1121,14 @@ export default {
                                 featureType: 'manmade',
                                 elementType: 'all',
                                 stylers: {
-                                    visibility: 'off'
+                                    color: '#d1d1d1'
                                 }
                             },
                             {
                                 featureType: 'local',
                                 elementType: 'all',
                                 stylers: {
-                                    visibility: 'off'
+                                    color: '#d1d1d1'
                                 }
                             },
                             {
@@ -1151,23 +1140,23 @@ export default {
                             },
                             {
                                 featureType: 'boundary',
-                                elementType: 'geometry.fill',
+                                elementType: 'all',
                                 stylers: {
-                                    color: '#029fd4'
+                                    color: '#999999'
                                 }
                             },
                             {
                                 featureType: 'building',
                                 elementType: 'all',
                                 stylers: {
-                                    color: '#1a5787'
+                                    color: '#d1d1d1'
                                 }
                             },
                             {
                                 featureType: 'label',
-                                elementType: 'all',
+                                elementType: 'labels.text.fill',
                                 stylers: {
-                                    visibility: 'off'
+                                    color: '#999999'
                                 }
                             }
                         ]
@@ -1178,18 +1167,19 @@ export default {
                         type: 'scatter',
                         coordinateSystem: 'bmap',
                         data: convertData(data),
-                        encode: {
-                            value: 2
-                        },
                         symbolSize: function (val) {
                             return val[2] / 10;
                         },
+                        encode: {
+                            value: 2
+                        },
                         label: {
                             formatter: '{b}',
-                            position: 'right'
+                            position: 'right',
+                            show: false
                         },
                         itemStyle: {
-                            color: '#505152'
+                            color: '#909399'
                         },
                         emphasis: {
                             label: {
@@ -1208,40 +1198,31 @@ export default {
                             })
                             .slice(0, 80)
                         ),
-                        encode: {
-                            value: 2
-                        },
                         symbolSize: function (val) {
                             return val[2] / 10;
                         },
-                        showEffectOn: 'emphasis',
-                        rippleEffect: {
-                            brushType: 'stroke'
+                        encode: {
+                            value: 2
                         },
-                        hoverAnimation: true,
+                        showEffectOn: 'render',
+                        rippleEffect: {
+                            brushType: 'stroke',
+                            scale:5
+                        },
                         label: {
                             formatter: '{b}',
                             position: 'right',
-                            show: true
+                            show: false
                         },
                         itemStyle: {
-                            color: '#23e503',
-                            shadowBlur: 2,
+                            color: '#67C23A',
+                            shadowBlur: 100,
                             shadowColor: '#333'
                         },
-                        zlevel: 1
-                    },
-                    {
-                        type: 'custom',
-                        coordinateSystem: 'bmap',
-                        // renderItem: renderItem,
-                        itemStyle: {
-                            opacity: 0.5
+                        emphasis: {
+                            scale: true
                         },
-                        animation: false,
-                        silent: true,
-                        data: [0],
-                        z: -10
+                        zlevel: 1
                     }
                 ]
             };
@@ -1251,11 +1232,11 @@ export default {
         },
         drawLine() {
             // 基于准备好的dom，初始化echarts实例
-            let myChart = this.$echarts.init(this.$refs.myChart);
+            let myChart = echarts.init(this.$refs.myChart);
             // 绘制图表
             myChart.setOption({
                 title: {
-                    text: "数据接收和发送",
+                    text: "Mqtt数据接收和发送",
                     left: "5%"
                 },
                 tooltip: {
@@ -1331,7 +1312,7 @@ export default {
         },
         drawLine1() {
             // 基于准备好的dom，初始化echarts实例
-            let myChart = this.$echarts.init(this.$refs.myChart1);
+            let myChart = echarts.init(this.$refs.myChart1);
             var option;
 
             option = {

@@ -1,70 +1,81 @@
 <template>
-<el-card style="margin:6px;">
+<el-card style="margin:6px;padding-bottom:100px;">
     <el-tabs v-model="activeName">
         <el-tab-pane label="基本信息" name="basic">
             <el-form ref="form" :model="form" :rules="rules" label-width="80px" style="margin-top:20px;">
-                <el-row :gutter="50">
-                    <el-col :span="8">
+                <el-row :gutter="100">
+                    <el-col :span="7">
                         <el-form-item label="产品名称" prop="productName">
                             <el-input v-model="form.productName" placeholder="请输入产品名称" />
                         </el-form-item>
-                        <el-form-item label="备注" prop="remark">
-                            <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" rows="4" />
-                        </el-form-item>
-                    </el-col>
-                    <el-col :span="8">
                         <el-form-item label="产品分类" prop="categoryId">
-                            <el-select v-model="form.categoryId" placeholder="请选择分类" @change="selectCategory">
+                            <el-select v-model="form.categoryId" placeholder="请选择分类" @change="selectCategory" style="width:100%">
                                 <el-option v-for="category in categoryShortList" :key="category.id" :label="category.name" :value="category.id"></el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item label="联网方式" prop="networkMethod">
-                            <el-select v-model="form.networkMethod" placeholder="请选择联网方式" disabled>
+                            <el-select v-model="form.networkMethod" placeholder="请选择联网方式" style="width:100%;">
                                 <el-option v-for="dict in dict.type.iot_network_method" :key="dict.value" :label="dict.label" :value="parseInt(dict.value)"></el-option>
                             </el-select>
                         </el-form-item>
+                        <el-form-item label="备注信息" prop="remark">
+                            <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" rows="4" />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="7">
                         <el-form-item label="设备类型" prop="deviceType">
-                            <el-select v-model="form.deviceType" placeholder="请选择设备类型" disabled>
+                            <el-select v-model="form.deviceType" placeholder="请选择设备类型" disabled style="width:100%">
                                 <el-option v-for="dict in dict.type.iot_device_type" :key="dict.value" :label="dict.label" :value="parseInt(dict.value)"></el-option>
                             </el-select>
                         </el-form-item>
-                    </el-col>
-                    <el-col :span="8">
-                        <el-form-item label="MQTT认证" prop="vertificateMethod">
-                            <el-select v-model="form.vertificateMethod" placeholder="请选择认证方式" disabled>
+                        <el-form-item label="设备认证" prop="vertificateMethod">
+                            <el-select v-model="form.vertificateMethod" placeholder="请选择认证方式" disabled style="width:100%">
                                 <el-option v-for="dict in dict.type.iot_vertificate_method" :key="dict.value" :label="dict.label" :value="parseInt(dict.value)"></el-option>
                             </el-select>
                         </el-form-item>
+                        <el-form-item label="产品秘钥" prop="mqttPassword">
+                            <el-input v-model="form.mqttPassword" placeholder="自动生成" readonly :type="keyInputType">
+                                <el-button slot="append" icon="el-icon-view" style="font-size:18px;" @click="changeInputType('key')"></el-button>
+                            </el-input>
+                        </el-form-item>
                         <el-form-item label="Mqtt账号" prop="mqttAccount">
-                            <el-input v-model="form.mqttAccount" placeholder="自动生成" disabled />
+                            <el-input v-model="form.mqttAccount" placeholder="自动生成" readonly :type="accountInputType">
+                                <el-button slot="append" icon="el-icon-view" style="font-size:18px;" @click="changeInputType('account')"></el-button>
+                            </el-input>
                         </el-form-item>
                         <el-form-item label="Mqtt密码" prop="mqttPassword">
-                            <el-input v-model="form.mqttPassword" placeholder="自动生成" disabled />
-                        </el-form-item>
-
-                    </el-col>
-                    <el-col :span="20">
-                        <el-form-item style="text-align: center;margin:30px 0px;">
-                            <el-button type="primary" @click="submitForm(1)">提交</el-button>
-                            <el-button type="danger" @click="submitForm(2)" v-show="product.productId!=undefined">提交并发布</el-button>
-                            <el-button type="info" @click="goBack()">返回</el-button>
+                            <el-input v-model="form.mqttPassword" placeholder="自动生成" readonly :type="passwordInputType">
+                                <el-button slot="append" icon="el-icon-view" style="font-size:18px;" @click="changeInputType('password')"></el-button>
+                            </el-input>
                         </el-form-item>
                     </el-col>
-
+                    <el-col :span="8">
+                        <el-form-item label="产品图片">
+                            <imageUpload ref="image-upload" :value="form.imgUrl" :limit="1" :fileSize="1" @input="getImagePath($event)"></imageUpload>
+                        </el-form-item>
+                    </el-col>
                 </el-row>
+
+                <el-col :span="20">
+                    <el-form-item style="text-align: center;margin:40px 0px;">
+                        <el-button type="primary" @click="submitForm(1)">提交</el-button>
+                        <el-button type="danger" @click="submitForm(2)" v-show="form.productId!=undefined">提交并发布</el-button>
+                        <el-button type="info" @click="goBack()">返回</el-button>
+                    </el-form-item>
+                </el-col>
             </el-form>
         </el-tab-pane>
 
-        <el-tab-pane label="物模型" name="things" :disabled="product.productId==undefined">
-            <product-things-model ref="productThingsModel" :product="product" />
+        <el-tab-pane label="物模型" name="things" :disabled="form.productId==undefined">
+            <product-things-model ref="productThingsModel" :product="form" />
         </el-tab-pane>
 
-        <el-tab-pane label="告警" name="alert" :disabled="product.productId==undefined">
-            <product-alert ref="productAlert"></product-alert>
+        <el-tab-pane label="告警" name="alert" :disabled="form.productId==undefined">
+            <product-alert ref="productAlert" :product="form"></product-alert>
         </el-tab-pane>
 
-        <el-tab-pane label="APP自定义" name="productApp" :disabled="product.productId==undefined">
-            <product-app ref="productApp" :product="product" />
+        <el-tab-pane label="APP自定义" name="productApp" :disabled="form.productId==undefined">
+            <product-app ref="productApp" :product="form" />
         </el-tab-pane>
     </el-tabs>
 
@@ -75,6 +86,7 @@
 import productThingsModel from "./product-things-model";
 import productApp from "./product-app"
 import productAlert from "./product-alert"
+import imageUpload from "../../../components/ImageUpload/index"
 import {
     listShortCategory
 } from "@/api/iot/category";
@@ -91,11 +103,14 @@ export default {
         productThingsModel,
         productApp,
         productAlert,
+        imageUpload,
     },
     data() {
         return {
-            // 产品信息
-            product: {},
+            // 输入框类型
+            keyInputType: "password",
+            accountInputType: "password",
+            passwordInputType: "password",
             // 选中选项卡
             activeName: 'basic',
             // 分类短列表
@@ -119,6 +134,7 @@ export default {
                     trigger: "blur"
                 }]
             },
+
         };
     },
     created() {
@@ -127,7 +143,6 @@ export default {
         if (productId != 0) {
             getProduct(productId).then(response => {
                 this.form = response.data;
-                this.product = response.data;
             });
         }
         // 获取简短分类列表
@@ -180,7 +195,6 @@ export default {
                         addProduct(this.form).then(response => {
                             this.$modal.alertSuccess("添加成功");
                             this.form = response.data;
-                            this.product = response.data;
                         });
                     }
                 }
@@ -195,6 +209,20 @@ export default {
                 }
             }
         },
+        /**获取上传图片的路径 */
+        getImagePath(data) {
+            this.form.imgUrl = data;
+        },
+        /**改变输入框类型**/
+        changeInputType(name) {
+            if (name == "key") {
+                this.keyInputType = this.keyInputType == "password" ? "text" : "password";
+            } else if (name == "account") {
+                this.accountInputType = this.accountInputType == "password" ? "text" : "password";
+            } else if (name == "password") {
+                this.passwordInputType = this.passwordInputType == "password" ? "text" : "password";
+            }
+        }
     }
 };
 </script>

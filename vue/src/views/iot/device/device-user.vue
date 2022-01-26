@@ -8,7 +8,7 @@
         <right-toolbar @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="deviceUserList" @selection-change="handleSelectionChange" border size="mini">
+    <el-table v-loading="loading" :data="deviceUserList" @selection-change="handleSelectionChange" size="mini">
         <el-table-column label="用户昵称" align="center" prop="userName" width="200" />
         <el-table-column label="手机号码" align="center" prop="phonenumber" width="200" />
         <el-table-column label="设备所有者" align="center" prop="isOwner" width="100">
@@ -16,7 +16,6 @@
                 <dict-tag :options="dict.type.iot_yes_no" :value="scope.row.isOwner" />
             </template>
         </el-table-column>
-        <el-table-column label="设备名称" align="center" prop="deviceName" width="200" />
         <el-table-column label="创建时间" align="center" prop="createTime" width="150">
             <template slot-scope="scope">
                 <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>

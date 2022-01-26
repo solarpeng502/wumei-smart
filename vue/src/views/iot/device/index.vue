@@ -1,7 +1,7 @@
 <template>
 <div style="padding:6px;">
     <el-card v-show="showSearch" style="margin-bottom:6px;">
-        <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px" style="margin-bottom:-20px;">
+        <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="75px" style="margin-bottom:-20px;">
             <el-form-item label="设备名称" prop="deviceName">
                 <el-input v-model="queryParams.deviceName" placeholder="请输入设备名称" clearable size="small" @keyup.enter.native="handleQuery" />
             </el-form-item>
@@ -16,15 +16,9 @@
             <el-form-item label="激活时间">
                 <el-date-picker v-model="daterangeActiveTime" size="small" style="width: 240px" value-format="yyyy-MM-dd" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
             </el-form-item>
-            <el-form-item>
-                <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-                <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-            </el-form-item>
         </el-form>
-    </el-card>
 
-    <el-card style="padding-bottom:100px;">
-        <el-row :gutter="10" class="mb8">
+        <el-row :gutter="10" class="mb8" style="margin-bottom:-5px;margin-top:10px;">
             <el-col :span="1.5">
                 <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleEditDevice(0)" v-hasPermi="['iot:device:add']">新增</el-button>
             </el-col>
@@ -37,11 +31,118 @@
             <el-col :span="1.5">
                 <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" v-hasPermi="['iot:device:export']">导出</el-button>
             </el-col>
+            <el-col :span="1.5">
+                <el-button type="info" plain icon="el-icon-document-copy" size="mini" @click="changeViewType" v-hasPermi="['iot:device:list']">切换视图</el-button>
+            </el-col>
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
+    </el-card>
 
-        <el-table v-loading="loading" :data="deviceList" @selection-change="handleSelectionChange" border>
+    <el-card style="padding-bottom:100px;">
+        <el-row :gutter="40" v-if="viewType=='card'">
+            <el-col :span="6" v-for="(item,index) in deviceList" :key="index" style="margin-bottom:40px;text-align:center;">
+                <el-card :body-style="{ padding: '0px'}" shadow="always" style="height:460px;" >
+                    <el-image style="width:100%;height:150px;" lazy :preview-src-list="[baseUrl+item.imgUrl]" :src="baseUrl+item.imgUrl" fit="cover" v-if="item.imgUrl!=null && item.imgUrl!=''"></el-image>
+                    <el-image style="width:100%;height:150px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else></el-image>
+                    <el-descriptions :column="2" size="medium" :title="item.deviceName+'（ v '+item.firmwareVersion+' ）'" style="padding:10px;">
+                        <template slot="extra">
+                            <div style="font-size:28px;color:#ccc;">
+                                <svg-icon v-if="item.status==3 && item.rssi >= '-55'" icon-class="wifi_4" />
+                                <svg-icon v-else-if="item.status==3 && item.rssi >= '-70' && item.rssi < '-55' " icon-class="wifi_3" />
+                                <svg-icon v-else-if="item.status==3 && item.rssi >= '-85' && item.rssi < '-70' " icon-class="wifi_2" />
+                                <svg-icon v-else-if="item.status==3 && item.rssi >= '-100' && item.rssi < '-85' " icon-class="wifi_1" />
+                                <svg-icon v-else icon-class="wifi_0" />
+                            </div>
+                        </template>
+                        <el-descriptions-item label="设备状态">
+                            <dict-tag :options="dict.type.iot_device_status" :value="item.status" size="mini" />
+                        </el-descriptions-item>
+                        <el-descriptions-item label="产品名称">
+                            <el-link type="primary" :underline="false">{{item.productName}}</el-link>
+                        </el-descriptions-item>
+                        <el-descriptions-item label="设备影子">
+                            <dict-tag :options="dict.type.iot_is_enable" :value="item.isShadow" size="mini" />
+                        </el-descriptions-item>
+                        <el-descriptions-item label="激活时间">
+                            <span>{{ parseTime(item.activeTime, '{y}-{m}-{d}') }}</span>
+                        </el-descriptions-item>
+                        <el-descriptions-item label="设备编号">
+                            {{item.serialNumber}}
+                        </el-descriptions-item>
+                    </el-descriptions>
+
+                    <el-descriptions :column="2" border size="mini" style="padding:0 10px;height:70px;overflow:hidden;">
+                        <el-descriptions-item v-for="subItem in item.readOnlyList" :key="subItem.id">
+                            <template slot="label">
+                                <span style="white-space: nowrap;text-overflow: ellipsis">{{subItem.name}}</span>
+                            </template>
+                            <el-link type="primary" :underline="false">{{subItem.value}} {{subItem.unit==null?"":subItem.unit}}</el-link>
+                        </el-descriptions-item>
+                        <el-descriptions-item v-for="subItem in item.boolList" :key="subItem.id">
+                            <template slot="label">
+                                <div style="white-space: nowrap;text-overflow:ellipsis;width:40px;overflow:hidden;" :title="subItem.name">{{subItem.name}}</div>
+                            </template>
+                            <el-switch v-model="subItem.value" active-text="" inactive-text="" :active-value="'1'" :inactive-value="'0'" />
+                        </el-descriptions-item>
+                        <el-descriptions-item v-for="subItem in item.enumList" :key="subItem.id">
+                            <template slot="label">
+                                <div style="white-space: nowrap;text-overflow:ellipsis;width:40px;overflow:hidden;" :title="subItem.name">{{subItem.name}}</div>
+                            </template>
+                            <el-select v-model="subItem.value" placeholder="请选择" clearable size="mini" :title="subItem.name">
+                                <el-option v-for="children in subItem.enumList" :key="children.value" :label="children.text" :value="children.value" />
+                            </el-select>
+                        </el-descriptions-item>
+                        <el-descriptions-item v-for="subItem in item.decimalList" :key="subItem.id">
+                            <template slot="label">
+                                <div style="white-space: nowrap;text-overflow:ellipsis;width:40px;overflow:hidden;" :title="subItem.name">{{subItem.name}}</div>
+                            </template>
+                            <el-input v-model="subItem.value" :placeholder="'小数：'+subItem.name" size="mini" :title="'小数：'+subItem.name">
+                                <el-button slot="append" icon="el-icon-s-promotion" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
+                            </el-input>
+                        </el-descriptions-item>
+                        <el-descriptions-item v-for="subItem in item.integerList" :key="subItem.id">
+                            <template slot="label">
+                                <div style="white-space: nowrap;text-overflow:ellipsis;width:40px;overflow:hidden;" :title="subItem.name">{{subItem.name}}</div>
+                            </template>
+                            <el-input v-model="subItem.value" :placeholder="'整数：'+subItem.name" :title="'整数：'+subItem.name" size="mini">
+                                <el-button slot="append" icon="el-icon-s-promotion" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
+                            </el-input>
+                        </el-descriptions-item>
+                        <el-descriptions-item v-for="subItem in item.arrayList" :key="subItem.id">
+                            <template slot="label">
+                                <div style="white-space: nowrap;text-overflow:ellipsis;width:40px;overflow:hidden;" :title="subItem.name">{{subItem.name}}</div>
+                            </template>
+                            <el-input v-model="subItem.value" :placeholder="'数组：'+subItem.name" :title="'数组：'+subItem.name" size="mini">
+                                <el-button slot="append" icon="el-icon-s-promotion" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
+                            </el-input>
+                        </el-descriptions-item>
+                        <el-descriptions-item v-for="subItem in item.stringList" :key="subItem.id">
+                            <template slot="label">
+                                <div style="white-space: nowrap;text-overflow:ellipsis;width:40px;overflow:hidden;" :title="subItem.name">{{subItem.name}}</div>
+                            </template>
+                            <el-input v-model="subItem.value" :placeholder="'字符串：'+subItem.name" :title="'字符串：'+subItem.name" size="mini">
+                                <el-button slot="append" icon="el-icon-s-promotion" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
+                            </el-input>
+                        </el-descriptions-item>
+                    </el-descriptions>
+                    <el-button-group style="padding:10px;margin-top:5px;">
+                        <el-button type="success" size="mini" icon="el-icon-odometer" @click="handleMonitor(item)" v-hasPermi="['iot:device:edit']">实时监测</el-button>
+                        <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleEditDevice(item)" v-hasPermi="['iot:device:edit']">查看详情 </el-button>
+                        <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDelete(item)" v-hasPermi="['iot:device:remove']">删除</el-button>
+                        <el-button type="info" size="mini">查看物模型</el-button>
+                    </el-button-group>
+                </el-card>
+            </el-col>
+        </el-row>
+
+        <el-table v-loading="loading" :data="deviceList" @selection-change="handleSelectionChange" v-if="viewType=='list'">
             <el-table-column type="selection" width="55" align="center" />
+            <el-table-column label="图片" align="center" prop="imgUrl">
+                <template slot-scope="scope">
+                    <el-image style="height: 70px" lazy :preview-src-list="[baseUrl+scope.row.imgUrl]" :src="baseUrl+scope.row.imgUrl" fit="cover" v-if="scope.row.imgUrl!=null && scope.row.imgUrl!=''"></el-image>
+                    <el-image style="height: 70px" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else></el-image>
+                </template>
+            </el-table-column>
             <el-table-column label="设备名称" align="center" prop="deviceName">
                 <template slot-scope="scope">
                     <el-link type="primary" :underline="false" @click="handleEditDevice(scope.row)">{{scope.row.deviceName}}</el-link>
@@ -49,10 +150,68 @@
             </el-table-column>
             <el-table-column label="设备编号" align="center" prop="serialNumber" />
             <el-table-column label="产品名称" align="center" prop="productName" />
+            <el-table-column label="运行状态" align="left" min-width="200" prop="list">
+                <template slot-scope="scope">
+                    <el-descriptions :column="1" border size="mini">
+                        <el-descriptions-item v-for="subItem in scope.row.readOnlyList" :key="subItem.id">
+                            <template slot="label">
+                                <span style="white-space: nowrap;">{{subItem.name}}</span>
+                            </template>
+                            <el-link type="primary" :underline="false">{{subItem.value}} {{subItem.unit==null?"":subItem.unit}}</el-link>
+                        </el-descriptions-item>
+                        <el-descriptions-item v-for="subItem in scope.row.boolList" :key="subItem.id">
+                            <template slot="label">
+                                <span style="white-space: nowrap;">{{subItem.name}}</span>
+                            </template>
+                            <el-switch v-model="subItem.value" active-text="" inactive-text="" :active-value="'1'" :inactive-value="'0'" />
+                        </el-descriptions-item>
+                        <el-descriptions-item v-for="subItem in scope.row.enumList" :key="subItem.id">
+                            <template slot="label">
+                                <span style="white-space: nowrap;">{{subItem.name}}</span>
+                            </template>
+                            <el-select v-model="subItem.value" placeholder="请选择" clearable size="mini" :title="subItem.name">
+                                <el-option v-for="children in subItem.enumList" :key="children.value" :label="children.text" :value="children.value" />
+                            </el-select>
+                        </el-descriptions-item>
+                        <el-descriptions-item v-for="subItem in scope.row.decimalList" :key="subItem.id">
+                            <template slot="label">
+                                <span style="white-space: nowrap;">{{subItem.name}}</span>
+                            </template>
+                            <el-input v-model="subItem.value" :placeholder="'小数：'+subItem.name" size="mini" :title="'小数：'+subItem.name">
+                                <el-button slot="append" icon="el-icon-s-promotion" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
+                            </el-input>
+                        </el-descriptions-item>
+                        <el-descriptions-item v-for="subItem in scope.row.integerList" :key="subItem.id">
+                            <template slot="label">
+                                <span style="white-space: nowrap;">{{subItem.name}}</span>
+                            </template>
+                            <el-input v-model="subItem.value" :placeholder="'整数：'+subItem.name" :title="'整数：'+subItem.name" size="mini">
+                                <el-button slot="append" icon="el-icon-s-promotion" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
+                            </el-input>
+                        </el-descriptions-item>
+                        <el-descriptions-item v-for="subItem in scope.row.arrayList" :key="subItem.id">
+                            <template slot="label">
+                                <span style="white-space: nowrap;">{{subItem.name}}</span>
+                            </template>
+                            <el-input v-model="subItem.value" :placeholder="'数组：'+subItem.name" :title="'数组：'+subItem.name" size="mini">
+                                <el-button slot="append" icon="el-icon-s-promotion" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
+                            </el-input>
+                        </el-descriptions-item>
+                        <el-descriptions-item v-for="subItem in scope.row.stringList" :key="subItem.id">
+                            <template slot="label">
+                                <span style="white-space: nowrap;">{{subItem.name}}</span>
+                            </template>
+                            <el-input v-model="subItem.value" :placeholder="'字符串：'+subItem.name" :title="'字符串：'+subItem.name" size="mini">
+                                <el-button slot="append" icon="el-icon-s-promotion" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
+                            </el-input>
+                        </el-descriptions-item>
+                    </el-descriptions>
+                </template>
+            </el-table-column>
             <!-- wifi信号强度(信号极好4格[-55—— 0]，信号好3格[-70—— -55），信号一般2格[-85—— -70），信号差1格[-100—— -85）) -->
             <el-table-column label="信号" align="center" prop="rssi" width="100">
                 <template slot-scope="scope">
-                    <div style="font-size: 30px">
+                    <div style="font-size: 30px;color:#ccc;">
                         <svg-icon v-if="scope.row.status==3 && scope.row.rssi >= '-55'" icon-class="wifi_4" />
                         <svg-icon v-else-if="scope.row.status==3 && scope.row.rssi >= '-70' && scope.row.rssi < '-55' " icon-class="wifi_3" />
                         <svg-icon v-else-if="scope.row.status==3 && scope.row.rssi >= '-85' && scope.row.rssi < '-70' " icon-class="wifi_2" />
@@ -61,47 +220,15 @@
                     </div>
                 </template>
             </el-table-column>
-            <el-table-column label="运行状态" align="left" min-width="150" prop="list">
-                <template slot-scope="scope">
-                    <div v-for="item in scope.row.monitorList" :key="item.id">
-                        <span>{{item.name}}：</span>
-                        <span>{{item.value}}</span>
-                    </div>
-                    <div v-for="item in scope.row.boolList" :key="item.id">
-                        <span>{{item.name}}：</span>
-                        <el-switch v-model="item.value" active-text="" inactive-text="" :active-value="'1'" :inactive-value="'0'" />
-                    </div>
-                    <div v-for="item in scope.row.enumList" :key="item.id" style="margin-top:5px;">
-                        <el-select v-model="item.value" placeholder="请选择" clearable size="mini" :title="item.name">
-                            <el-option v-for="item in item.enumList" :key="item.value" :label="item.text" :value="item.value" />
-                        </el-select>
-                    </div>
-                    <!--<div v-for="item in scope.row.decimalList" :key="item.id" style="margin-top:5px;">
-                        <el-input v-model="item.value" :placeholder="'小数：'+item.name" size="mini" :title="'小数：'+item.name">
-                            <el-button slot="append" icon="el-icon-s-promotion" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
-                        </el-input>
-                    </div>
-                    <div v-for="item in scope.row.integerList" :key="item.id" style="margin-top:5px;">
-                        <el-input v-model="item.value" :placeholder="'整数：'+item.name" :title="'整数：'+item.name" size="mini">
-                            <el-button slot="append" icon="el-icon-s-promotion" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
-                        </el-input>
-                    </div>
-                    <div v-for="item in scope.row.arrayList" :key="item.id" style="margin-top:5px;">
-                        <el-input v-model="item.value" :placeholder="'数组：'+item.name" :title="'数组：'+item.name" size="mini">
-                            <el-button slot="append" icon="el-icon-s-promotion" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
-                        </el-input>
-                    </div>
-                    <div v-for="item in scope.row.stringList" :key="item.id" style="margin-top:5px;">
-                        <el-input v-model="item.value" :placeholder="'字符串：'+item.name" :title="'字符串：'+item.name" size="mini">
-                            <el-button slot="append" icon="el-icon-s-promotion" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
-                        </el-input>
-                    </div> -->
-                </template>
-            </el-table-column>
             <!--设备状态（1-未激活，2-禁用，3-在线，4-离线）-->
             <el-table-column label="设备状态" align="center" prop="status">
                 <template slot-scope="scope">
                     <dict-tag :options="dict.type.iot_device_status" :value="scope.row.status" />
+                </template>
+            </el-table-column>
+            <el-table-column label="设备影子" align="center" prop="isShadow">
+                <template slot-scope="scope">
+                    <dict-tag :options="dict.type.iot_is_enable" :value="scope.row.isShadow" />
                 </template>
             </el-table-column>
             <el-table-column label="固件版本" align="center" prop="firmwareVersion" width="100">
@@ -117,7 +244,7 @@
             </el-table-column>
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="200">
                 <template slot-scope="scope">
-                    <el-button size="small" type="success" style="padding:5px;" icon="el-icon-search" @click="handleMonitor(scope.row)" v-hasPermi="['iot:device:edit']">监测</el-button>
+                    <el-button size="small" type="success" style="padding:5px;" icon="el-icon-odometer" @click="handleMonitor(scope.row)" v-hasPermi="['iot:device:edit']">监测</el-button>
                     <el-button size="small" type="primary" style="padding:5px;" icon="el-icon-edit" @click="handleEditDevice(scope.row)" v-hasPermi="['iot:device:edit']">详情</el-button>
                     <el-button size="small" type="danger" style="padding:5px;" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['iot:device:remove']">删除</el-button>
                 </template>
@@ -144,6 +271,7 @@
 
 <script>
 import mqtt from 'mqtt'
+import * as echarts from 'echarts';
 import {
     listDeviceShort,
     delDevice,
@@ -151,9 +279,11 @@ import {
 
 export default {
     name: "Device",
-    dicts: ['iot_device_status'],
+    dicts: ['iot_device_status', 'iot_is_enable'],
     data() {
         return {
+            // 视图类型
+            viewType:"card",
             // mqtt客户端
             client: {},
             // 遮罩层
@@ -380,10 +510,13 @@ export default {
                 ...this.queryParams
             }, `device_${new Date().getTime()}.xlsx`)
         },
-
+        /**改变视图**/
+        changeViewType(){
+            this.viewType=this.viewType=="card"?"list":"card";
+        },
         /**监测数据 */
         getMonitor() {
-            var myChart = this.$echarts.init(this.$refs.monitor);
+            var myChart = echarts.init(this.$refs.monitor);
             var option;
 
             function randomData() {
@@ -465,7 +598,7 @@ export default {
 
         /**监测数据 */
         getMonitor1() {
-            var myChart = this.$echarts.init(this.$refs.monitor1);
+            var myChart = echarts.init(this.$refs.monitor1);
             var option;
 
             function randomData() {

@@ -396,7 +396,7 @@ export default {
         /** 选择物模型 */
         handleSelect() {
             this.openSelect = true;
-            this.title = "添加物模型";
+            this.title = "导入通用物模型";
             this.form.type = 1;
             this.form.datatype = "integer"
             this.form.specs = {
@@ -420,8 +420,8 @@ export default {
                     productName: this.productInfo.productName,
                     templateIds: this.templateIds
                 }
-                importModel(importData).then(response => {
-                    this.$modal.msgSuccess("导入成功");
+                importModel(importData).then(response => {     
+                    this.$modal.msgSuccess(response.msg);               
                     this.openSelect = false;
                     this.$refs.productSelectTemplate.$refs.selectTemplateTable.clearSelection();
                     this.getList();
@@ -493,7 +493,7 @@ export default {
         // 格式化物模型
         formatThingsSpecs() {
             var data = {};
-            data.datatype = this.form.datatype;
+            data.type = this.form.datatype;
             if (this.form.datatype == "integer" || this.form.datatype == "decimal") {
                 data.min = Number(this.form.specs.min);
                 data.max = Number(this.form.specs.max);
@@ -536,22 +536,22 @@ export default {
         /** 格式化显示数据定义 */
         formatSpecsDisplay(json) {
             let specs = JSON.parse(json);
-            if (specs.datatype === "integer" || specs.datatype === "decimal") {
+            if (specs.type === "integer" || specs.type === "decimal") {
                 return "最大值：<span style=\"color:#F56C6C\">" + specs.max +
                     "</span><br />最小值：<span style=\"color:#F56C6C\">" + specs.min +
                     "</span><br />步长：<span style=\"color:#F56C6C\">" + specs.step +
                     "</span><br />单位：<span style=\"color:#F56C6C\">" + specs.unit;
-            } else if (specs.datatype === "string") {
+            } else if (specs.type === "string") {
                 return "最大长度：<span style=\"color:#F56C6C\">" + specs.maxLength + "</span>";
-            } else if (specs.datatype === "array") {
+            } else if (specs.type === "array") {
                 return "数组类型：<span style=\"color:#F56C6C\">" + specs.arrayType + "</span>";
-            } else if (specs.datatype === "enum") {
+            } else if (specs.type === "enum") {
                 let items = "";
                 for (let i = 0; i < specs.enumList.length; i++) {
                     items = items + specs.enumList[i].value + "：<span style='color:#F56C6C'>" + specs.enumList[i].text + "</span><br/>"
                 }
                 return items;
-            } else if (specs.datatype === "bool") {
+            } else if (specs.type === "bool") {
                 return "0：<span style=\"color:#F56C6C\">" + specs.falseText +
                     "</span><br />1：<span style=\"color:#F56C6C\">" + specs.trueText
             }

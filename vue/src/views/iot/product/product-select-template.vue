@@ -30,7 +30,7 @@
                 <el-switch v-model="scope.row.isTop" :active-value="1" :inactive-value="0" active-color="#81c0fb" disabled></el-switch>
             </template>
         </el-table-column>
-        <el-table-column label="实时监测" align="center" prop="isMonitor">
+        <el-table-column label="监测值" align="center" prop="isMonitor">
             <template slot-scope="scope">
                 <el-switch v-model="scope.row.isMonitor" :active-value="1" :inactive-value="0" active-color="#81c0fb" disabled></el-switch>
             </template>

@@ -57,7 +57,7 @@ export default {
     props: {
         productId: {
             type: Number,
-            default: null
+            default: 0
         }
     },
     data() {

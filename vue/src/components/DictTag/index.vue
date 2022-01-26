@@ -7,6 +7,7 @@
           :key="item.value"
           :index="index"
           :class="item.raw.cssClass"
+          :size="size"
           >{{ item.label }}</span
         >
         <el-tag
@@ -16,6 +17,7 @@
           :index="index"
           :type="item.raw.listClass == 'primary' ? '' : item.raw.listClass"
           :class="item.raw.cssClass"
+          :size="size"
         >
           {{ item.label }}
         </el-tag>
@@ -33,6 +35,10 @@ export default {
       default: null,
     },
     value: [Number, String, Array],
+    size:{
+      type: String,
+      default:"big"
+    }
   },
   computed: {
     values() {

@@ -1,18 +1,18 @@
 
 ### 一、项目简介
 
-1. wumei-smart是一个简单易用的生活物联网平台。可用于企业搭建私域物联网，个人学习和搭建自己的智能家居平台。项目包含服务端、web端、移动端、设备端SDK、以及手机和电脑端的设备模拟器（可用于控制和监测手机、电脑）。
+1. 物美智能([wumei-smart](http://www.wumei.live/introduce.html))]是一个简单易用的生活物联网平台。可用于搭建物联网平台以及二次开发和学习。
 
-2. 服务端采用Spring boot；前端采用Vue；移动端采用Uniapp；数据库采用Mysql、Redis和TDengine；设备端支持多种硬件SDK生成，例如ESP32、ESP8266、树莓派等；设备模拟器采用Android和Winform框架，不仅能模拟硬件设备，还可以控制和监测电脑、手机。
+2. 服务端使用spring boot；数据库mysql、redis和InfluxDB；前端vue；移动端uniapp，支持安卓、苹果和小程序；硬件端目前支持esp8266、esp32和树莓派。软硬件交互基于Mqtt协议，使用EMQX的broken作为消息服务器。
 
-3.项目在不断开发中...
+
 
 <br />
 
 
 ### 二、功能
 - 物模型管理（属性、功能、事件）
-- 多租户
+- 多租户（管理员-管理系统、角色、权限、产品、设备；租户-管理账号下产品和设备；用户-管理自己设备和分组）
 - 产品管理
 - 产品分类
 - 固件管理
@@ -31,7 +31,8 @@
 - 接入智能音箱
 - 自定义Topic
 - 相关文档编写
-
+- 设备通用的Http查询接口（例如天气）
+- ...
 
  
 ### 四、技术栈    
@@ -58,7 +59,8 @@
 <br />
 
 ### 五、加入互助交流群:1073236354
-<br />
+<a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=P_oc91N6KC39zp2PEV_-BY3xMnAokeZ8&jump_from=webapi"><img border="0" src="//pub.idqqimg.com/wpa/images/group.png" alt="物美智能wumeismart" title="物美智能wumeismart"></a> 
+<br /><br />
 
 ### 八、测试账号：默认
 * [进入登录界面>>>](http://wumei.live:89/)

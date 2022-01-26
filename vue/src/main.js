@@ -37,8 +37,6 @@ import VueMeta from 'vue-meta'
 import DictData from '@/components/DictData'
 // Echart
 import echarts from 'echarts';
-// 调用preventDefault函数来阻止事件的默认行为
-import 'default-passive-events'
 
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts
@@ -86,3 +84,9 @@ new Vue({
   store,
   render: h => h(App)
 })
+
+// 带有边框
+Element.Table.props.border = {
+  default:true,
+  type:Boolean
+}

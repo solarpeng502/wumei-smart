@@ -47,6 +47,7 @@
                     <span>v </span> {{scope.row.version}}
                 </template>
             </el-table-column>
+            <el-table-column label="路径" align="left" prop="filePath" />
             <el-table-column label="创建时间" align="center" prop="createTime" width="180">
                 <template slot-scope="scope">
                     <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
@@ -78,12 +79,9 @@
                 <el-form-item label="固件版本" prop="version">
                     <el-input v-model="form.version" placeholder="请输入固件版本" />
                 </el-form-item>
+
                 <el-form-item label="固件上传" prop="filePath">
-                    <el-upload ref="upload" :limit="1" accept="" :action="upload.url" :headers="upload.headers" :file-list="upload.fileList" :on-progress="handleFileUploadProgress" :on-success="handleFileSuccess" :auto-upload="false">
-                        <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-                        <el-button style="margin-left: 10px;" size="small" type="success" :loading="upload.isUploading" @click="submitUpload">上传到服务器</el-button>
-                        <div slot="tip" class="el-upload__tip"></div>
-                    </el-upload>
+                    <fileUpload ref="file-upload" :value="form.filePath" :limit="1" :fileSize="10" :fileType='["bin", "zip", "pdf"]' @input="getFilePath($event)"></fileUpload>
                 </el-form-item>
                 <el-form-item label="备注" prop="remark">
                     <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -101,6 +99,10 @@
 
 <script>
 import {
+    download
+} from '@/api/iot/tool'
+import fileUpload from '../../../components/FileUpload/index'
+import {
     listShortProduct
 } from "@/api/iot/product"
 import {
@@ -117,6 +119,9 @@ import {
 export default {
     name: "Firmware",
     dicts: ["iot_yes_no"],
+    components: {
+        fileUpload
+    },
     data() {
         return {
             // 遮罩层
@@ -202,7 +207,7 @@ export default {
                     Authorization: "Bearer " + getToken()
                 },
                 // 上传的地址
-                url: process.env.VUE_APP_BASE_API + "/iot/firmware/upload",
+                url: process.env.VUE_APP_BASE_API + "/iot/tool/upload",
                 // 上传的文件列表
                 fileList: []
             },
@@ -338,6 +343,11 @@ export default {
                 }
             }
         },
+        // 获取文件路径
+        getFilePath(data){
+            console.log(data);
+            this.form.filePath=data;
+        },
 
         // 文件提交处理
         submitUpload() {
@@ -355,14 +365,7 @@ export default {
         },
         // 文件下载处理
         handleDownload(row) {
-            var name = row.firmwareName;
-            var url = process.env.VUE_APP_BASE_API + "/iot/firmware/download?fileName=" + row.filePath;
-            var suffix = url.substring(url.lastIndexOf("."), url.length);
-            const a = document.createElement('a')
-            a.setAttribute('download', name + suffix)
-            a.setAttribute('target', '_blank')
-            a.setAttribute('href', url)
-            a.click()
+            download(row.filePath);
         }
 
     },

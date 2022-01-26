@@ -2,7 +2,7 @@
 <div style="padding:6px;">
     <el-row :gutter="10">
         <el-col :span="24" id="parent">
-            <div id="monitor" ref="monitor" style="height:400px;width:1500px;"></div>
+            <div id="monitor" ref="monitor" style="height:600px;width:1500px;"></div>
         </el-col>
         <el-col :span="24"></el-col>
     </el-row>
@@ -26,7 +26,7 @@ export default {
     methods: {
         /**监测数据 */
         getMonitor() {
-            var myChart = this.$echarts.init(this.$refs.monitor);
+            var myChart = echarts.init(this.$refs.monitor);
             var option;
 
             let base = +new Date(2010, 9, 3);
