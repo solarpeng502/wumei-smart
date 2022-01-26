@@ -1,12 +1,11 @@
 'use strict'
 const path = require('path')
-const defaultSettings = require('./src/settings.js')
 
 function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = defaultSettings.title || '物美智' // 标题
+const name = process.env.VUE_APP_TITLE || '物美智能系统' // 网页标题
 
 const port = process.env.port || process.env.npm_config_port || 80 // 端口
 
@@ -49,7 +48,7 @@ module.exports = {
       alias: {
         '@': resolve('src')
       }
-    }
+    },
   },
   chainWebpack(config) {
     config.plugins.delete('preload') // TODO: need test
@@ -110,7 +109,7 @@ module.exports = {
           config.optimization.runtimeChunk('single'),
           {
              from: path.resolve(__dirname, './public/robots.txt'), //防爬虫文件
-             to: './', //到根目录下
+             to: './' //到根目录下
           }
         }
       )

@@ -1,13 +1,3 @@
-/******************************************************************************
- * 作者：kerwincui
- * 时间：2021-06-08
- * 邮箱：164770707@qq.com
- * 源码地址：https://gitee.com/kerwincui/wumei-smart
- * author: kerwincui
- * create: 2021-06-08
- * email：164770707@qq.com
- * source:https://github.com/kerwincui/wumei-smart
- ******************************************************************************/
 import request from '@/utils/request'
 
 // 查询参数列表
@@ -61,19 +51,10 @@ export function delConfig(configId) {
   })
 }
 
-// 清理参数缓存
-export function clearCache() {
+// 刷新参数缓存
+export function refreshCache() {
   return request({
-    url: '/system/config/clearCache',
+    url: '/system/config/refreshCache',
     method: 'delete'
-  })
-}
-
-// 导出参数
-export function exportConfig(query) {
-  return request({
-    url: '/system/config/export',
-    method: 'get',
-    params: query
   })
 }
