@@ -6,6 +6,7 @@
 2. 服务端使用spring boot；数据库mysql、redis和InfluxDB；前端vue；移动端uniapp，支持安卓、苹果和小程序；硬件端目前支持esp8266、esp32和树莓派。软硬件交互基于Mqtt协议，使用EMQX的broken作为消息服务器。
 
 3. 系统架构图
+
 ![架构图](https://github.com/kerwincui/wumei-smart/blob/master/document/sys.png?raw=true)
 
 
