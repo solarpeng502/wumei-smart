@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/springboot/wumei.iml" filepath="$PROJECT_DIR$/springboot/wumei.iml" />
+      <module fileurl="file://$PROJECT_DIR$/springboot/wumei-admin/wumei-admin.iml" filepath="$PROJECT_DIR$/springboot/wumei-admin/wumei-admin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/springboot/wumei-common/wumei-common.iml" filepath="$PROJECT_DIR$/springboot/wumei-common/wumei-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/springboot/wumei-framework/wumei-framework.iml" filepath="$PROJECT_DIR$/springboot/wumei-framework/wumei-framework.iml" />
+      <module fileurl="file://$PROJECT_DIR$/springboot/wumei-generator/wumei-generator.iml" filepath="$PROJECT_DIR$/springboot/wumei-generator/wumei-generator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/springboot/wumei-iot/wumei-iot.iml" filepath="$PROJECT_DIR$/springboot/wumei-iot/wumei-iot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/springboot/wumei-quartz/wumei-quartz.iml" filepath="$PROJECT_DIR$/springboot/wumei-quartz/wumei-quartz.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/wumei-smart.iml" filepath="$PROJECT_DIR$/.idea/wumei-smart.iml" />
+      <module fileurl="file://$PROJECT_DIR$/springboot/wumei-system/wumei-system.iml" filepath="$PROJECT_DIR$/springboot/wumei-system/wumei-system.iml" />
+    </modules>
+  </component>
+</project>
