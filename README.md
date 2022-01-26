@@ -51,8 +51,7 @@
 
 
 ### 五、加入互助交流群:1073236354
-<a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=P_oc91N6KC39zp2PEV_-BY3xMnAokeZ8&jump_from=webapi"><img border="0" src="//pub.idqqimg.com/wpa/images/group.png" alt="物美智能wumeismart" title="物美智能wumeismart"></a> 
-<br /><br />
+
 
 ### 八、测试账号：默认
 * [进入登录界面>>>](http://wumei.live:89/)
