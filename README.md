@@ -3,7 +3,7 @@
 
 1. 物美智能([wumei-smart](http://www.wumei.live/introduce.html))]是一个简单易用的生活物联网平台。可用于搭建物联网平台以及二次开发和学习。
 
-2. 服务端使用spring boot；数据库mysql、redis和InfluxDB；前端vue；移动端uniapp，支持安卓、苹果和小程序；硬件端目前支持esp8266、esp32和树莓派。软硬件交互基于Mqtt协议，使用EMQX的broken作为消息服务器。
+2. 后端采用Spring boot；前端采用Vue；移动端采用Uniapp；数据库采用Mysql、Redis和TDengine；设备端支持多种硬件SDK生成，例如ESP32、ESP8266、树莓派等；设备模拟器采用Android和Winform框架，不仅能模拟硬件设备，还可以控制和监测电脑、手机。
 
 3. 系统架构图
 
