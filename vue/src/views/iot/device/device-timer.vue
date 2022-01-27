@@ -125,19 +125,42 @@
                     <el-form-item label="执行动作">
                         <el-row v-for="(item,index) in form.actions" :key="index" style="margin-bottom:10px;">
                             <el-col :span="4">
-                                <el-select v-model="item.modelType" placeholder="请选择">
-                                    <el-option v-for="subItem in modelTypes" :key="subItem.value" :label="subItem.label" :value="subItem.value">
+                                <el-select v-model="item.type" placeholder="请选择类别">
+                                    <el-option v-for="subItem in modelTypes" :key="subItem.value" :label="subItem.label" :value="subItem.value" @change="thingsModelTypeChange($event,index)">
                                     </el-option>
                                 </el-select>
                             </el-col>
                             <el-col :span="4" :offset="1">
-                                <el-select v-model="item.modelType" placeholder="请选择">
-                                    <el-option v-for="subItem in modelTypes" :key="subItem.value" :label="subItem.label" :value="subItem.value">
+                                <el-select v-model="item.id" placeholder="请选择" v-if="item.type==1" @change="thingsModelItemChange($event,index)">
+                                    <el-option v-for="subItem in thingsModel.properties" :key="subItem.id" :label="subItem.name" :value="subItem.id">
+                                    </el-option>
+                                </el-select>
+                                <el-select v-model="item.id" placeholder="请选择" v-else-if="item.type==2" @change="thingsModelItemChange($event,index)">
+                                    <el-option v-for="subItem in thingsModel.functions" :key="subItem.id" :label="subItem.name" :value="subItem.id">
                                     </el-option>
                                 </el-select>
                             </el-col>
                             <el-col :span="10" :offset="1">
-                                <el-input v-model="item.value" placeholder="值" />
+                                <!--物模型项的值-->
+                                <span v-if="thingsModelItems[index].datatype.type=='integer' || thingsModelItems[index].datatype.type=='decimal'">
+                                    <el-input v-model="item.value" placeholder="值" :max="thingsModelItems[index].datatype.max" :min="thingsModelItems[index].datatype.min" type="number" />
+                                </span>
+                                <span v-else-if="thingsModelItems[index].datatype.type=='bool'">
+                                    <el-switch v-model="item.value" :active-text="thingsModelItems[index].datatype.trueText" :inactive-text="thingsModelItems[index].datatype.falseText" active-value="1" inactive-value="0">
+                                    </el-switch>
+                                </span>
+                                <span v-else-if="thingsModelItems[index].datatype.type=='enum'">
+                                    <el-select v-model="item.value" placeholder="请选择">
+                                        <el-option v-for="subItem in thingsModelItems[index].datatype.enumList" :key="subItem.value" :label="subItem.text" :value="subItem.value">
+                                        </el-option>
+                                    </el-select>
+                                </span>
+                                <span v-else-if="thingsModelItems[index].datatype.type=='string'">
+                                    <el-input v-model="item.value" placeholder="值" :max="thingsModelItems[index].datatype.maxLength" />
+                                </span>
+                                <span v-else-if="thingsModelItems[index].datatype.type=='array'">
+                                    <el-input v-model="item.value" placeholder="值" />
+                                </span>
                             </el-col>
                             <el-col :span="2" :offset="1" v-if="index!=0"><a style="color:#F56C6C" @click="removeEnumItem(index)">删除</a></el-col>
                         </el-row>
@@ -224,7 +247,9 @@ import {
     changeJobStatus
 } from "@/api/iot/deviceJob";
 import Crontab from '@/components/Crontab'
-
+import {
+    cacheJsonThingsModel
+} from "@/api/iot/model";
 export default {
     components: {
         Crontab
@@ -240,12 +265,33 @@ export default {
     watch: {
         // 获取到父组件传递的device后
         device: function (newVal, oldVal) {
-            this.form.deviceId = newVal.deviceId;
-            this.form.deviceName = newVal.deviceName;
+            this.deviceId = newVal.deviceId;
+            this.deviceName = newVal.deviceName;
+            console.log(this.form);
+            // 获取缓存的Json物模型
+            cacheJsonThingsModel(newVal.productId).then(response => {
+                this.thingsModel = JSON.parse(response.data);
+                // 过滤监测数据，监测数据未只读
+                this.thingsModel.properties = this.thingsModel.properties.filter(item => item.isMonitor == 0);
+            });
         }
     },
     data() {
         return {
+            // 物模型JSON
+            thingsModel: {},
+            // 物模型项,对应actions中的项
+            thingsModelItems: [{
+                id: "",
+                name: "",
+                datatype: {
+                    type: "",
+                }
+            }],
+            // 设备ID
+            deviceId:0,
+            // 设备名称
+            deviceName:"",
             // 遮罩层
             loading: true,
             // 选中数组
@@ -326,8 +372,6 @@ export default {
             }],
             // 表单参数
             form: {
-                deviceId: 0,
-                deviceName: "",
                 jobGroup: "DEFAULT", // 定时分组
                 misfirePolicy: 2, // 1=立即执行，2=执行一次，3=放弃执行
                 concurrent: 1, // 是否并发，1=禁止，0=允许
@@ -337,7 +381,8 @@ export default {
                     id: "",
                     name: "",
                     value: "",
-                    modelType: 1, // 1=属性，2=功能
+                    type: 2, // 1=属性，2=功能
+                    source: 2, // 1=设备，2=定时，3=告警输出
                 }]
             },
             // 表单校验
@@ -389,8 +434,6 @@ export default {
                 jobName: undefined,
                 cronExpression: undefined,
                 status: "0",
-                deviceId: 0,
-                deviceName: "",
                 jobGroup: "DEFAULT", // 定时分组
                 misfirePolicy: 2, // 1=立即执行，2=执行一次，3=放弃执行
                 concurrent: 1, // 是否并发，1=禁止，0=允许
@@ -399,10 +442,19 @@ export default {
                     id: "",
                     name: "",
                     value: "",
-                    modelType: 1, // 1=属性，2=功能
-                }]
+                    type: 2, // 1=属性，2=功能
+                    source: 2, // 1=设备，2=定时，3=告警输出
+                }],
             };
-            this.resetForm("form");
+            // 物模型项,对应actions
+            this.thingsModelItems = [{
+                    id: "",
+                    name: "",
+                    datatype: {
+                        type: "",
+                    }
+                }],
+                this.resetForm("form");
         },
         /** 搜索按钮操作 */
         handleQuery() {
@@ -491,6 +543,10 @@ export default {
         submitForm: function () {
             this.$refs["form"].validate(valid => {
                 if (valid) {
+                    console.log(this.form);
+                    this.form.actions[0].deviceId = this.deviceId;
+                    this.form.actions[0].deviceName = this.deviceName;
+                    this.form.actions = JSON.stringify(this.form.actions);
                     if (this.form.jobId != undefined) {
                         updateJob(this.form).then(response => {
                             this.$modal.msgSuccess("修改成功");
@@ -528,12 +584,21 @@ export default {
             this.form.actions.push({
                 id: "",
                 name: "",
-                value: ""
-            })
+                value: "",
+                type: 2, // 1=属性，2=功能，3=事件，5=设备上线，6=设备下线
+                source: 2, // 1=设备，2=定时，3=告警输出
+                deviceId: this.deviceId,
+                deviceName: this.deviceName,
+            });
+            this.thingsModelItems.push({
+                datatype: {}
+            });
+            console.log(this.form.actions);
         },
         /** 删除枚举项 */
         removeEnumItem(index) {
             this.form.actions.splice(index, 1);
+            this.thingsModelItems.splice(index, 1);
         },
         /** 修改重复事件 **/
         repeatChange(data) {
@@ -568,13 +633,41 @@ export default {
             if (this.timerTimeValue == "") {
                 this.$modal.alertError("执行时间不能为空");
             }
-            let minute = this.timerTimeValue.substring(0, 2);
-            let hour = this.timerTimeValue.substring(3);
+            let hour = this.timerTimeValue.substring(0, 2);
+            let minute = this.timerTimeValue.substring(3);
             let week = "*";
             if (this.timerWeekValue.length > 0) {
                 week = this.timerWeekValue;
             }
             this.form.cronExpression = "0 " + minute + " " + hour + " ? * " + week;
+        },
+        /** 物模型项改变事件 **/
+        thingsModelItemChange(identifier, index) {
+            this.form.actions[index].value = "";
+            if (this.form.actions[index].type == 1) {
+                //属性
+                for (let i = 0; i < this.thingsModel.properties.length; i++) {
+                    if (this.thingsModel.properties[i].id == identifier) {
+                        this.form.actions[index].name = this.thingsModel.properties[i].name;
+                        this.thingsModelItems[index] = this.thingsModel.properties[i];
+                        break;
+                    }
+                }
+            } else if (this.form.actions[index].type == 2) {
+                //事件
+                for (let i = 0; i < this.thingsModel.functions.length; i++) {
+                    if (this.thingsModel.functions[i].id == identifier) {
+                        this.form.actions[index].name = this.thingsModel.functions[i].name;
+                        this.thingsModelItems[index] = this.thingsModel.functions[i];
+                        break;
+                    }
+                }
+            }
+            console.log(this.thingsModelItems[index])
+        },
+        /** 物模型类别改变事件 */
+        thingsModelTypeChange(value, index) {
+            // this.form.actions[index]="";
         }
     }
 };

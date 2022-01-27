@@ -66,4 +66,11 @@ public interface IThingsModelService
      * @return 结果
      */
     public int deleteThingsModelByModelId(Long modelId);
+
+    /**
+     * 根据产品ID获取JSON物模型
+     * @param productId
+     * @return
+     */
+    public String getCacheThingsModelByProductId(Long productId);
 }

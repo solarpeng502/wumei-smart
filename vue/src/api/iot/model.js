@@ -51,3 +51,11 @@ export function delModel(modelId) {
     method: 'delete'
   })
 }
+
+// 根据产品ID获取缓存的物模型
+export function cacheJsonThingsModel(productId){
+  return request({
+    url: '/iot/model/cache/' + productId,
+    method: 'get'
+  })
+}

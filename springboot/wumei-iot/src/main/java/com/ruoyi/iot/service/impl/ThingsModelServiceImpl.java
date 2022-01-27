@@ -101,6 +101,11 @@ public class ThingsModelServiceImpl implements IThingsModelService
         return 2;
     }
 
+    /**
+     * 导入通用物模型
+     * @param input
+     * @return
+     */
     @Override
     public int importByTemplateIds(ImportThingsModelInput input){
         // 物模型标识符不能重复 TODO 重复查询待优化
@@ -197,10 +202,11 @@ public class ThingsModelServiceImpl implements IThingsModelService
     }
 
     /**
-     * 根据产品ID获取物模型
+     * 根据产品ID获取JSON物模型
      * @param productId
      * @return
      */
+    @Override
     public String getCacheThingsModelByProductId(Long productId){
         // redis获取物模型
         String thingsModelJson = redisCache.getCacheObject(tslPreKey +productId);
@@ -211,7 +217,7 @@ public class ThingsModelServiceImpl implements IThingsModelService
     }
 
     /**
-     * 根据产品ID更新redis中的物模型
+     * 根据产品ID更新JSON物模型
      * @param productId
      * @return
      */

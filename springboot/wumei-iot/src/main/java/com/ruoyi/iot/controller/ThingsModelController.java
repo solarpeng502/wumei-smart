@@ -124,4 +124,15 @@ public class ThingsModelController extends BaseController
     {
         return toAjax(thingsModelService.deleteThingsModelByModelIds(modelIds));
     }
+
+    /**
+     * 获取缓存的JSON物模型
+     */
+    @PreAuthorize("@ss.hasPermi('iot:device:query')")
+    @GetMapping(value = "/cache/{productId}")
+    @ApiOperation("获取缓存的JSON物模型")
+    public AjaxResult getCacheThingsModelByProductId(@PathVariable("productId") Long productId)
+    {
+        return AjaxResult.success("操作成功",thingsModelService.getCacheThingsModelByProductId(productId));
+    }
 }

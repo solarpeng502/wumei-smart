@@ -70,7 +70,7 @@
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
         <el-form ref="form" :model="form" :rules="rules" label-width="80px">
             <el-row>
-                <el-col :span="21">
+                <el-col :span="15">
                     <el-form-item label="告警名称" prop="alertName">
                         <el-input v-model="form.alertName" placeholder="请输入告警名称" />
                     </el-form-item>
@@ -207,7 +207,7 @@
                 </el-col>
             </el-row>
 
-            <el-col :span="24">
+            <el-col :span="16">
                 <el-form-item label="备注" prop="remark">
                     <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
                 </el-form-item>
@@ -234,6 +234,9 @@ import {
     addAlert,
     updateAlert
 } from "@/api/iot/alert";
+import {
+    cacheJsonThingsModel
+} from "@/api/iot/model";
 import Crontab from '@/components/Crontab'
 export default {
     name: "device-alert",
@@ -253,10 +256,16 @@ export default {
             this.productInfo = newVal;
             this.queryParams.productId = this.productInfo.productId;
             this.getList();
+            // 获取缓存的Json物模型
+            cacheJsonThingsModel(newVal.productId).then(response => {
+                this.thingsModel = JSON.parse(response.data);
+            });
         }
     },
     data() {
         return {
+            // 物模型JSON
+            thingsModel:{},
             // 遮罩层
             loading: true,
             // 选中数组
@@ -411,7 +420,7 @@ export default {
     },
 
     created() {
-        this.getList();
+        // this.getList();
     },
     methods: {
         /** 查询设备告警列表 */
@@ -487,7 +496,7 @@ export default {
         handleAdd() {
             this.reset();
             this.open = true;
-            this.title = "添加设备告警";
+            this.title = "添加自定义告警";
         },
         /** 修改按钮操作 */
         handleUpdate(row) {
