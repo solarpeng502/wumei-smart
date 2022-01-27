@@ -3,7 +3,7 @@
     <el-row :gutter="10">
         <el-col :span="24">
             <el-card style="margin:-10px;margin-bottom:20px;" shadow="hover">
-                <span style="font-weight:bold;">物美智能 - 开源生活物联网平台</span>
+                <span style="font-weight:bold;">wumei smart - 开源生活物联网平台</span>
                 <el-link href="https://gitee.com/kerwincui/wumei-smart/wikis/" target="_blank" type="primary" style="margin-left:20px;">项目文档 >></el-link>
                 <el-link href="https://github.com/kerwincui/wumei-smart" target="_blank" type="danger" style="margin-left:20px;">Github源码 >></el-link>
                 <el-link href="https://gitee.com/kerwincui/wumei-smart" target="_blank" type="success" style="margin-left:20px;">码云源码 >></el-link>
@@ -11,16 +11,16 @@
         </el-col>
         <el-col :span="16">
             <el-card style="margin:-10px;" shadow="hover">
-                <div ref="map" style="height:600px;margin:-10px;margin-top:-5px;"></div>
+                <div ref="map" style="height:620px;margin:-10px;margin-top:-5px;"></div>
             </el-card>
         </el-col>
 
         <el-col :span="8">
             <el-card style="margin:-10px;margin-left:10px;" shadow="hover">
-                <div class="my-charts" ref="myChart" style="height:280px;"></div>
+                <div class="my-charts" ref="myChart" style="height:290px;"></div>
             </el-card>
             <el-card style="margin:-10px;margin-left:10px;margin-top:20px;" shadow="hover">
-                <div class="my-charts" ref="myChart1" style="height:260px;"></div>
+                <div class="my-charts" ref="myChart1" style="height:270px;"></div>
             </el-card>
         </el-col>
     </el-row>
@@ -1026,7 +1026,7 @@ export default {
                         res.push({
                             name: data[i].name,
                             // value: geoCoord.concat(data[i].value)
-                            value: geoCoord.concat(100),
+                            value: geoCoord.concat(120),
                         });
                     }
                 }
@@ -1058,7 +1058,7 @@ export default {
                                 featureType: 'land',
                                 elementType: 'all',
                                 stylers: {
-                                    color: '#f3f3f3'
+                                    color: '#FFFFFF'
                                 }
                             },
                             {
@@ -1179,7 +1179,7 @@ export default {
                             show: false
                         },
                         itemStyle: {
-                            color: '#909399'
+                            color: '#F56C6C'
                         },
                         emphasis: {
                             label: {

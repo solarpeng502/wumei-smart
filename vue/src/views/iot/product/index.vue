@@ -39,11 +39,17 @@
     </el-card>
 
     <el-card style="padding-bottom:100px;">
-        <el-row :gutter="40" v-if="viewType=='card'">
+        <el-row :gutter="40" v-loading="loading" v-if="viewType=='card'">
             <el-col :span="6" v-for="(item,index) in productList" :key="index" style="margin-bottom:40px;text-align:center;">
-                <el-card :body-style="{ padding: '0px'}" shadow="always" style="height:450px;">
-                    <el-image style="width:100%;height:200px;" lazy :preview-src-list="[baseUrl+item.imgUrl]" :src="baseUrl+item.imgUrl" fit="cover" v-if="item.imgUrl!=null && item.imgUrl!=''"></el-image>
-                    <el-image style="width:100%;height:200px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else></el-image>
+                <el-card :body-style="{ padding: '0px'}" shadow="always">
+                    <el-image style="width:100%;height:170px;" lazy :preview-src-list="[baseUrl+item.imgUrl]" :src="baseUrl+item.imgUrl" fit="cover" v-if="item.imgUrl!=null && item.imgUrl!=''"></el-image>
+                    <!-- 用于显示本地计算机、手机、树莓派等设备图片-->
+                    <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else-if="item.productId==1"></el-image>
+                    <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else-if="item.productId==2"></el-image>
+                    <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/raspberry.jpg')]" :src="require('@/assets/images/raspberry.jpg')" fit="cover" v-else-if="item.productId==3"></el-image>
+                    <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/telphone.jpg')]" :src="require('@/assets/images/telphone.jpg')" fit="cover" v-else-if="item.productId==4"></el-image>
+                    <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/computer.jpg')]" :src="require('@/assets/images/computer.jpg')" fit="cover" v-else-if="item.productId==5"></el-image>
+                    <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else></el-image>
                     <el-descriptions :column="2" size="medium" :title="item.productName" style="padding:10px;">
                         <template slot="extra">
                             <dict-tag :options="dict.type.iot_product_status" :value="item.status" size="medium" />
@@ -70,11 +76,11 @@
                             {{item.remark}}
                         </el-descriptions-item>
                     </el-descriptions>
-                    <el-button-group style="padding:10px;padding-top:0;">
+                    <el-button-group style="padding:0 10px 20px 10px;">
                         <el-button size="mini" type="primary" icon="el-icon-edit" @click="handleEditProduct(item)" v-hasPermi="['tool:gen:edit']">详情</el-button>
                         <el-button size="mini" type="danger" icon="el-icon-delete" @click="handleDelete(item)" v-hasPermi="['iot:product:remove']">删除</el-button>
-                        <el-button size="mini" type="success" icon="el-icon-edit" @click="handleGeneratorSDK(item)" v-hasPermi="['iot:product:edit']">设备端SDK</el-button>
-                        <el-button size="mini" type="info">查看物模型</el-button>
+                        <el-button size="mini" type="success" icon="el-icon-edit" @click="handleGeneratorSDK(item)" v-hasPermi="['iot:product:edit']">下载SDK</el-button>
+                        <el-button size="mini" type="info">物模型</el-button>
                     </el-button-group>
                 </el-card>
             </el-col>

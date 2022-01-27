@@ -16,6 +16,10 @@
             <el-form-item label="激活时间">
                 <el-date-picker v-model="daterangeActiveTime" size="small" style="width: 240px" value-format="yyyy-MM-dd" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
             </el-form-item>
+            <el-form-item>
+                <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+                <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+            </el-form-item>
         </el-form>
 
         <el-row :gutter="10" class="mb8" style="margin-bottom:-5px;margin-top:10px;">
@@ -34,16 +38,21 @@
             <el-col :span="1.5">
                 <el-button type="info" plain icon="el-icon-document-copy" size="mini" @click="changeViewType" v-hasPermi="['iot:device:list']">切换视图</el-button>
             </el-col>
-            <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
     </el-card>
 
     <el-card style="padding-bottom:100px;">
-        <el-row :gutter="40" v-if="viewType=='card'">
+        <el-row :gutter="40" v-loading="loading" v-if="viewType=='card'">
             <el-col :span="6" v-for="(item,index) in deviceList" :key="index" style="margin-bottom:40px;text-align:center;">
-                <el-card :body-style="{ padding: '0px'}" shadow="always" style="height:460px;" >
-                    <el-image style="width:100%;height:150px;" lazy :preview-src-list="[baseUrl+item.imgUrl]" :src="baseUrl+item.imgUrl" fit="cover" v-if="item.imgUrl!=null && item.imgUrl!=''"></el-image>
-                    <el-image style="width:100%;height:150px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else></el-image>
+                <el-card :body-style="{ padding: '0px'}" shadow="always">
+                    <el-image style="width:100%;height:90px;" lazy :preview-src-list="[baseUrl+item.imgUrl]" :src="baseUrl+item.imgUrl" fit="cover" v-if="item.imgUrl!=null && item.imgUrl!=''"></el-image>
+                    <!-- 用于显示本地计算机、手机、树莓派等设备图片-->
+                    <el-image style="width:100%;height:90px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else-if="item.productId==1"></el-image>
+                    <el-image style="width:100%;height:90px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else-if="item.productId==2"></el-image>
+                    <el-image style="width:100%;height:90px;" :preview-src-list="[require('@/assets/images/raspberry.jpg')]" :src="require('@/assets/images/raspberry.jpg')" fit="cover" v-else-if="item.productId==3"></el-image>
+                    <el-image style="width:100%;height:90px;" :preview-src-list="[require('@/assets/images/telphone.jpg')]" :src="require('@/assets/images/telphone.jpg')" fit="cover" v-else-if="item.productId==4"></el-image>
+                    <el-image style="width:100%;height:90px;" :preview-src-list="[require('@/assets/images/computer.jpg')]" :src="require('@/assets/images/computer.jpg')" fit="cover" v-else-if="item.productId==5"></el-image>
+                    <el-image style="width:100%;height:90px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else></el-image>
                     <el-descriptions :column="2" size="medium" :title="item.deviceName+'（ v '+item.firmwareVersion+' ）'" style="padding:10px;">
                         <template slot="extra">
                             <div style="font-size:28px;color:#ccc;">
@@ -71,12 +80,12 @@
                         </el-descriptions-item>
                     </el-descriptions>
 
-                    <el-descriptions :column="2" border size="mini" style="padding:0 10px;height:70px;overflow:hidden;">
+                    <el-descriptions :column="2" border size="mini" style="padding:0 10px;height:80px;overflow:hidden;">
                         <el-descriptions-item v-for="subItem in item.readOnlyList" :key="subItem.id">
                             <template slot="label">
                                 <span style="white-space: nowrap;text-overflow: ellipsis">{{subItem.name}}</span>
                             </template>
-                            <el-link type="primary" :underline="false">{{subItem.value}} {{subItem.unit==null?"":subItem.unit}}</el-link>
+                            <el-link type="primary" :underline="false" style="white-space: nowrap;">{{subItem.value}} {{subItem.unit==null?"":subItem.unit}}</el-link>
                         </el-descriptions-item>
                         <el-descriptions-item v-for="subItem in item.boolList" :key="subItem.id">
                             <template slot="label">
@@ -125,11 +134,10 @@
                             </el-input>
                         </el-descriptions-item>
                     </el-descriptions>
-                    <el-button-group style="padding:10px;margin-top:5px;">
+                    <el-button-group style="padding:10px 10px 20px 10px;">
                         <el-button type="success" size="mini" icon="el-icon-odometer" @click="handleMonitor(item)" v-hasPermi="['iot:device:edit']">实时监测</el-button>
-                        <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleEditDevice(item)" v-hasPermi="['iot:device:edit']">查看详情 </el-button>
+                        <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleEditDevice(item)" v-hasPermi="['iot:device:edit']">详情 </el-button>
                         <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDelete(item)" v-hasPermi="['iot:device:remove']">删除</el-button>
-                        <el-button type="info" size="mini">查看物模型</el-button>
                     </el-button-group>
                 </el-card>
             </el-col>
@@ -283,7 +291,7 @@ export default {
     data() {
         return {
             // 视图类型
-            viewType:"card",
+            viewType: "card",
             // mqtt客户端
             client: {},
             // 遮罩层
@@ -511,8 +519,8 @@ export default {
             }, `device_${new Date().getTime()}.xlsx`)
         },
         /**改变视图**/
-        changeViewType(){
-            this.viewType=this.viewType=="card"?"list":"card";
+        changeViewType() {
+            this.viewType = this.viewType == "card" ? "list" : "card";
         },
         /**监测数据 */
         getMonitor() {
