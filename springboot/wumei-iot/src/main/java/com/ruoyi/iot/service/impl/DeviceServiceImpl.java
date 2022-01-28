@@ -374,6 +374,7 @@ public class DeviceServiceImpl implements IDeviceService
             device.setThingsModelValue(JSONObject.toJSONString(getThingsModelDefaultValue(device.getProductId())));
         }else{
             device.setProductId(null);
+            device.setProductName(null);
         }
         return deviceMapper.updateDevice(device);
     }

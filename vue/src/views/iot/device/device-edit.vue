@@ -103,7 +103,7 @@
             <device-log ref="deviceLog" :device="form" />
         </el-tab-pane>
 
-        <el-tab-pane label="设备统计" name="deviceStastic" :disabled="form.deviceId==undefined">
+        <el-tab-pane label="监测统计" name="deviceStastic" :disabled="form.deviceId==undefined">
             <device-statistic ref="deviceStatistic" :device="form" />
         </el-tab-pane>
     </el-tabs>
@@ -274,6 +274,7 @@ export default {
         getProductData(product) {
             this.form.productId = product.productId;
             this.form.productName = product.productName;
+            console.log(product);
         },
         // 获取选中的用户
         getUserData(user) {

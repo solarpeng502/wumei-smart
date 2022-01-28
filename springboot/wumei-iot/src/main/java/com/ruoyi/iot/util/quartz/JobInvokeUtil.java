@@ -24,11 +24,20 @@ public class JobInvokeUtil
      */
     public static void invokeMethod(DeviceJob deviceJob) throws Exception
     {
-        String invokeTarget = deviceJob.getActions();
-        System.out.println("------------------------执行了一次任务-----------------------------");
+        String actions = deviceJob.getActions();
+        if(deviceJob.getJobType()==1){
+            // 定时
 
+            System.out.println("------------------------执行了一次定时任务-----------------------------");
+        }else if(deviceJob.getJobType()==2){
+            // 告警
 
+            System.out.println("------------------------执行了一次告警-----------------------------");
+        }else if(deviceJob.getJobType()==3){
+            // 场景联动
 
+            System.out.println("------------------------执行了一次场景联动-----------------------------");
+        }
     }
 
 

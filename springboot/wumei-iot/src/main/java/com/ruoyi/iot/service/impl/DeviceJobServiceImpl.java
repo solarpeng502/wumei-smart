@@ -42,8 +42,7 @@ public class DeviceJobServiceImpl implements IDeviceJobService
         List<DeviceJob> jobList = jobMapper.selectJobAll();
         for (DeviceJob deviceJob : jobList)
         {
-            DeviceJob job=null;
-            ScheduleUtils.createScheduleJob(scheduler, job);
+            ScheduleUtils.createScheduleJob(scheduler, deviceJob);
         }
     }
 
@@ -196,12 +195,10 @@ public class DeviceJobServiceImpl implements IDeviceJobService
     @Transactional(rollbackFor = Exception.class)
     public int insertJob(DeviceJob deviceJob) throws SchedulerException, TaskException
     {
-        deviceJob.setStatus(ScheduleConstants.Status.PAUSE.getValue());
         int rows = jobMapper.insertJob(deviceJob);
         if (rows > 0)
         {
-            DeviceJob job=null;
-            ScheduleUtils.createScheduleJob(scheduler, job);
+            ScheduleUtils.createScheduleJob(scheduler, deviceJob);
         }
         return rows;
     }
@@ -209,17 +206,17 @@ public class DeviceJobServiceImpl implements IDeviceJobService
     /**
      * 更新任务的时间表达式
      * 
-     * @param job 调度信息
+     * @param deviceJob 调度信息
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateJob(DeviceJob job) throws SchedulerException, TaskException
+    public int updateJob(DeviceJob deviceJob) throws SchedulerException, TaskException
     {
-        DeviceJob properties = selectJobById(job.getJobId());
-        int rows = jobMapper.updateJob(job);
+        DeviceJob properties = selectJobById(deviceJob.getJobId());
+        int rows = jobMapper.updateJob(deviceJob);
         if (rows > 0)
         {
-            updateSchedulerJob(job, properties.getJobGroup());
+            updateSchedulerJob(deviceJob, properties.getJobGroup());
         }
         return rows;
     }
@@ -240,8 +237,7 @@ public class DeviceJobServiceImpl implements IDeviceJobService
             // 防止创建时存在数据问题 先移除，然后在执行创建操作
             scheduler.deleteJob(jobKey);
         }
-        DeviceJob job=null;
-        ScheduleUtils.createScheduleJob(scheduler, job);
+        ScheduleUtils.createScheduleJob(scheduler, deviceJob);
     }
 
     /**

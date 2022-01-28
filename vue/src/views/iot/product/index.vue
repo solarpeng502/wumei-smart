@@ -44,8 +44,8 @@
                 <el-card :body-style="{ padding: '0px'}" shadow="always">
                     <el-image style="width:100%;height:170px;" lazy :preview-src-list="[baseUrl+item.imgUrl]" :src="baseUrl+item.imgUrl" fit="cover" v-if="item.imgUrl!=null && item.imgUrl!=''"></el-image>
                     <!-- 用于显示本地计算机、手机、树莓派等设备图片-->
-                    <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else-if="item.productId==1"></el-image>
-                    <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else-if="item.productId==2"></el-image>
+                    <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/esp8266.jpg')]" :src="require('@/assets/images/esp8266.jpg')" fit="cover" v-else-if="item.productId==1"></el-image>
+                    <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/esp32.jpg')]" :src="require('@/assets/images/esp32.jpg')" fit="cover" v-else-if="item.productId==2"></el-image>
                     <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/raspberry.jpg')]" :src="require('@/assets/images/raspberry.jpg')" fit="cover" v-else-if="item.productId==3"></el-image>
                     <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/telphone.jpg')]" :src="require('@/assets/images/telphone.jpg')" fit="cover" v-else-if="item.productId==4"></el-image>
                     <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/computer.jpg')]" :src="require('@/assets/images/computer.jpg')" fit="cover" v-else-if="item.productId==5"></el-image>
@@ -91,8 +91,13 @@
             <el-table-column type="selection" width="55" align="center" />
             <el-table-column label="图片" align="center" prop="imgUrl">
                 <template slot-scope="scope">
-                    <el-image style="width: 100px; height: 70px" lazy :preview-src-list="[baseUrl+scope.row.imgUrl]" :src="baseUrl+scope.row.imgUrl" fit="contain" v-if="scope.row.imgUrl!=null && scope.row.imgUrl!=''"></el-image>
-                    <el-image style="width: 100px; height: 70px" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" v-else></el-image>
+                    <el-image style="height: 70px" lazy :preview-src-list="[baseUrl+scope.row.imgUrl]" :src="baseUrl+scope.row.imgUrl" fit="contain" v-if="scope.row.imgUrl!=null && scope.row.imgUrl!=''"></el-image>
+                    <el-image style="height:70px;" :preview-src-list="[require('@/assets/images/esp8266.jpg')]" :src="require('@/assets/images/esp8266.jpg')" fit="cover" v-else-if="scope.row.productId==1"></el-image>
+                    <el-image style="height:70px;" :preview-src-list="[require('@/assets/images/esp32.jpg')]" :src="require('@/assets/images/esp32.jpg')" fit="cover" v-else-if="scope.row.productId==2"></el-image>
+                    <el-image style="height:70px;" :preview-src-list="[require('@/assets/images/raspberry.jpg')]" :src="require('@/assets/images/raspberry.jpg')" fit="cover" v-else-if="scope.row.productId==3"></el-image>
+                    <el-image style="height:70px;" :preview-src-list="[require('@/assets/images/telphone.jpg')]" :src="require('@/assets/images/telphone.jpg')" fit="cover" v-else-if="scope.row.productId==4"></el-image>
+                    <el-image style="height:70px;" :preview-src-list="[require('@/assets/images/computer.jpg')]" :src="require('@/assets/images/computer.jpg')" fit="cover" v-else-if="scope.row.productId==5"></el-image>
+                    <el-image style="height:70px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else></el-image>
                 </template>
             </el-table-column>
             <el-table-column label="产品名称" align="center" prop="productName">
