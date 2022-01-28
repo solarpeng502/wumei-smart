@@ -103,7 +103,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="deviceId != null and deviceId != ''">device_id,</if>
 			<if test="deviceName != null and deviceName != ''">device_name,</if>
 			<if test="actions != null and actions != ''">actions,</if>
-			<if test="isAdvance != null and isAdvance != ''">is_advance,</if>
  			<if test="cronExpression != null and cronExpression != ''">cron_expression,</if>
  			<if test="misfirePolicy != null and misfirePolicy != ''">misfire_policy,</if>
  			<if test="concurrent != null and concurrent != ''">concurrent,</if>
@@ -116,6 +115,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="productName != null and productName!=''">product_name,</if>
 			<if test="sceneId != null and sceneId!=0">scene_id,</if>
 			<if test="alertId != null and alertId!=0">alert_id,</if>
+ 		    is_advance,
  			create_time
  		)values(
  			<if test="jobId != null and jobId != 0">#{jobId},</if>
@@ -124,7 +124,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="deviceId != null and deviceId != ''">#{deviceId},</if>
 			<if test="deviceName != null and deviceName != ''">#{deviceName},</if>
 			<if test="actions != null and actions != ''">#{actions},</if>
-			<if test="isAdvance != null and isAdvance != ''">#{isAdvance},</if>
  			<if test="cronExpression != null and cronExpression != ''">#{cronExpression},</if>
  			<if test="misfirePolicy != null and misfirePolicy != ''">#{misfirePolicy},</if>
  			<if test="concurrent != null and concurrent != ''">#{concurrent},</if>
@@ -137,6 +136,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="productName != null and productName!=''">#{productName},</if>
 			<if test="sceneId != null and sceneId!=0">#{sceneId},</if>
 			<if test="alertId != null and alertId!=0">#{alertId},</if>
+ 		    #{isAdvance},
  			sysdate()
  		)
 	</insert>
