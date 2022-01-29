@@ -109,12 +109,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="status != null and status != ''">status,</if>
  			<if test="remark != null and remark != ''">remark,</if>
  			<if test="createBy != null and createBy != ''">create_by,</if>
-			<if test="isRepeat != null and isRepeat!=''">is_repeat,</if>
 			<if test="jobType != null and jobType!=''">job_type,</if>
 			<if test="productId != null and productId!=0">product_id,</if>
 			<if test="productName != null and productName!=''">product_name,</if>
 			<if test="sceneId != null and sceneId!=0">scene_id,</if>
 			<if test="alertId != null and alertId!=0">alert_id,</if>
+			is_repeat,
  		    is_advance,
  			create_time
  		)values(
@@ -130,12 +130,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="status != null and status != ''">#{status},</if>
  			<if test="remark != null and remark != ''">#{remark},</if>
  			<if test="createBy != null and createBy != ''">#{createBy},</if>
-			<if test="isRepeat != null and isRepeat!=''">#{isRepeat},</if>
 			<if test="jobType != null and jobType!=''">#{jobType},</if>
 			<if test="productId != null and productId!=0">#{productId},</if>
 			<if test="productName != null and productName!=''">#{productName},</if>
 			<if test="sceneId != null and sceneId!=0">#{sceneId},</if>
 			<if test="alertId != null and alertId!=0">#{alertId},</if>
+			#{isRepeat},
  		    #{isAdvance},
  			sysdate()
  		)

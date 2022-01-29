@@ -48,7 +48,7 @@
 
         <el-table-column label="状态" align="center">
             <template slot-scope="scope">
-                <el-switch v-model="scope.row.status" active-value="0" inactive-value="1" @change="handleStatusChange(scope.row)"></el-switch>
+                <el-switch v-model="scope.row.status" active-value="0" inactive-value="1" active-text="启用" @change="handleStatusChange(scope.row)"></el-switch>
             </template>
         </el-table-column>
         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -74,20 +74,20 @@
                 </el-col>
                 <el-col :span="24">
                     <el-form-item label="执行时间" prop="timerTimeValue">
-                        <el-time-picker v-model="timerTimeValue" value-format="HH:mm" placeholder="选择时间" style="width:354px;" @change="timeChange"></el-time-picker>
+                        <el-time-picker v-model="timerTimeValue" value-format="HH:mm" placeholder="选择时间" style="width:354px;" @change="timeChange" :disabled="form.isAdvance==1"></el-time-picker>
                     </el-form-item>
                 </el-col>
                 <el-col :span="24">
                     <el-form-item label="重复执行" prop="timerWeek">
                         <el-row>
                             <el-col :span="4">
-                                <el-select v-model="timerWeekRepeatValue" placeholder="请选择" @change="repeatChange">
-                                    <el-option v-for="item in timerWeekRepeats" :key="item.value" :label="item.label" :value="item.value">
+                                <el-select v-model="timerRepeatValue" placeholder="请选择" @change="repeatChange" :disabled="form.isAdvance==1">
+                                    <el-option v-for="item in timerRepeats" :key="item.value" :label="item.label" :value="item.value">
                                     </el-option>
                                 </el-select>
                             </el-col>
-                            <el-col :span="15" :offset="1" v-if="timerWeekRepeatValue==3">
-                                <el-select v-model="timerWeekValue" placeholder="请选择" multiple style="width:485px" @change="weekChange">
+                            <el-col :span="15" :offset="1" v-if="timerRepeatValue==3">
+                                <el-select v-model="timerWeekValue" placeholder="请选择" multiple style="width:485px" @change="weekChange" :disabled="form.isAdvance==1">
                                     <el-option v-for="item in timerWeeks" :key="item.value" :label="item.label" :value="item.value">
                                     </el-option>
                                 </el-select>
@@ -120,20 +120,20 @@
                         <el-divider></el-divider>
                     </div>
                     <el-form-item label="执行动作">
-                        <el-row v-for="(actionItem,index) in actionList" :key="index+action" style="margin-bottom:10px;">
+                        <el-row v-for="(actionItem,index) in actionList" :key="index+'action'" style="margin-bottom:10px;">
                             <el-col :span="4">
                                 <el-select v-model="actionItem.type" placeholder="请选择类别">
-                                    <el-option v-for="subItem in modelTypes" :key="subItem.value" :label="subItem.label" :value="subItem.value" @change="thingsModelTypeChange($event,index)">
+                                    <el-option v-for="(subItem,subIndex) in modelTypes" :key="subIndex+'type'" :label="subItem.label" :value="subItem.value" @change="thingsModelTypeChange($event,index)">
                                     </el-option>
                                 </el-select>
                             </el-col>
                             <el-col :span="4" :offset="1">
                                 <el-select v-model="actionItem.id" placeholder="请选择" v-if="actionItem.type==1" @change="thingsModelItemChange($event,index)">
-                                    <el-option v-for="subItem in thingsModel.properties" :key="subItem.id+property" :label="subItem.name" :value="subItem.id">
+                                    <el-option v-for="(subItem,subIndex) in thingsModel.properties" :key="subIndex+'property'" :label="subItem.name" :value="subItem.id">
                                     </el-option>
                                 </el-select>
                                 <el-select v-model="actionItem.id" placeholder="请选择" v-else-if="actionItem.type==2" @change="thingsModelItemChange($event,index)">
-                                    <el-option v-for="subItem in thingsModel.functions" :key="subItem.id+func" :label="subItem.name" :value="subItem.id">
+                                    <el-option v-for="(subItem,subIndex) in thingsModel.functions" :key="subIndex+'func'" :label="subItem.name" :value="subItem.id">
                                     </el-option>
                                 </el-select>
                             </el-col>
@@ -149,7 +149,7 @@
                                 </span>
                                 <span v-else-if="actionItem.thingsModelItem && actionItem.thingsModelItem.datatype.type=='enum'">
                                     <el-select v-model="actionItem.value" placeholder="请选择" style="width:100%" @change="thingsItemSelectChange($event,index)">
-                                        <el-option v-for="subItem in actionItem.thingsModelItem.datatype.enumList" :key="subItem.value+things" :label="subItem.text" :value="subItem.value">
+                                        <el-option v-for="(subItem,subIndex) in actionItem.thingsModelItem.datatype.enumList" :key="subIndex+'things'" :label="subItem.text" :value="subItem.value">
                                         </el-option>
                                     </el-select>
                                 </span>
@@ -197,25 +197,13 @@
                     <el-form-item label="创建时间：">{{ form.createTime }}</el-form-item>
                 </el-col>
                 <el-col :span="12">
-                    <el-form-item label="cron表达式：">{{ form.cronExpression }}</el-form-item>
-                </el-col>
-                <el-col :span="12">
-                    <el-form-item label="下次执行时间：">{{ parseTime(form.nextValidTime) }}</el-form-item>
-                </el-col>
-                <el-col :span="24">
-                    <el-form-item label="执行动作：">{{ form.actions }}</el-form-item>
-                </el-col>
-                <el-col :span="12">
-                    <el-form-item label="定时状态：">
-                        <div v-if="form.status == 0">正常</div>
-                        <div v-else-if="form.status == 1">失败</div>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="12">
                     <el-form-item label="是否并发：">
                         <div v-if="form.concurrent == 0">允许</div>
                         <div v-else-if="form.concurrent == 1">禁止</div>
                     </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="cron表达式：">{{ form.cronExpression }}</el-form-item>
                 </el-col>
                 <el-col :span="12">
                     <el-form-item label="执行策略：">
@@ -225,6 +213,22 @@
                         <div v-else-if="form.misfirePolicy == 3">放弃执行</div>
                     </el-form-item>
                 </el-col>
+                <el-col :span="12">
+                    <el-form-item label="下次执行时间：">{{ parseTime(form.nextValidTime) }}</el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="定时状态：">
+                        <div v-if="form.status == 0">正常</div>
+                        <div v-else-if="form.status == 1">暂停</div>
+                    </el-form-item>
+                </el-col>
+
+                <el-col :span="24">
+                    <el-form-item label="执行动作：">
+                        <div v-html="formatActionsDisplay(form.actions)" style="border:1px solid #ddd;padding:10px;border-radius:5px;width:465px;"></div>
+                    </el-form-item>
+                </el-col>
+
             </el-row>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -306,7 +310,7 @@ export default {
             // 传入的表达式
             expression: "",
             // 提交按钮加载
-            submitButtonLoading:false,
+            submitButtonLoading: false,
             // 查询参数
             queryParams: {
                 pageNum: 1,
@@ -316,7 +320,7 @@ export default {
                 status: undefined
             },
             // 重复执行项
-            timerWeekRepeats: [{
+            timerRepeats: [{
                 value: 1,
                 label: '每天'
             }, {
@@ -326,7 +330,7 @@ export default {
                 value: 3,
                 label: '指定'
             }],
-            timerWeekRepeatValue: 1,
+            timerRepeatValue: 1,
             // 周
             timerWeeks: [{
                 value: 1,
@@ -424,6 +428,9 @@ export default {
                 alertId: 0, // 告警ID
                 actions: "",
             };
+            this.timerRepeatValue = 1;
+            this.timerWeekValue = [1, 2, 3, 4, 5, 6, 7];
+            this.timerTimeValue = "";
             this.actionList = [{
                 id: "",
                 name: "",
@@ -499,57 +506,78 @@ export default {
         },
         /** 新增按钮操作 */
         handleAdd() {
-            this.submitButtonLoading=false;
             this.reset();
             this.open = true;
             this.title = "添加定时";
         },
         /** 修改按钮操作 */
         handleUpdate(row) {
-            this.submitButtonLoading=false;
             this.reset();
             const jobId = row.jobId || this.ids;
             getJob(jobId).then(response => {
                 this.form = response.data;
-                // actionList赋值
-                this.actionList = JSON.parse(this.form.actions);
-                for (let i = 0; i < this.actionList.length; i++) {
-                    if (this.actionList[i].type == 1) {
-                        for (let j = 0; j < this.thingsModel.properties.length; j++) {
-                            if (this.actionList[i].id == this.thingsModel.properties[j].id) {
-                                this.actionList[i].thingsModelItem = this.thingsModel.properties[j];
-                                break;
+                if (this.form.isAdvance == 0) {
+                    // actionList赋值
+                    this.actionList = JSON.parse(this.form.actions);
+                    for (let i = 0; i < this.actionList.length; i++) {
+                        if (this.actionList[i].type == 1) {
+                            for (let j = 0; j < this.thingsModel.properties.length; j++) {
+                                if (this.actionList[i].id == this.thingsModel.properties[j].id) {
+                                    this.actionList[i].thingsModelItem = this.thingsModel.properties[j];
+                                    break;
+                                }
                             }
-                        }
-                    } else if (this.actionList[i].type == 2) {
-                        for (let j = 0; j < this.thingsModel.functions.length; j++) {
-                            if (this.actionList[i].id == this.thingsModel.functions[j].id) {
-                                this.actionList[i].thingsModelItem = this.thingsModel.functions[j];
-                                break;
+                        } else if (this.actionList[i].type == 2) {
+                            for (let j = 0; j < this.thingsModel.functions.length; j++) {
+                                if (this.actionList[i].id == this.thingsModel.functions[j].id) {
+                                    this.actionList[i].thingsModelItem = this.thingsModel.functions[j];
+                                    break;
+                                }
                             }
                         }
                     }
+                    // 解析执行时间和重复执行项
+                    if (this.form.cronExpression.substring(12, 13) == "*") {
+                        this.timerRepeatValue = 2; // 执行一次
+                    } else if (this.form.cronExpression.substring(12) == "1,2,3,4,5,6,7") {
+                        this.timerRepeatValue = 1; // 每天
+                    } else {
+                        this.timerRepeatValue = 3; // 指定
+                    }
+                    let arrayValue = this.form.cronExpression.substring(12).split(",").map(Number);
+                    this.timerWeekValue = arrayValue;
+                    this.timerTimeValue = this.form.cronExpression.substring(5, 7) + ":" + this.form.cronExpression.substring(2, 4)
                 }
-                // 解析执行时间和重复执行项
-                if (this.form.cronExpression.substring(12, 13) == "*") {
-                    this.timerWeekRepeatValue = 2;
-                } else if (this.form.cronExpression.substring(12) == "1,2,3,4,5,6,7") {
-                    this.timerWeekRepeatValue = 1;
-                } else {
-                    this.timerWeekRepeatValue = 3;
-                }
-                let arrayValue = this.form.cronExpression.substring(12).split(",").map(Number);
-                this.timerWeekValue = arrayValue;
-                this.timerTimeValue = this.form.cronExpression.substring(5, 7) + ":" + this.form.cronExpression.substring(2, 4)
                 this.open = true;
                 this.title = "修改定时";
             });
         },
         /** 提交按钮 */
         submitForm: function () {
-            this.submitButtonLoading=true;
             this.$refs["form"].validate(valid => {
                 if (valid) {
+                    // 验证不能为空
+                    if (this.form.isAdvance == 0) {
+                        if (this.timerTimeValue == "" || this.timerTimeValue == null) {
+                            this.$modal.alertError("执行时间不能空");
+                            return;
+                        }
+                        if (this.timerRepeatValue == 3 && (this.timerWeekValue == null || this.timerWeekValue == "")) {
+                            this.$modal.alertError("请选择要执行的星期");
+                            return;
+                        }
+                    } else if (this.form.isAdvance == 1) {
+                        if (this.form.cronExpression == "") {
+                            this.$modal.alertError("cron表达式不能为空");
+                            return;
+                        }
+                    }
+                    for (let i = 0; i < this.actionList.length; i++) {
+                        if (this.actionList[i].id == "" || this.actionList[i].name == "" || this.actionList[i].value == "") {
+                            this.$modal.alertError("执行动作中的选项和值不能为空");
+                            return;
+                        }
+                    }
                     // 动作
                     this.actionList[0].deviceId = this.deviceInfo.deviceId;
                     this.actionList[0].deviceName = this.deviceInfo.deviceName;
@@ -563,15 +591,20 @@ export default {
                     this.form.deviceName = this.deviceInfo.deviceName;
                     this.form.productId = this.deviceInfo.productId;
                     this.form.productName = this.deviceInfo.productName;
+                    console.log(this.form);
+                    // 按钮等待后端加载完
+                    this.submitButtonLoading = true;
                     if (this.form.jobId != undefined) {
                         updateJob(this.form).then(response => {
                             this.$modal.msgSuccess("修改成功");
+                            this.submitButtonLoading = false;
                             this.open = false;
                             this.getList();
                         });
                     } else {
                         addJob(this.form).then(response => {
                             this.$modal.msgSuccess("新增成功");
+                            this.submitButtonLoading = false;
                             this.open = false;
                             this.getList();
                         });
@@ -623,16 +656,17 @@ export default {
         },
         /** 修改重复事件 **/
         repeatChange(data) {
-            if (this.timerWeekRepeatValue == 1) {
+            if (data == 1) {
                 // 每天
                 this.timerWeekValue = [1, 2, 3, 4, 5, 6, 7];
                 this.form.isRepeat = 1;
-            } else if (this.timerWeekRepeatValue == 2) {
+            } else if (data == 2) {
                 // 仅此一次
                 this.timerWeekValue = [];
-                this.form.isRepeat = 0;
+                this.form.isRepeat = 0;                
             } else {
                 // 指定
+                this.timerWeekValue = [1, 2, 3, 4, 5, 6, 7];
                 this.form.isRepeat = 1;
             }
             this.gentCronExpression();
@@ -647,17 +681,20 @@ export default {
         },
         /**自定义cron表达式选项改变事件 */
         customerCronChange(data) {
-            this.gentCronExpression();
+            if (data == 0) {
+                this.gentCronExpression();
+            }
         },
         /** 生成cron表达式**/
         gentCronExpression() {
-            if (this.timerTimeValue == "") {
-                this.$modal.alertError("执行时间不能为空");
+            let hour = "00";
+            let minute = "00";
+            if (this.timerTimeValue != null && this.timerTimeValue != "") {
+                hour = this.timerTimeValue.substring(0, 2);
+                minute = this.timerTimeValue.substring(3);
             }
-            let hour = this.timerTimeValue.substring(0, 2);
-            let minute = this.timerTimeValue.substring(3);
             let week = "*";
-            if (this.timerWeekValue.length > 0) {
+            if (this.timerRepeatValue==3 && this.timerWeekValue.length > 0) {
                 week = this.timerWeekValue;
             }
             this.form.cronExpression = "0 " + minute + " " + hour + " ? * " + week;
@@ -702,7 +739,7 @@ export default {
         thingsItemSelectChange(value, index) {
             let list = this.actionList[index].thingsModelItem.datatype.enumList;
             for (let i = 0; i < list.length; i++) {
-                if (list[i].value = value) {
+                if (list[i].value == value) {
                     this.actionList[index].valueText = list[i].text;
                     break;
                 }
@@ -710,6 +747,9 @@ export default {
         },
         /** 格式化显示动作 */
         formatActionsDisplay(json) {
+            if (json == null || json == "") {
+                return;
+            }
             let actions = JSON.parse(json);
             let result = "";
             for (let i = 0; i < actions.length; i++) {
