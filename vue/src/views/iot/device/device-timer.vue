@@ -33,15 +33,19 @@
 
     <el-table v-loading="loading" :data="jobList" @selection-change="handleSelectionChange" size="mini">
         <el-table-column type="selection" width="55" align="center" />
-        <el-table-column label="定时编号" width="100" align="center" prop="jobId" />
-        <el-table-column label="定时名称" align="center" prop="jobName" :show-overflow-tooltip="true" />
-        <el-table-column label="定时组名" align="center" prop="jobGroup">
+        <el-table-column label="名称" align="center" prop="jobName" :show-overflow-tooltip="true" />
+        <el-table-column label="定时描述" align="center" prop="cronText">
             <template slot-scope="scope">
-                <dict-tag :options="dict.type.sys_job_group" :value="scope.row.jobGroup" />
+                <div v-html="formatCronDisplay(scope.row)"></div>
             </template>
         </el-table-column>
-        <el-table-column label="动作" align="center" prop="actions" :show-overflow-tooltip="true" />
         <el-table-column label="CRON表达式" align="center" prop="cronExpression" :show-overflow-tooltip="true" />
+        <el-table-column label="动作" align="left" prop="actions" :show-overflow-tooltip="true">
+            <template slot-scope="scope">
+                <div v-html="formatActionsDisplay(scope.row.actions)"></div>
+            </template>
+        </el-table-column>
+
         <el-table-column label="状态" align="center">
             <template slot-scope="scope">
                 <el-switch v-model="scope.row.status" active-value="0" inactive-value="1" @change="handleStatusChange(scope.row)"></el-switch>
@@ -143,23 +147,24 @@
                             <el-col :span="10" :offset="1">
                                 <!--物模型项的值-->
                                 <span v-if="actionItem.thingsModelItem &&(actionItem.thingsModelItem.datatype.type=='integer' || actionItem.thingsModelItem.datatype.type=='decimal')">
-                                    <el-input v-model="actionItem.value" placeholder="值" :max="actionItem.thingsModelItem.datatype.max" :min="actionItem.thingsModelItem.datatype.min" type="number" />
+                                    <el-input style="width:180px;" v-model="actionItem.value" placeholder="值" :max="actionItem.thingsModelItem.datatype.max" :min="actionItem.thingsModelItem.datatype.min" type="number" />
+                                    <el-input style="width:70px;margin-left:15px;" v-model="actionItem.thingsModelItem.datatype.unit" placeholder="请输入整数或小数" disabled />
                                 </span>
                                 <span v-else-if=" actionItem.thingsModelItem && actionItem.thingsModelItem.datatype.type=='bool'">
-                                    <el-switch v-model="actionItem.value" :active-text="actionItem.thingsModelItem.datatype.trueText" :inactive-text="actionItem.thingsModelItem.datatype.falseText" active-value="1" inactive-value="0">
+                                    <el-switch @change="thingsItemSwitchChange($event,index)" v-model="actionItem.value" :active-text="actionItem.thingsModelItem.datatype.trueText" :inactive-text="actionItem.thingsModelItem.datatype.falseText" active-value="1" inactive-value="0">
                                     </el-switch>
                                 </span>
                                 <span v-else-if="actionItem.thingsModelItem && actionItem.thingsModelItem.datatype.type=='enum'">
-                                    <el-select v-model="actionItem.value" placeholder="请选择">
+                                    <el-select v-model="actionItem.value" placeholder="请选择" style="width:100%" @change="thingsItemSelectChange($event,index)">
                                         <el-option v-for="subItem in actionItem.thingsModelItem.datatype.enumList" :key="subItem.value" :label="subItem.text" :value="subItem.value">
                                         </el-option>
                                     </el-select>
                                 </span>
                                 <span v-else-if="actionItem.thingsModelItem && actionItem.thingsModelItem.datatype.type=='string'">
-                                    <el-input v-model="actionItem.value" placeholder="值" :max="actionItem.thingsModelItem.datatype.maxLength" />
+                                    <el-input v-model="actionItem.value" placeholder="请输入字符串" :max="actionItem.thingsModelItem.datatype.maxLength" />
                                 </span>
                                 <span v-else-if="actionItem.thingsModelItem && actionItem.thingsModelItem.datatype.type=='array'">
-                                    <el-input v-model="actionItem.value" placeholder="值" />
+                                    <el-input v-model="actionItem.value" placeholder="请输入英文逗号分隔的数组" />
                                 </span>
                             </el-col>
                             <el-col :span="2" :offset="1" v-if="index!=0"><a style="color:#F56C6C" @click="removeEnumItem(index)">删除</a></el-col>
@@ -270,7 +275,8 @@ export default {
             cacheJsonThingsModel(newVal.productId).then(response => {
                 this.thingsModel = JSON.parse(response.data);
                 // 过滤监测数据，监测数据未只读
-                this.thingsModel.properties = this.thingsModel.properties.filter(item => item.isMonitor == 0);
+                // this.thingsModel.properties = this.thingsModel.properties.filter(item => item.isMonitor == 0);
+                this.getList();
             });
         }
     },
@@ -382,7 +388,7 @@ export default {
         };
     },
     created() {
-        this.getList();
+        
     },
     methods: {
         /** 查询定时定时列表 */
@@ -426,6 +432,7 @@ export default {
                 id: "",
                 name: "",
                 value: "",
+                valueText: "", // 值的文本描述
                 type: 2, // 1=属性，2=功能，3=事件，5=设备上线，6=设备下线
                 source: 2, // 1=设备，2=定时，3=告警输出
                 deviceId: this.deviceInfo.deviceId,
@@ -669,7 +676,112 @@ export default {
         /** 物模型类别改变事件 */
         thingsModelTypeChange(value, index) {
 
-        }
+        },
+        /**物模型项开关按钮改变事件 */
+        thingsItemSwitchChange(value, index) {
+            if (value == "1") {
+                this.actionList[index].valueText = this.actionList[index].thingsModelItem.datatype.trueText;
+            } else if (value == "0") {
+                this.actionList[index].valueText = this.actionList[index].thingsModelItem.datatype.falseText;
+            }
+        },
+        /***物模型项下拉框改变事件 */
+        thingsItemSelectChange(value, index) {
+            let list = this.actionList[index].thingsModelItem.datatype.enumList;
+            for (let i = 0; i < list.length; i++) {
+                if (list[i].value = value) {
+                    this.actionList[index].valueText = list[i].text;
+                    break;
+                }
+            }
+        },
+        /** 格式化显示动作 */
+        formatActionsDisplay(json) {
+            let actions = JSON.parse(json);
+            let result = "";
+            for (let i = 0; i < actions.length; i++) {
+                let value = actions[i].value;
+                if (actions[i].type == 1) {
+                    // 属性
+                    for (let j = 0; j < this.thingsModel.properties.length; j++) {
+                        if (actions[i].id == this.thingsModel.properties[j].id) {
+                            if (this.thingsModel.properties[j].datatype == "decimal" || this.thingsModel.properties[j].datatype == "integer") {
+                                value = actions[i].value + this.thingsModel.properties[j].datatype.unit;
+                            } else if (this.thingsModel.properties[j].datatype == "enum") {
+                                for (let k = 0; k < this.thingsModel.properties[j].datatype.enumList.length; k++) {
+                                    if (actions[i].value == this.thingsModel.properties[j].datatype.enumList[k].value) {
+                                        value = this.thingsModel.properties[j].datatype.enumList[k].text;
+                                        break;
+                                    }
+                                }
+                            } else if (this.thingsModel.properties[j].datatype == "bool") {
+                                value = actions[i].value == "1" ? this.thingsModel.properties[j].datatype.trueText : this.thingsModel.properties[j].datatype.falseText;
+                            }
+                            break;
+                        }
+                    }
+                } else if (actions[i].type == 2) {
+                    // 功能
+                    for (let j = 0; j < this.thingsModel.functions.length; j++) {
+                        if (actions[i].id == this.thingsModel.functions[j].id) {
+                            if (this.thingsModel.functions[j].datatype.type == "decimal" || this.thingsModel.functions[j].datatype.type == "integer") {
+                                value = actions[i].value + this.thingsModel.functions[j].datatype.unit;
+                            } else if (this.thingsModel.functions[j].datatype.type == "enum") {
+                                for (let k = 0; k < this.thingsModel.functions[j].datatype.enumList.length; k++) {
+                                    if (actions[i].value == this.thingsModel.functions[j].datatype.enumList[k].value) {
+                                        value = this.thingsModel.functions[j].datatype.enumList[k].text;
+                                        break;
+                                    }
+                                }
+                            } else if (this.thingsModel.functions[j].datatype.type == "bool") {
+                                value = actions[i].value == "1" ? this.thingsModel.functions[j].datatype.trueText : this.thingsModel.functions[j].datatype.falseText;
+                            }
+                            break;
+                        }
+                    }
+                }
+                result = result + actions[i].name + "：<span style=\"color:#F56C6C\">" + value + "</span><br />";
+            }
+            return result;
+        },
+        /** 格式化显示CRON描述 */
+        formatCronDisplay(item) {
+            let result = "";
+            if (item.isAdvance == 0) {
+                let time = "<br /><span style=\"color:#F56C6C\">时间 " + item.cronExpression.substring(5, 7) + ":" + item.cronExpression.substring(2, 4) + "</span>";
+                let week = item.cronExpression.substring(12);
+                console.log(week);
+                if (item.isRepeat == 0) {
+                    result = "执行一次 " + time;
+                } else if (week == "1,2,3,4,5,6,7") {
+                    result = "每天 " + time;
+                } else {
+                    let weekArray = week.split(",");
+                    for (let i = 0; i < weekArray.length; i++) {
+                        if (weekArray[i] == "1") {
+                            result = result + "周一、";
+                        } else if (weekArray[i] == "2") {
+                            result = result + "周二、";
+                        } else if (weekArray[i] == "3") {
+                            result = result + "周三、";
+                        } else if (weekArray[i] == "4") {
+                            result = result + "周四、";
+                        } else if (weekArray[i] == "5") {
+                            result = result + "周五、";
+                        } else if (weekArray[i] == "6") {
+                            result = result + "周六、";
+                        } else if (weekArray[i] == "7") {
+                            result = result + "周日、";
+                        }
+                    }
+                    result = result.substring(0, result.length - 1) + " " + time;
+                }
+            } else {
+                result = "自定义Cron表达式";
+            }
+            return result;
+        },
+
     }
 };
 </script>
