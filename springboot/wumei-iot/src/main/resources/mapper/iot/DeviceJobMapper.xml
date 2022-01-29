@@ -76,7 +76,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="jobGroup != null and jobGroup != ''">job_group = #{jobGroup},</if>
  			<if test="deviceId != null and deviceId != ''">device_id = #{deviceId},</if>
 			<if test="deviceName != null and deviceName != ''">device_name = #{deviceName},</if>
-			<if test="actions != null and actions != ''">action = #{actions},</if>
+			<if test="actions != null and actions != ''">actions = #{actions},</if>
 			<if test="isAdvance != null and isAdvance != ''">is_advance = #{isAdvance},</if>
  			<if test="cronExpression != null and cronExpression != ''">cron_expression = #{cronExpression},</if>
  			<if test="misfirePolicy != null and misfirePolicy != ''">misfire_policy = #{misfirePolicy},</if>

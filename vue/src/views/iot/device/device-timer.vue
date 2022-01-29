@@ -1,10 +1,10 @@
 <template>
 <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="70px">
         <el-form-item label="定时名称" prop="jobName">
             <el-input v-model="queryParams.jobName" placeholder="请输入定时名称" clearable size="small" @keyup.enter.native="handleQuery" />
         </el-form-item>
-        <el-form-item label="定时状态" prop="status">
+        <el-form-item label="定时状态" prop="status" style="margin-left:20px;">
             <el-select v-model="queryParams.status" placeholder="请选择定时状态" clearable size="small">
                 <el-option v-for="dict in dict.type.sys_job_status" :key="dict.value" :label="dict.label" :value="dict.value" />
             </el-select>
@@ -34,7 +34,7 @@
     <el-table v-loading="loading" :data="jobList" @selection-change="handleSelectionChange" size="mini">
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column label="名称" align="center" prop="jobName" :show-overflow-tooltip="true" />
-        <el-table-column label="定时描述" align="center" prop="cronText">
+        <el-table-column label="描述" align="center" prop="cronText">
             <template slot-scope="scope">
                 <div v-html="formatCronDisplay(scope.row)"></div>
             </template>
@@ -54,16 +54,9 @@
         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
             <template slot-scope="scope">
                 <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['iot:job:edit']">修改</el-button>
+                <el-button size="mini" type="text" icon="el-icon-caret-right" @click="handleView(scope.row)" v-hasPermi="['iot:job:query']">定时详细</el-button><br />
                 <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['iot:job:remove']">删除</el-button>
-                <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)" v-hasPermi="['iot:job:changeStatus', 'iot:job:query']">
-                    <span class="el-dropdown-link">
-                        <i class="el-icon-d-arrow-right el-icon--right"></i>更多
-                    </span>
-                    <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item command="handleRun" icon="el-icon-caret-right" v-hasPermi="['iot:job:changeStatus']">执行一次</el-dropdown-item>
-                        <el-dropdown-item command="handleView" icon="el-icon-view" v-hasPermi="['iot:job:query']">定时详细</el-dropdown-item>
-                    </el-dropdown-menu>
-                </el-dropdown>
+                <el-button size="mini" type="text" icon="el-icon-caret-right" @click="handleRun(scope.row)" v-hasPermi="['iot:job:changeStatus']">执行一次</el-button>
             </template>
         </el-table-column>
     </el-table>
@@ -127,7 +120,7 @@
                         <el-divider></el-divider>
                     </div>
                     <el-form-item label="执行动作">
-                        <el-row v-for="(actionItem,index) in actionList" :key="index" style="margin-bottom:10px;">
+                        <el-row v-for="(actionItem,index) in actionList" :key="index+action" style="margin-bottom:10px;">
                             <el-col :span="4">
                                 <el-select v-model="actionItem.type" placeholder="请选择类别">
                                     <el-option v-for="subItem in modelTypes" :key="subItem.value" :label="subItem.label" :value="subItem.value" @change="thingsModelTypeChange($event,index)">
@@ -136,11 +129,11 @@
                             </el-col>
                             <el-col :span="4" :offset="1">
                                 <el-select v-model="actionItem.id" placeholder="请选择" v-if="actionItem.type==1" @change="thingsModelItemChange($event,index)">
-                                    <el-option v-for="subItem in thingsModel.properties" :key="subItem.id" :label="subItem.name" :value="subItem.id">
+                                    <el-option v-for="subItem in thingsModel.properties" :key="subItem.id+property" :label="subItem.name" :value="subItem.id">
                                     </el-option>
                                 </el-select>
                                 <el-select v-model="actionItem.id" placeholder="请选择" v-else-if="actionItem.type==2" @change="thingsModelItemChange($event,index)">
-                                    <el-option v-for="subItem in thingsModel.functions" :key="subItem.id" :label="subItem.name" :value="subItem.id">
+                                    <el-option v-for="subItem in thingsModel.functions" :key="subItem.id+func" :label="subItem.name" :value="subItem.id">
                                     </el-option>
                                 </el-select>
                             </el-col>
@@ -156,7 +149,7 @@
                                 </span>
                                 <span v-else-if="actionItem.thingsModelItem && actionItem.thingsModelItem.datatype.type=='enum'">
                                     <el-select v-model="actionItem.value" placeholder="请选择" style="width:100%" @change="thingsItemSelectChange($event,index)">
-                                        <el-option v-for="subItem in actionItem.thingsModelItem.datatype.enumList" :key="subItem.value" :label="subItem.text" :value="subItem.value">
+                                        <el-option v-for="subItem in actionItem.thingsModelItem.datatype.enumList" :key="subItem.value+things" :label="subItem.text" :value="subItem.value">
                                         </el-option>
                                     </el-select>
                                 </span>
@@ -182,7 +175,7 @@
             </el-row>
         </el-form>
         <div slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="submitForm">确 定</el-button>
+            <el-button type="primary" @click="submitForm" :loading="submitButtonLoading">确 定</el-button>
             <el-button @click="cancel">取 消</el-button>
         </div>
     </el-dialog>
@@ -312,6 +305,8 @@ export default {
             openCron: false,
             // 传入的表达式
             expression: "",
+            // 提交按钮加载
+            submitButtonLoading:false,
             // 查询参数
             queryParams: {
                 pageNum: 1,
@@ -320,18 +315,19 @@ export default {
                 jobGroup: undefined,
                 status: undefined
             },
-            // 周
+            // 重复执行项
             timerWeekRepeats: [{
-                value: '1',
+                value: 1,
                 label: '每天'
             }, {
-                value: '2',
+                value: 2,
                 label: '执行一次'
             }, {
-                value: '3',
+                value: 3,
                 label: '指定'
             }],
-            timerWeekRepeatValue: "1",
+            timerWeekRepeatValue: 1,
+            // 周
             timerWeeks: [{
                 value: 1,
                 label: '周一'
@@ -388,7 +384,7 @@ export default {
         };
     },
     created() {
-        
+
     },
     methods: {
         /** 查询定时定时列表 */
@@ -466,22 +462,6 @@ export default {
             this.single = selection.length != 1;
             this.multiple = !selection.length;
         },
-        // 更多操作触发
-        handleCommand(command, row) {
-            switch (command) {
-                case "handleRun":
-                    this.handleRun(row);
-                    break;
-                case "handleView":
-                    this.handleView(row);
-                    break;
-                case "handleJobLog":
-                    this.handleJobLog(row);
-                    break;
-                default:
-                    break;
-            }
-        },
         // 定时状态修改
         handleStatusChange(row) {
             let text = row.status === "0" ? "启用" : "停用";
@@ -519,22 +499,55 @@ export default {
         },
         /** 新增按钮操作 */
         handleAdd() {
+            this.submitButtonLoading=false;
             this.reset();
             this.open = true;
             this.title = "添加定时";
         },
         /** 修改按钮操作 */
         handleUpdate(row) {
+            this.submitButtonLoading=false;
             this.reset();
             const jobId = row.jobId || this.ids;
             getJob(jobId).then(response => {
                 this.form = response.data;
+                // actionList赋值
+                this.actionList = JSON.parse(this.form.actions);
+                for (let i = 0; i < this.actionList.length; i++) {
+                    if (this.actionList[i].type == 1) {
+                        for (let j = 0; j < this.thingsModel.properties.length; j++) {
+                            if (this.actionList[i].id == this.thingsModel.properties[j].id) {
+                                this.actionList[i].thingsModelItem = this.thingsModel.properties[j];
+                                break;
+                            }
+                        }
+                    } else if (this.actionList[i].type == 2) {
+                        for (let j = 0; j < this.thingsModel.functions.length; j++) {
+                            if (this.actionList[i].id == this.thingsModel.functions[j].id) {
+                                this.actionList[i].thingsModelItem = this.thingsModel.functions[j];
+                                break;
+                            }
+                        }
+                    }
+                }
+                // 解析执行时间和重复执行项
+                if (this.form.cronExpression.substring(12, 13) == "*") {
+                    this.timerWeekRepeatValue = 2;
+                } else if (this.form.cronExpression.substring(12) == "1,2,3,4,5,6,7") {
+                    this.timerWeekRepeatValue = 1;
+                } else {
+                    this.timerWeekRepeatValue = 3;
+                }
+                let arrayValue = this.form.cronExpression.substring(12).split(",").map(Number);
+                this.timerWeekValue = arrayValue;
+                this.timerTimeValue = this.form.cronExpression.substring(5, 7) + ":" + this.form.cronExpression.substring(2, 4)
                 this.open = true;
                 this.title = "修改定时";
             });
         },
         /** 提交按钮 */
         submitForm: function () {
+            this.submitButtonLoading=true;
             this.$refs["form"].validate(valid => {
                 if (valid) {
                     // 动作
@@ -740,7 +753,7 @@ export default {
                         }
                     }
                 }
-                result = result + actions[i].name + "：<span style=\"color:#F56C6C\">" + value + "</span><br />";
+                result = result + actions[i].name + "：</span><span style=\"color:#F56C6C\">" + value + "</span><br />";
             }
             return result;
         },
@@ -750,7 +763,6 @@ export default {
             if (item.isAdvance == 0) {
                 let time = "<br /><span style=\"color:#F56C6C\">时间 " + item.cronExpression.substring(5, 7) + ":" + item.cronExpression.substring(2, 4) + "</span>";
                 let week = item.cronExpression.substring(12);
-                console.log(week);
                 if (item.isRepeat == 0) {
                     result = "执行一次 " + time;
                 } else if (week == "1,2,3,4,5,6,7") {
