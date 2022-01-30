@@ -21,7 +21,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<result property="updateBy"       column="update_by"       />
 		<result property="updateTime"     column="update_time"     />
 		<result property="remark"         column="remark"          />
-		<result property="isRepeat"    column="is_repeat"    />
 		<result property="jobType"    column="job_type"    />
 		<result property="productId"    column="product_id"    />
 		<result property="productName"    column="product_name"    />
@@ -30,7 +29,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</resultMap>
 	
 	<sql id="selectJobVo">
-        select job_id, job_name, job_group, device_id,device_name,actions,is_advance, cron_expression, misfire_policy, concurrent, status, create_by, create_time, remark,is_repeat, job_type, product_id, product_name, scene_id, alert_id
+        select job_id, job_name, job_group, device_id,device_name,actions,is_advance, cron_expression, misfire_policy, concurrent, status, create_by, create_time, remark, job_type, product_id, product_name, scene_id, alert_id
 		from iot_device_job
     </sql>
 	
@@ -84,7 +83,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="status !=null">status = #{status},</if>
  			<if test="remark != null and remark != ''">remark = #{remark},</if>
  			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
-			<if test="isRepeat != null">is_repeat = #{isRepeat},</if>
 			<if test="jobType != null">job_type = #{jobType},</if>
 			<if test="productId != null and productId!=0">product_id = #{productId},</if>
 			<if test="productName != null and productName!=''">product_name = #{productName},</if>
@@ -114,7 +112,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="productName != null and productName!=''">product_name,</if>
 			<if test="sceneId != null and sceneId!=0">scene_id,</if>
 			<if test="alertId != null and alertId!=0">alert_id,</if>
-			is_repeat,
  		    is_advance,
  			create_time
  		)values(
@@ -135,7 +132,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="productName != null and productName!=''">#{productName},</if>
 			<if test="sceneId != null and sceneId!=0">#{sceneId},</if>
 			<if test="alertId != null and alertId!=0">#{alertId},</if>
-			#{isRepeat},
  		    #{isAdvance},
  			sysdate()
  		)

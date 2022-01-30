@@ -63,10 +63,6 @@ public class DeviceJob extends BaseEntity
     /** 是否详细corn表达式 */
     private Integer isAdvance;
 
-    /** 是否重复（0=否，1=是） */
-    @Excel(name = "是否重复", readConverterExp = "0==否，1=是")
-    private Integer isRepeat;
-
     /** 定时类型（1=设备定时，2=设备告警，3=场景联动） */
     @Excel(name = "定时类型", readConverterExp = "1==设备定时，2=设备告警，3=场景联动")
     private Integer jobType;
@@ -93,14 +89,6 @@ public class DeviceJob extends BaseEntity
 
     public void setIsAdvance(Integer isAdvance) {
         this.isAdvance = isAdvance;
-    }
-
-    public Integer getIsRepeat() {
-        return isRepeat;
-    }
-
-    public void setIsRepeat(Integer isRepeat) {
-        this.isRepeat = isRepeat;
     }
 
     public Integer getJobType() {
