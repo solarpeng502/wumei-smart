@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class BookController {
     @GetMapping("/book/classical")
     public JSONObject getBook() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JSONObject bookJson = new JSONObject();
         bookJson.put("1", "西游记");
         bookJson.put("2", "水浒传");
@@ -24,7 +24,7 @@ public class BookController {
     }
     @PostMapping("/book/sell")
     public JSONObject sellBook() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JSONObject bookJson = new JSONObject();
         bookJson.put("4", "三国演义");
         return bookJson;

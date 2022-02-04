@@ -30,10 +30,14 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/js/**","/css/**","/data/**","/img/**","/less/**","/plugins/**","/sass/**","/scss/**","/logout/**").permitAll()
-                .antMatchers("/login","logout").permitAll()
-                .anyRequest().authenticated();
+        // 限制资源服务器只接管匹配的资源
+        http.requestMatchers().antMatchers("/book/**")
+                .and()
+                .authorizeRequests()//授权的请求
+                .anyRequest().authenticated()
+                //关闭跨站请求防护
+                .and()
+                .csrf().disable();
     }
 
     public TokenStore jdbcTokenStore(){

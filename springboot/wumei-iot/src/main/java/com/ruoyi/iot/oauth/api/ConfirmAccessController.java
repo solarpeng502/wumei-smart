@@ -16,7 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Created by wxy on 2017/4/4 0004.
+ * kerwincui
  */
 @Controller
 @SessionAttributes("authorizationRequest")
