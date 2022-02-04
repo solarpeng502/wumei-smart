@@ -32,14 +32,14 @@ public class BookApprovalHandler extends ApprovalStoreUserApprovalHandler {
 
     @Override
     public AuthorizationRequest updateAfterApproval(AuthorizationRequest authorizationRequest, Authentication userAuthentication) {
-        // Get the approved scopes
+        // 获取授权过的范围
         Set<String> requestedScopes = authorizationRequest.getScope();
         Set<String> approvedScopes = new HashSet<String>();
         Set<Approval> approvals = new HashSet<Approval>();
 
         Date expiry = computeExpiry();
 
-        // Store the scopes that have been approved / denied
+        // 存储授权或拒绝的范围
         Map<String, String> approvalParameters = authorizationRequest.getApprovalParameters();
         for (String requestedScope : requestedScopes) {
             String approvalParameter = OAuth2Utils.SCOPE_PREFIX + requestedScope;
@@ -71,7 +71,8 @@ public class BookApprovalHandler extends ApprovalStoreUserApprovalHandler {
 
     private Date computeExpiry() {
         Calendar expiresAt = Calendar.getInstance();
-        if (approvalExpirySeconds == -1) { // use default of 1 month
+        // use default of 1 month
+        if (approvalExpirySeconds == -1) {
             expiresAt.add(Calendar.MONTH, 1);
         }
         else {

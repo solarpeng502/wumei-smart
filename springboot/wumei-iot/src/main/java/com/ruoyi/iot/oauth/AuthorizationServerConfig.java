@@ -8,6 +8,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -59,6 +62,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      */
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+
         clients.withClientDetails(getClientDetailsService());
     }
 
@@ -69,11 +73,17 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      */
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+        // 查询用户、授权、分组，可以被重写
         endpoints.userDetailsService(userDetailsService)
+                // 审批客户端的授权
                 .userApprovalHandler(userApprovalHandler())
+                // 授权审批
                 .approvalStore(approvalStore())
+                // 获取授权码
                 .authorizationCodeServices(new JdbcAuthorizationCodeServices(dataSource))
+                // 验证token
                 .authenticationManager(authenticationManager)
+                // 查询、保存、刷新token
                 .tokenStore(this.getJdbcTokenStore());
     }
 
@@ -89,7 +99,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Bean
     public JdbcClientDetailsService getClientDetailsService() {
-        return new JdbcClientDetailsService(dataSource);
+        JdbcClientDetailsService jdbcClientDetailsService = new JdbcClientDetailsService(dataSource);
+        jdbcClientDetailsService.setPasswordEncoder(passwordEncoder());
+        return jdbcClientDetailsService;
     }
 
     @Bean
@@ -101,4 +113,11 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         TokenStore tokenStore = new JdbcTokenStore(dataSource);
         return tokenStore;
     }
+
+
+
+    public BCryptPasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
+
 }

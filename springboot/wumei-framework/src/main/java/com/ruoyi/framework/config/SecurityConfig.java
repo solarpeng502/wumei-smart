@@ -24,7 +24,8 @@ import com.ruoyi.framework.security.handle.LogoutSuccessHandlerImpl;
  * 
  * @author ruoyi
  */
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+//@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter
 {
     /**
@@ -125,7 +126,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
 //        httpSecurity.addFilterBefore(corsFilter, LogoutFilter.class);
         httpSecurity.authorizeRequests()
                 .antMatchers("/js/**","/css/**","/data/**","/img/**","/less/**","/plugins/**","/sass/**","/scss/**","/logout/**").permitAll()
-                .antMatchers("/login", "/oauth/authorize","/oauth/token").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -153,6 +153,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
     protected void configure(AuthenticationManagerBuilder auth) throws Exception
     {
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
-//        auth.userDetailsService(userDetailsService);
     }
 }
