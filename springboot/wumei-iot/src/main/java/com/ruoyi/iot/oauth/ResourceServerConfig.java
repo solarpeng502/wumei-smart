@@ -31,7 +31,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         // 限制资源服务器只接管匹配的资源
-        http.requestMatchers().antMatchers("/book/**")
+        http.requestMatchers().antMatchers("/speaker/**")
                 .and()
                 .authorizeRequests()//授权的请求
                 .anyRequest().authenticated()

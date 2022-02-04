@@ -126,7 +126,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
 //        httpSecurity.addFilterBefore(corsFilter, LogoutFilter.class);
         httpSecurity.authorizeRequests()
                 .antMatchers("/js/**","/css/**","/data/**","/img/**","/less/**","/plugins/**","/sass/**","/scss/**","/logout/**").permitAll()
-                .antMatchers("/book/**").permitAll()
+                .antMatchers("/speaker/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()

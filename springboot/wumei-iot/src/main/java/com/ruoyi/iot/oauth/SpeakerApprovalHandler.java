@@ -16,19 +16,18 @@ import java.util.*;
 /**
  * kerwincui
  */
-public class BookApprovalHandler extends ApprovalStoreUserApprovalHandler {
+public class SpeakerApprovalHandler extends ApprovalStoreUserApprovalHandler {
 
     private int approvalExpirySeconds = -1;
 
     @Autowired
     private ApprovalStore approvalStore;
 
-    public BookApprovalHandler(JdbcClientDetailsService clientDetailsService, ApprovalStore approvalStore, OAuth2RequestFactory oAuth2RequestFactory) {
+    public SpeakerApprovalHandler(JdbcClientDetailsService clientDetailsService, ApprovalStore approvalStore, OAuth2RequestFactory oAuth2RequestFactory) {
         this.setApprovalStore(approvalStore);
         this.setClientDetailsService(clientDetailsService);
         this.setRequestFactory(oAuth2RequestFactory);
     }
-
 
     @Override
     public AuthorizationRequest updateAfterApproval(AuthorizationRequest authorizationRequest, Authentication userAuthentication) {
@@ -36,7 +35,6 @@ public class BookApprovalHandler extends ApprovalStoreUserApprovalHandler {
         Set<String> requestedScopes = authorizationRequest.getScope();
         Set<String> approvedScopes = new HashSet<String>();
         Set<Approval> approvals = new HashSet<Approval>();
-
         Date expiry = computeExpiry();
 
         // 存储授权或拒绝的范围
@@ -71,7 +69,7 @@ public class BookApprovalHandler extends ApprovalStoreUserApprovalHandler {
 
     private Date computeExpiry() {
         Calendar expiresAt = Calendar.getInstance();
-        // use default of 1 month
+        // 默认一个月
         if (approvalExpirySeconds == -1) {
             expiresAt.add(Calendar.MONTH, 1);
         }
