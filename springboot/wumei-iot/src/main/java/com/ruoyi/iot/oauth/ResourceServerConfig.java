@@ -25,7 +25,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
         TokenStore tokenStore = jdbcTokenStore();
         OAuth2AuthenticationManager auth2AuthenticationManager= new OAuth2AuthenticationManager();
         resources.authenticationManager(auth2AuthenticationManager);
-        resources.resourceId("book-service").tokenStore(tokenStore).stateless(true);
+        resources.resourceId("speaker-service").tokenStore(tokenStore).stateless(true);
     }
 
     @Override
