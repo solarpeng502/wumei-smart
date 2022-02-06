@@ -126,7 +126,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
 //        httpSecurity.addFilterBefore(corsFilter, LogoutFilter.class);
         httpSecurity.authorizeRequests()
                 // 静态资源文件
-                .antMatchers("/css/**","/logout/**").permitAll()
+                .antMatchers("/css/**","/fonts/**","/logout/**").permitAll()
                 // 智能音箱控制器由资源服务器管理
                 .antMatchers("/speaker/**").permitAll()
                 .anyRequest().authenticated()
