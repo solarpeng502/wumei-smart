@@ -14,17 +14,17 @@ public class LoginController {
     @Autowired
     private TokenStore tokenStore;
 
-    @RequestMapping("/login")
+    @RequestMapping("/oauth/login")
     public String login() {
         return "oauth/login";
     }
 
-    @RequestMapping("/index")
+    @RequestMapping("/oauth/index")
     public String index() {
-        return "layout/index";
+        return "oauth/index";
     }
 
-    @GetMapping("/logout")
+    @GetMapping("/oauth/logout")
     @ResponseBody
     public String logout(@RequestHeader String Authorization) {
         if (!Authorization.isEmpty()){

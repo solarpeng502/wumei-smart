@@ -1,7 +1,9 @@
 package com.ruoyi.framework.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -12,6 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.filter.CorsFilter;
@@ -24,8 +27,8 @@ import com.ruoyi.framework.security.handle.LogoutSuccessHandlerImpl;
  * 
  * @author ruoyi
  */
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter
 {
     /**
@@ -124,19 +127,57 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
 //        // 添加CORS filter
 //        httpSecurity.addFilterBefore(corsFilter, JwtAuthenticationTokenFilter.class);
 //        httpSecurity.addFilterBefore(corsFilter, LogoutFilter.class);
-        httpSecurity.authorizeRequests()
+
+        httpSecurity
+                // CSRF禁用，因为不使用session
+                .csrf().disable()
+                // 认证失败处理类
+                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+                // 基于token，所以不需要session
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                // 过滤请求
+                .authorizeRequests()
+                // 对于登录login 注册register 验证码captchaImage 允许匿名访问
+                .antMatchers("/login", "/register", "/captchaImage","/iot/tool/register").anonymous()
+                .antMatchers(
+                        HttpMethod.GET,
+                        "/",
+                        "/*.html",
+                        "/**/*.html",
+                        "/**/*.css",
+                        "/**/*.js",
+                        "/profile/**"
+                ).permitAll()
+                .antMatchers("/swagger-ui.html").anonymous()
+                .antMatchers("/swagger-resources/**").anonymous()
+                .antMatchers("/webjars/**").anonymous()
+                .antMatchers("/*/api-docs").anonymous()
+                .antMatchers("/druid/**").anonymous()
+
+
                 // 静态资源文件
-                .antMatchers("/css/**","/fonts/**","/logout/**").permitAll()
+                .antMatchers("/oauth/logout/**","/oauth/css/**","/oauth/fonts/**").permitAll()
                 // 智能音箱控制器由资源服务器管理
-                .antMatchers("/speaker/**").permitAll()
+                .antMatchers("/oauth/speaker/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/login")
+                .loginPage("/oauth/login")
                 .permitAll()
                 .and()
-                .logout().logoutUrl("/logout")
-                .permitAll();
+                .logout().logoutUrl("/oauth/logout")
+                .permitAll()
+
+
+
+                .and()
+                .headers().frameOptions().disable();
+        httpSecurity.logout().logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler);
+        // 添加JWT filter
+        httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        // 添加CORS filter
+        httpSecurity.addFilterBefore(corsFilter, JwtAuthenticationTokenFilter.class);
+        httpSecurity.addFilterBefore(corsFilter, LogoutFilter.class);
 
     }
 

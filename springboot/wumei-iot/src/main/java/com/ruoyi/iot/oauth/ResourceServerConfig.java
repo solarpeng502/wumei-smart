@@ -3,6 +3,7 @@ package com.ruoyi.iot.oauth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
@@ -31,7 +32,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         // 限制资源服务器只接管匹配的资源
-        http.requestMatchers().antMatchers("/speaker/**")
+        http.requestMatchers().antMatchers("/oauth/speaker/**")
                 .and()
                 .authorizeRequests()//授权的请求
                 .anyRequest().authenticated()

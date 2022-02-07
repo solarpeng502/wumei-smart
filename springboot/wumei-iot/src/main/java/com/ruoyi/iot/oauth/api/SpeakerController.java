@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class SpeakerController {
-    @GetMapping("/speaker/classical")
+    @GetMapping("/oauth/speaker/classical")
     public JSONObject getBook() {
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JSONObject bookJson = new JSONObject();
@@ -22,7 +22,7 @@ public class SpeakerController {
         bookJson.put("4", "三国演义");
         return bookJson;
     }
-    @PostMapping("/speaker/sell")
+    @PostMapping("/oauth/speaker/sell")
     public JSONObject sellBook() {
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JSONObject bookJson = new JSONObject();
