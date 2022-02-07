@@ -92,47 +92,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception
     {
-//        httpSecurity
-//                // CSRF禁用，因为不使用session
-//                .csrf().disable()
-//                // 认证失败处理类
-//                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-//                // 基于token，所以不需要session
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-//                // 过滤请求
-//                .authorizeRequests()
-//                // 对于登录login 注册register 验证码captchaImage 允许匿名访问
-//                .antMatchers("/login", "/register", "/captchaImage","/iot/tool/register").anonymous()
-//                .antMatchers(
-//                        HttpMethod.GET,
-//                        "/",
-//                        "/*.html",
-//                        "/**/*.html",
-//                        "/**/*.css",
-//                        "/**/*.js",
-//                        "/profile/**"
-//                ).permitAll()
-//                .antMatchers("/swagger-ui.html").anonymous()
-//                .antMatchers("/swagger-resources/**").anonymous()
-//                .antMatchers("/webjars/**").anonymous()
-//                .antMatchers("/*/api-docs").anonymous()
-//                .antMatchers("/druid/**").anonymous()
-//                // 除上面外的所有请求全部需要鉴权认证
-//                .anyRequest().authenticated()
-//                .and()
-//                .headers().frameOptions().disable()
-//        httpSecurity.logout().logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler);
-//        // 添加JWT filter
-//        httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
-//        // 添加CORS filter
-//        httpSecurity.addFilterBefore(corsFilter, JwtAuthenticationTokenFilter.class);
-//        httpSecurity.addFilterBefore(corsFilter, LogoutFilter.class);
-
         httpSecurity
                 // CSRF禁用，因为不使用session
                 .csrf().disable()
-                // 认证失败处理类
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+                // 认证失败处理类 TODO 启用自定义认证会导致oauth授权地址不能访问
+                //.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 // 基于token，所以不需要session
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 // 过滤请求
@@ -153,8 +117,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                 .antMatchers("/webjars/**").anonymous()
                 .antMatchers("/*/api-docs").anonymous()
                 .antMatchers("/druid/**").anonymous()
-
-
+                /************ oauth ************************/
                 // 静态资源文件
                 .antMatchers("/oauth/logout/**","/oauth/css/**","/oauth/fonts/**").permitAll()
                 // 智能音箱控制器由资源服务器管理
@@ -167,9 +130,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                 .and()
                 .logout().logoutUrl("/oauth/logout")
                 .permitAll()
-
-
-
+                /************* oauth **************************/
                 .and()
                 .headers().frameOptions().disable();
         httpSecurity.logout().logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler);

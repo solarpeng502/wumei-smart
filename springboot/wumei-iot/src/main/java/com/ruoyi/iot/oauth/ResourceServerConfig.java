@@ -34,7 +34,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
         // 限制资源服务器只接管匹配的资源
         http.requestMatchers().antMatchers("/oauth/speaker/**")
                 .and()
-                .authorizeRequests()//授权的请求
+                //授权的请求
+                .authorizeRequests()
                 .anyRequest().authenticated()
                 //关闭跨站请求防护
                 .and()

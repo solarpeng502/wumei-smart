@@ -12,21 +12,22 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class SpeakerController {
-    @GetMapping("/oauth/speaker/classical")
-    public JSONObject getBook() {
+    @GetMapping("/oauth/speaker/get")
+    public JSONObject getSpeaker() {
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        JSONObject bookJson = new JSONObject();
-        bookJson.put("1", "西游记");
-        bookJson.put("2", "水浒传");
-        bookJson.put("3", "红楼梦");
-        bookJson.put("4", "三国演义");
-        return bookJson;
+        JSONObject Json = new JSONObject();
+        Json.put("1", "1");
+        Json.put("2", "2");
+        Json.put("3", "3");
+        System.out.println("调用了接口get");
+        return Json;
     }
-    @PostMapping("/oauth/speaker/sell")
-    public JSONObject sellBook() {
+    @PostMapping("/oauth/speaker/post")
+    public JSONObject postSpeaker() {
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JSONObject bookJson = new JSONObject();
-        bookJson.put("4", "三国演义");
+        bookJson.put("1", "1");
+        System.out.println("调用了接口post");
         return bookJson;
     }
 }

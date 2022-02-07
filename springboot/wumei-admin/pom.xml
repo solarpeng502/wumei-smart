@@ -93,12 +93,6 @@
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     <warName>${project.artifactId}</warName>
-                    <webResources>
-                        <resource>
-                            <directory></directory>
-                            <filtering>false</filtering>
-                        </resource>
-                    </webResources>
                 </configuration>   
            </plugin>   
         </plugins>
