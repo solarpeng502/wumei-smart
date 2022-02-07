@@ -3,7 +3,6 @@ package com.ruoyi;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
  * 启动程序
@@ -11,12 +10,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  * @author ruoyi
  */
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
-public class RuoYiApplication
+public class WumeiSmartApplication
 {
     public static void main(String[] args)
     {
         // System.setProperty("spring.devtools.restart.enabled", "false");
-        SpringApplication.run(RuoYiApplication.class, args);
+        SpringApplication.run(WumeiSmartApplication.class, args);
         System.out.println("                               _                            _   \n" +
                 "                              (_)                          | |             \n" +
                 "__      ___   _ _ __ ___   ___ _   ___ _ __ ___   __ _ _ __| |_            \n" +
