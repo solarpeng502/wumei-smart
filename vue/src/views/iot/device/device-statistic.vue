@@ -11,6 +11,7 @@
 
 <script>
 import * as echarts from 'echarts';
+require('echarts/theme/macarons') // echarts theme
 export default {
     name: "device-statistic",
     data() {
@@ -26,7 +27,7 @@ export default {
     methods: {
         /**监测数据 */
         getMonitor() {
-            var myChart = echarts.init(this.$refs.monitor);
+            var myChart = echarts.init(this.$refs.monitor,"macarons");
             var option;
 
             let base = +new Date(2010, 9, 3);
