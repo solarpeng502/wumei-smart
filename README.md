@@ -6,8 +6,9 @@
 2. 设备接入采用EMQX消息服务器，认证采用EMQX内置的Http认证插件，需要关闭匿名认证。后端采用Spring boot；前端采用Vue；移动端采用Uniapp；数据库采用Mysql、Redis和TDengine；设备端支持多种硬件SDK生成，例如ESP32、ESP8266、树莓派等；设备模拟器采用Android和Winform框架，不仅能模拟硬件设备，还可以控制和监测电脑、手机。
 
 3. 系统架构图
-
-![架构图](https://github.com/kerwincui/wumei-smart/blob/master/document/sys.png?raw=true)
+![系统架构图](https://github.com/kerwincui/wumei-smart/blob/master/document/sys.png?raw=true)
+4. 使用流程
+![使用流程图](https://raw.githubusercontent.com/kerwincui/wumei-smart/master/document/process.png)
 
 
 ### 二、功能
