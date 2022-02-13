@@ -1,14 +1,6 @@
 <template>
-<div class="app-container home" style="padding-bottom:200px;">
+<div class="app-container home">
     <el-row :gutter="40">
-        <el-col :span="24">
-            <el-card style="margin:-10px;margin-bottom:30px;" shadow="hover">
-                <span style="font-weight:bold;">wumei smart - 开源生活物联网平台</span>
-                <el-link href="https://gitee.com/kerwincui/wumei-smart/wikis/" target="_blank" type="primary" style="margin-left:20px;">项目文档 >></el-link>
-                <el-link href="https://github.com/kerwincui/wumei-smart" target="_blank" type="danger" style="margin-left:20px;">Github源码 >></el-link>
-                <el-link href="https://gitee.com/kerwincui/wumei-smart" target="_blank" type="success" style="margin-left:20px;">码云源码 >></el-link>
-            </el-card>
-        </el-col>
         <el-col :span="14">
             <el-card style="margin:-10px;" shadow="hover">
                 <div ref="map" style="height:650px;margin:-10px;margin-top:-5px;"></div>
@@ -28,56 +20,66 @@
 
     <el-row :gutter="40" style="margin-top:80px;">
         <el-col :span="1">
-            <el-card style="margin:-10px;height:238px;margin-right:-31px;padding-top:45px;text-align:center;font-weight:bold;" shadow="none">
+            <el-card style="margin:-10px;height:218px;margin-right:-31px;padding-top:35px;text-align:center;font-weight:bold;" shadow="none">
                 服<br />务<br />器<br />状<br />态
             </el-card>
         </el-col>
         <el-col :span="5">
-            <el-card style="margin:-10px;height:238px;" shadow="hover">
+            <el-card style="margin:-10px;height:218px;" shadow="hover">
                 <el-descriptions :column="1">
                     <el-descriptions-item label="服务器名称"><strong>{{server.sys.computerName}}</strong></el-descriptions-item>
                     <el-descriptions-item label="服务器IP"><strong>{{server.sys.computerIp}}</strong></el-descriptions-item>
                     <el-descriptions-item label="操作系统"><strong>{{server.sys.osName}}</strong></el-descriptions-item>
                     <el-descriptions-item label="系统架构"><strong>{{server.sys.osArch}}</strong></el-descriptions-item>
-                    <el-descriptions-item label="CPU核心数"><strong>{{server.cpu.cpuNum}}</strong></el-descriptions-item>
+                    <el-descriptions-item label="CPU核心"><strong>{{server.cpu.cpuNum}}核</strong></el-descriptions-item>
+                    <el-descriptions-item label="总内存"><strong>{{server.mem.total}}G</strong></el-descriptions-item>
                 </el-descriptions>
             </el-card>
         </el-col>
         <el-col :span="4">
             <el-card style="margin:-10px;" shadow="hover">
-                <div ref="pieCpu" style="height:200px;"></div>
+                <div ref="pieCpu" style="height:200px;margin-bottom:-20px;"></div>
             </el-card>
         </el-col>
         <el-col :span="4">
             <el-card style="margin:-10px;" shadow="hover">
-                <div ref="pieMemery" style="height:200px;"></div>
+                <div ref="pieMemery" style="height:200px;margin-bottom:-20px;"></div>
             </el-card>
         </el-col>
         <el-col :span="4">
             <el-card style="margin:-10px;" shadow="hover">
-                <div ref="pieDisk" style="height:200px;"></div>
+                <div ref="pieDisk" style="height:200px;margin-bottom:-20px;"></div>
             </el-card>
         </el-col>
         <el-col :span="6">
-            <el-card style="margin:-10px;height:238px;" shadow="hover">
-                <el-descriptions  :column="1">
+            <el-card style="margin:-10px;height:218px;" shadow="hover">
+                <el-descriptions :column="1">
                     <el-descriptions-item label="Java名称"><strong>{{server.jvm.name}}</strong></el-descriptions-item>
                     <el-descriptions-item label="启动时间"><strong>{{ server.jvm.startTime }}</strong></el-descriptions-item>
                     <el-descriptions-item label="Java版本"><strong>{{ server.jvm.version }}</strong></el-descriptions-item>
                     <el-descriptions-item label="运行时长"><strong>{{ server.jvm.runTime }}</strong></el-descriptions-item>
                     <el-descriptions-item label="占用内存"><strong>{{server.jvm.used}}M</strong></el-descriptions-item>
+                    <el-descriptions-item label="JVM总内存"><strong>{{server.jvm.total}}M</strong></el-descriptions-item>
                 </el-descriptions>
             </el-card>
         </el-col>
     </el-row>
 
+    <div style="margin:-21px;margin-top:100px;bottom:0;border:1px solid #ccc;padding:10px;margin-bottom:-21px;">
+        <div>
+            <el-link href="https://wumei.live" target="_blank" type="primary" style="margin-left:20px;">开源生活物联网平台 >></el-link>
+            <el-link href="https://github.com/kerwincui/wumei-smart" target="_blank" type="danger" style="margin-left:30px;">Github源码 >></el-link>
+            <el-link href="https://gitee.com/kerwincui/wumei-smart" target="_blank" type="success" style="margin-left:30px;">码云源码 >></el-link>
+        </div>
+    </div>
+
 </div>
 </template>
 
 <style scoped>
-    .margin-top .el-descriptions-item__label {
-        font-weight:bold;
-    }
+.margin-top .el-descriptions-item__label {
+    font-weight: bold;
+}
 </style>
 
 <script>
@@ -106,7 +108,8 @@ export default {
                     version: "",
                     startTime: "",
                     runTime: "",
-                    used: ""
+                    used: "",
+                    total: 100
                 },
                 sys: {
                     computerName: "",
@@ -116,6 +119,9 @@ export default {
                 },
                 cpu: {
                     cpuNum: 1
+                },
+                mem: {
+                    total: 2
                 }
             }
         };
@@ -1128,7 +1134,7 @@ export default {
                     trigger: 'item'
                 },
                 bmap: {
-                    center: [133, 35],
+                    center: [133, 37],
                     zoom: 5,
                     roam: true,
                     mapStyle: {
@@ -1463,13 +1469,13 @@ export default {
                     orient: 'vertical',
                     left: 'right'
                 },
-                color:['#E6A23C','#F56C6C', '#409EFF'],
+                color: ['#E6A23C', '#F56C6C', '#409EFF'],
                 series: [{
                     name: 'CPU使用率 %',
                     type: 'pie',
                     radius: '55%',
                     label: {
-                        show:false
+                        show: false
                     },
                     labelLine: {
                         normal: {
@@ -1500,7 +1506,7 @@ export default {
             var option;
             option = {
                 title: {
-                    text: '内存使用率 %',
+                    text: '内存使用 G',
                     left: 'left'
                 },
                 tooltip: {
@@ -1510,13 +1516,13 @@ export default {
                     orient: 'vertical',
                     left: 'right'
                 },
-                color:['#F56C6C', '#409EFF'],
+                color: ['#F56C6C', '#409EFF'],
                 series: [{
-                    name: '内存使用率 %',
+                    name: '内存使用率 G',
                     type: 'pie',
                     radius: '55%',
                     label: {
-                        show:false
+                        show: false
                     },
                     labelLine: {
                         normal: {
@@ -1545,7 +1551,7 @@ export default {
             let two = this.server.sysFiles[0].free.replace("GB", "");;
             option = {
                 title: {
-                    text: 'C盘状态 GB',
+                    text: 'C盘状态 G',
                     left: 'left'
                 },
                 tooltip: {
@@ -1555,13 +1561,13 @@ export default {
                     orient: 'vertical',
                     left: 'right'
                 },
-                color:['#F56C6C', '#409EFF'],
+                color: ['#F56C6C', '#409EFF'],
                 series: [{
-                    name: '磁盘状态 GB',
+                    name: '磁盘状态 G',
                     type: 'pie',
                     radius: '55%',
                     label: {
-                        show:false
+                        show: false
                     },
                     labelLine: {
                         normal: {

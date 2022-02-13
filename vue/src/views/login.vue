@@ -209,7 +209,7 @@ export default {
     h3 {
         margin: 0;
         font-weight: bold;
-        font-size:24px;
+        font-size:20px;
         color:#333;
     }
 
