@@ -1,6 +1,5 @@
 package com.ruoyi.iot.mqtt;
 
-import com.ruoyi.iot.controller.FirmwareController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,7 @@ public class MqttConfig {
     private static final Logger logger = LoggerFactory.getLogger(MqttConfig.class);
 
     @Autowired
-    private EmqxClient mqttPushClient;
+    private EmqxClient emqxClient;
 
     /**
      * 用户名
@@ -95,8 +94,8 @@ public class MqttConfig {
     public void setkeepalive(int keepalive) {this.keepalive = keepalive;}
 
     @Bean
-    public EmqxClient getMqttPushClient() {
-        mqttPushClient.connect(hostUrl, clientId, username, password, timeout, keepalive);
-        return mqttPushClient;
+    public void EmqxClientStart() {
+        logger.info("mqtt启动中...");
+        emqxClient.connect(hostUrl, clientId, username, password, timeout, keepalive);
     }
 }

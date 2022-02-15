@@ -5,6 +5,7 @@ import com.ruoyi.iot.domain.Device;
 import com.ruoyi.iot.model.DeviceShortOutput;
 import com.ruoyi.iot.model.IdAndName;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesInput;
+import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesOutput;
 
 /**
  * 设备Mapper接口
@@ -23,6 +24,14 @@ public interface DeviceMapper
     public Device selectDeviceByDeviceId(Long deviceId);
 
     /**
+     * 根据设备编号查询设备
+     *
+     * @param serialNumber 设备主键
+     * @return 设备
+     */
+    public Device selectDeviceBySerialNumber(String serialNumber);
+
+    /**
      * 查询设备和运行状态
      *
      * @param deviceId 设备主键
@@ -33,10 +42,10 @@ public interface DeviceMapper
     /**
      * 查询设备的物模型值
      *
-     * @param deviceId 设备主键
+     * @param serialNumber 设备编号
      * @return 设备
      */
-    public String selectDeviceThingsModelValueById(Long deviceId);
+    public ThingsModelValuesOutput selectDeviceThingsModelValueBySerialNumber(String serialNumber);
 
     /**
      * 修改设备的物模型值
@@ -45,6 +54,7 @@ public interface DeviceMapper
      * @return 结果
      */
     public int updateDeviceThingsModelValue(ThingsModelValuesInput input);
+
 
     /**
      * 查询设备列表
@@ -77,6 +87,14 @@ public interface DeviceMapper
      * @return 结果
      */
     public int updateDevice(Device device);
+
+    /**
+     * 通过设备编号修改设备
+     *
+     * @param device 设备
+     * @return 结果
+     */
+    public int updateDeviceBySerialNumber(Device device);
 
     /**
      * 删除设备

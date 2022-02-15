@@ -23,6 +23,14 @@ public interface IDeviceService
     public Device selectDeviceByDeviceId(Long deviceId);
 
     /**
+     * 根据设备编号查询设备
+     *
+     * @param serialNumber 设备主键
+     * @return 设备
+     */
+    public Device selectDeviceBySerialNumber(String serialNumber);
+
+    /**
      * 查询设备和运行状态
      *
      * @param deviceId 设备主键
@@ -31,18 +39,11 @@ public interface IDeviceService
     public DeviceShortOutput selectDeviceRunningStatusByDeviceId(Long deviceId);
 
     /**
-     * 查询设备的物模型值
-     * @param deviceId
-     * @return
-     */
-    public String selectDeviceThingsModelValueById(Long deviceId);
-
-    /**
-     * 更新设备的物模型
+     * 上报设备的物模型
      * @param input
      * @return
      */
-    public int updateDeviceThingsModelValue(ThingsModelValuesInput input,int type);
+    public int reportDeviceThingsModelValue(ThingsModelValuesInput input,int type);
 
     /**
      * 查询设备列表
@@ -75,6 +76,13 @@ public interface IDeviceService
      * @return 结果
      */
     public int updateDevice(Device device);
+
+    /**
+     * 上报设备信息
+     * @param device 设备
+     * @return 结果
+     */
+    public int reportDevice(Device device);
 
     /**
      * 批量删除设备

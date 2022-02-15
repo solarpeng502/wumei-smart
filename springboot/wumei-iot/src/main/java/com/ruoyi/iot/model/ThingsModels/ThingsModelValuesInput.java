@@ -15,14 +15,24 @@ public class ThingsModelValuesInput
     /** 产品ID **/
     private Long productId;
 
-    /** 设备ID **/
     private Long deviceId;
+
+    /** 设备ID **/
+    private String deviceNumber;
 
     /** 设备物模型值的字符串格式 **/
     private String stringValue;
 
     /** 设备物模型值的集合 **/
     private List<ThingsModelValueItemInput> thingsModelValueItemInputs;
+
+    public Long getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(Long deviceId) {
+        this.deviceId = deviceId;
+    }
 
     public Long getProductId() {
         return productId;
@@ -40,12 +50,12 @@ public class ThingsModelValuesInput
         this.stringValue = stringValue;
     }
 
-    public Long getDeviceId() {
-        return deviceId;
+    public String getDeviceNumber() {
+        return deviceNumber;
     }
 
-    public void setDeviceId(Long deviceId) {
-        this.deviceId = deviceId;
+    public void setDeviceNumber(String deviceNumber) {
+        this.deviceNumber = deviceNumber;
     }
 
     public List<ThingsModelValueItemInput> getThingsModelValueItemInputs() {

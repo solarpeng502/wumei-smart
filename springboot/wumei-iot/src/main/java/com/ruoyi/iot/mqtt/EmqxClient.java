@@ -5,12 +5,10 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 /**
- * @Classname MqttPushClient
+ * @Classname EmqxClient
  * @Description mqtt推送客户端
  */
 @Component
@@ -18,10 +16,10 @@ public class EmqxClient {
     private static final Logger logger = LoggerFactory.getLogger(EmqxClient.class);
 
     @Autowired
-    private EmqxCallback pushCallback;
+    private EmqxCallback emqxCallback;
 
     @Autowired
-    private MqttConfig mqttConfig;
+    private EmqxService emqxService;
 
     private static MqttClient client;
 
@@ -54,7 +52,7 @@ public class EmqxClient {
             options.setConnectionTimeout(timeout);
             options.setKeepAliveInterval(keepalive);
             EmqxClient.setClient(client);
-            client.setCallback(pushCallback);
+            client.setCallback(emqxCallback);
             clientConnect(options,client);
         } catch (Exception e) {
             e.printStackTrace();
@@ -70,13 +68,15 @@ public class EmqxClient {
     public void clientConnect(MqttConnectOptions options, MqttClient client) throws InterruptedException {
         try {
             client.connect(options);
+            logger.info("mqtt连接成功");
+            // 订阅主题
+            emqxService.subscribe(client);
         } catch (Exception e) {
             logger.error("mqtt连接失败,"+e.getMessage());
             //发生错误后重新连接
             Thread.sleep(10000);
             clientConnect(options,client);
         }
-        logger.info("mqtt连接成功");
     }
 
     /**
@@ -87,6 +87,7 @@ public class EmqxClient {
      * @param pushMessage 消息体
      */
     public void publish(int qos, boolean retained, String topic, String pushMessage) {
+        logger.info("发布主题" + topic);
         MqttMessage message = new MqttMessage();
         message.setQos(qos);
         message.setRetained(retained);
@@ -108,12 +109,11 @@ public class EmqxClient {
 
     /**
      * 订阅某个主题
-     *
      * @param topic 主题
      * @param qos   连接方式
      */
     public void subscribe(String topic, int qos) {
-        logger.info("开始订阅主题" + topic);
+        logger.info("订阅主题" + topic);
         try {
             EmqxClient.getClient().subscribe(topic, qos);
         } catch (MqttException e) {

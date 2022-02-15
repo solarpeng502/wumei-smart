@@ -51,6 +51,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="imgUrl"    column="img_url"    />
     </resultMap>
 
+    <resultMap type="com.ruoyi.iot.model.ThingsModels.ThingsModelValuesOutput" id="DeviceThingsValueResult">
+        <result property="deviceId"    column="device_id"    />
+        <result property="deviceName"    column="device_name"    />
+        <result property="productId"    column="product_id"    />
+        <result property="productName"    column="product_name"    />
+        <result property="serialNumber"    column="serial_number"    />
+        <result property="thingsModelValue"    column="things_model_value"    />
+    </resultMap>
+
     <sql id="selectDeviceVo">
         select device_id, device_name, product_id, product_name, user_id, user_name, tenant_id, tenant_name, serial_number, firmware_version, status, rssi,is_shadow ,is_customer_location,things_model_value,network_address, network_ip, longitude, latitude, active_time, create_time, update_time, img_url,remark from iot_device
     </sql>
@@ -77,8 +86,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         order by create_time desc
     </select>
 
-    <select id="selectDeviceThingsModelValueById" parameterType="Long" resultType="java.lang.String">
-        select things_model_value from iot_device where device_id = #{deviceId}
+    <select id="selectDeviceThingsModelValueBySerialNumber" parameterType="String" resultMap="DeviceThingsValueResult">
+        select product_id,product_name,device_id,device_name,serial_number,things_model_value from iot_device where serial_number = #{serialNumber}
     </select>
 
     <update id="updateDeviceThingsModelValue" parameterType="com.ruoyi.iot.model.ThingsModels.ThingsModelValuesInput">
@@ -105,6 +114,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectDeviceByDeviceId" parameterType="Long" resultMap="DeviceResult">
         <include refid="selectDeviceVo"/>
         where device_id = #{deviceId}
+    </select>
+
+    <select id="selectDeviceBySerialNumber" parameterType="String" resultMap="DeviceResult">
+        <include refid="selectDeviceVo"/>
+        where serial_number = #{serialNumber}
     </select>
 
     <select id="selectDeviceRunningStatusByDeviceId" parameterType="Long" resultMap="DeviceShortResult">
@@ -203,6 +217,39 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="imgUrl != null">img_url = #{imgUrl},</if>
         </trim>
         where device_id = #{deviceId}
+    </update>
+
+    <update id="updateDeviceBySerialNumber" parameterType="Device">
+        update iot_device
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deviceName != null and deviceName != ''">device_name = #{deviceName},</if>
+            <if test="productId != null">product_id = #{productId},</if>
+            <if test="productName != null and productName != ''">product_name = #{productName},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="userName != null and userName != ''">user_name = #{userName},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="tenantName != null and tenantName != ''">tenant_name = #{tenantName},</if>
+            <if test="serialNumber != null and serialNumber != ''">serial_number = #{serialNumber},</if>
+            <if test="firmwareVersion != null">firmware_version = #{firmwareVersion},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="rssi != null">rssi = #{rssi},</if>
+            <if test="isShadow != null">is_shadow = #{isShadow},</if>
+            <if test="isCustomerLocation != null">is_customer_location = #{isCustomerLocation},</if>
+            <if test="thingsModelValue != null">things_model_value = #{thingsModelValue},</if>
+            <if test="networkAddress != null">network_address = #{networkAddress},</if>
+            <if test="networkIp != null">network_ip = #{networkIp},</if>
+            <if test="longitude != null">longitude = #{longitude},</if>
+            <if test="latitude != null">latitude = #{latitude},</if>
+            <if test="activeTime != null">active_time = #{activeTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="imgUrl != null">img_url = #{imgUrl},</if>
+        </trim>
+        where serial_number = #{serialNumber}
     </update>
 
     <delete id="deleteDeviceByDeviceId" parameterType="Long">

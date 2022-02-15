@@ -78,7 +78,7 @@ public class ThingsModelValueItemDto
         this.name = name;
     }
 
-    public class DataType{
+    public static class DataType{
         private String type;
         private String falseText;
         private String trueText;
@@ -171,7 +171,7 @@ public class ThingsModelValueItemDto
         }
     }
 
-    public class EnumItem
+    public static class EnumItem
     {
         private String text;
         private String value;
