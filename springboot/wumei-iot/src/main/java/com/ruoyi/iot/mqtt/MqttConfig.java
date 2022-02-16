@@ -93,7 +93,7 @@ public class MqttConfig {
     }
     public void setkeepalive(int keepalive) {this.keepalive = keepalive;}
 
-    @Bean
+    // @Bean
     public void EmqxClientStart() {
         logger.info("mqtt启动中...");
         emqxClient.connect(hostUrl, clientId, username, password, timeout, keepalive);

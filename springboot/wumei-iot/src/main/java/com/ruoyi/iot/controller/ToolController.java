@@ -11,6 +11,8 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.common.utils.file.MimeTypeUtils;
+import com.ruoyi.iot.model.MqttAuthModel;
+import com.ruoyi.iot.model.MqttClientConnectModel;
 import com.ruoyi.iot.model.RegisterUserInput;
 import com.ruoyi.iot.service.ICategoryService;
 import com.ruoyi.iot.service.IToolService;
@@ -26,7 +28,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.system.ApplicationHome;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -73,6 +77,29 @@ public class ToolController extends BaseController
     {
         String msg = toolService.register(user);
         return StringUtils.isEmpty(msg) ? success() : error(msg);
+    }
+
+    @ApiOperation("mqtt认证")
+    @PostMapping("/mqtt/auth")
+    public ResponseEntity mqttAuth(@RequestParam String clientid, @RequestParam String username, @RequestParam String password ){
+
+        System.out.println("-------------------------认证-------------------------------");
+        System.out.println(clientid+username+password);
+        if(username.equals("admin") && password.equals("admin123")) {
+            System.out.println("-------------------------认证成功-------------------------------");
+            return ResponseEntity.ok().body("ok");
+        }else{
+            System.out.println("-------------------------认证失败-------------------------------");
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+    }
+
+    @ApiOperation("mqtt钩子处理")
+    @PostMapping("/mqtt/webhook")
+    public AjaxResult webHookProcess(@RequestBody MqttClientConnectModel model){
+        System.out.println("------------------------事件--------------------------------");
+        System.out.println(model.getAction());
+        return AjaxResult.success();
     }
 
     /**
