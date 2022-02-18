@@ -115,7 +115,7 @@ export default {
         // 获取到父组件传递的device后，刷新列表
         device: function (newVal, oldVal) {
             this.deviceInfo = newVal;
-            if (this.deviceInfo.deviceId != 0) {
+            if (this.deviceInfo && this.deviceInfo.deviceId != 0) {
                 getDeviceRunningStatus(this.deviceInfo.deviceId).then(response => {
                     this.deviceInfo = response.data;
                     this.$nextTick(function () {
