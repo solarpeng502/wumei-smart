@@ -2,6 +2,7 @@ package com.ruoyi.iot.mapper;
 
 import java.util.List;
 import com.ruoyi.iot.domain.Device;
+import com.ruoyi.iot.model.DeviceAuthenticateModel;
 import com.ruoyi.iot.model.DeviceShortOutput;
 import com.ruoyi.iot.model.IdAndName;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesInput;
@@ -30,6 +31,14 @@ public interface DeviceMapper
      * @return 设备
      */
     public Device selectDeviceBySerialNumber(String serialNumber);
+
+    /**
+     * 根据设备编号查询设备认证信息
+     *
+     * @param serialNumber 设备主键
+     * @return 设备
+     */
+    public DeviceAuthenticateModel selectDeviceAuthenticateBySerialNumber(String serialNumber);
 
     /**
      * 查询设备和运行状态
@@ -87,6 +96,14 @@ public interface DeviceMapper
      * @return 结果
      */
     public int updateDevice(Device device);
+
+    /**
+     * 更新设备状态
+     *
+     * @param device 设备
+     * @return 结果
+     */
+    public int updateDeviceStatus(Device device);
 
     /**
      * 通过设备编号修改设备

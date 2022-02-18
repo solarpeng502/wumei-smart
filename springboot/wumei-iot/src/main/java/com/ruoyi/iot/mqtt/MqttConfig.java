@@ -71,7 +71,7 @@ public class MqttConfig {
 
     public String getclientId()
     {
-        return clientId;
+        return "server-"+clientId;
     }
     public void setclientId(String clientId) {this.clientId = clientId;}
 
@@ -96,6 +96,6 @@ public class MqttConfig {
     // @Bean
     public void EmqxClientStart() {
         logger.info("mqtt启动中...");
-        emqxClient.connect(hostUrl, clientId, username, password, timeout, keepalive);
+        emqxClient.connect(gethostUrl(), getclientId(), getusername(), getpassword(), gettimeout(), getkeepalive());
     }
 }

@@ -39,6 +39,8 @@ public class EmqxService {
     private static final String suffixGet="/get";
     private static final String info="info";
     private static final String ntp="ntp";
+    private static final String ota="ota";
+    private static final String status="status";
     private static final String property="property";
     private static final String function="function";
     private static final String event="event";
@@ -164,8 +166,15 @@ public class EmqxService {
     /**
      * 发布设备升级
      */
-    public void publishOta(){
+    public void publishOta(Long productId,String deviceNum){
+        emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+"/"+ota+suffixGet, "");
+    }
 
+    /**
+     * 发布设备状态
+     */
+    public void publishStatus(Long productId,String deviceNum,int status){
+        emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+"/"+status+suffixGet, "{\"status\":"+status+"}");
     }
 
 

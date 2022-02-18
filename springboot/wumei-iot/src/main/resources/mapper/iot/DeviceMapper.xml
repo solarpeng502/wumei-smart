@@ -51,6 +51,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="imgUrl"    column="img_url"    />
     </resultMap>
 
+    <resultMap type="com.ruoyi.iot.model.DeviceAuthenticateModel" id="DeviceAuthenticateResult">
+        <result property="deviceId"    column="device_id"    />
+        <result property="deviceName"    column="device_name"    />
+        <result property="status"    column="status"    />
+        <result property="productId"    column="product_id"    />
+        <result property="productName"    column="product_name"    />
+        <result property="serialNumber"    column="serial_number"    />
+        <result property="mqttAccount"    column="mqtt_account"    />
+        <result property="mqttPassword"    column="mqtt_password"    />
+        <result property="mqttSecret"    column="mqtt_secret"    />
+    </resultMap>
+
     <resultMap type="com.ruoyi.iot.model.ThingsModels.ThingsModelValuesOutput" id="DeviceThingsValueResult">
         <result property="deviceId"    column="device_id"    />
         <result property="deviceName"    column="device_name"    />
@@ -114,6 +126,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectDeviceByDeviceId" parameterType="Long" resultMap="DeviceResult">
         <include refid="selectDeviceVo"/>
         where device_id = #{deviceId}
+    </select>
+
+    <select id="selectDeviceAuthenticateBySerialNumber" parameterType="String" resultMap="DeviceAuthenticateResult">
+        select d.device_id, d.device_name,d.status, d.product_id, d.product_name, d.serial_number ,p.mqtt_password,p.mqtt_account,p.mqtt_secret
+        from iot_device d
+        left join iot_product p on d.product_id=p.product_id
+        where serial_number = #{serialNumber}
     </select>
 
     <select id="selectDeviceBySerialNumber" parameterType="String" resultMap="DeviceResult">
@@ -217,6 +236,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="imgUrl != null">img_url = #{imgUrl},</if>
         </trim>
         where device_id = #{deviceId}
+    </update>
+
+    <update id="updateDeviceStatus" parameterType="Device">
+        update iot_device set status=#{status}
+        where serial_number = #{serialNumber}
     </update>
 
     <update id="updateDeviceBySerialNumber" parameterType="Device">

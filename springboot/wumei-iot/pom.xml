@@ -61,6 +61,18 @@
             <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
             <version>1.2.0</version>
         </dependency>
+        <!--AES-->
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>5.2.3.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.wumei</groupId>
+            <artifactId>wumei-quartz</artifactId>
+            <version>3.8.0</version>
+        </dependency>
 
 
     </dependencies>

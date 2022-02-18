@@ -1,18 +1,18 @@
 package com.ruoyi.iot.service.impl;
 
-import java.util.List;
-import java.util.Random;
-
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.iot.domain.Product;
+import com.ruoyi.iot.mapper.ProductMapper;
 import com.ruoyi.iot.model.IdAndName;
+import com.ruoyi.iot.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.iot.mapper.ProductMapper;
-import com.ruoyi.iot.domain.Product;
-import com.ruoyi.iot.service.IProductService;
+
+import java.util.List;
+import java.util.Random;
 
 import static com.ruoyi.common.utils.SecurityUtils.getLoginUser;
 
@@ -86,8 +86,9 @@ public class ProductServiceImpl implements IProductService
             product.setIsSys(1);
         }
         // mqtt账号密码
-        product.setMqttAccount("A"+getStringRandom(15));
+        product.setMqttAccount("wumei-smart");
         product.setMqttPassword("P"+getStringRandom(15));
+        product.setMqttSecret("K"+getStringRandom(15));
         product.setStatus(product.getStatus()==null?1:product.getStatus());
         product.setTenantId(user.getUserId());
         product.setTenantName(user.getUserName());

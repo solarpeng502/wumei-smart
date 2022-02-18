@@ -48,6 +48,17 @@ public class Product extends BaseEntity
     /** mqtt密码 */
     private String mqttPassword;
 
+    /** 产品秘钥 */
+    private String mqttSecret;
+
+    public String getMqttSecret() {
+        return mqttSecret;
+    }
+
+    public void setMqttSecret(String mqttSecret) {
+        this.mqttSecret = mqttSecret;
+    }
+
     /** 状态（1-未发布，2-已发布，不能修改） */
     @Excel(name = "状态", readConverterExp = "1=-未发布，2-已发布，不能修改")
     private Integer status;

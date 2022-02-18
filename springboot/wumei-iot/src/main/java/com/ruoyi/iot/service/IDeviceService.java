@@ -1,10 +1,11 @@
 package com.ruoyi.iot.service;
 
-import java.util.List;
 import com.ruoyi.iot.domain.Device;
+import com.ruoyi.iot.model.DeviceAuthenticateModel;
 import com.ruoyi.iot.model.DeviceShortOutput;
-import com.ruoyi.iot.model.IdAndName;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesInput;
+
+import java.util.List;
 
 /**
  * 设备Service接口
@@ -29,6 +30,14 @@ public interface IDeviceService
      * @return 设备
      */
     public Device selectDeviceBySerialNumber(String serialNumber);
+
+    /**
+     * 根据设备编号查询设备认证信息
+     *
+     * @param serialNumber 设备主键
+     * @return 设备
+     */
+    public DeviceAuthenticateModel selectDeviceAuthenticateBySerialNumber(String serialNumber);
 
     /**
      * 查询设备和运行状态
@@ -76,6 +85,14 @@ public interface IDeviceService
      * @return 结果
      */
     public int updateDevice(Device device);
+
+    /**
+     * 更新设备状态
+     * @param deviceNUm 设备编号
+     * @param status 设备状态（1-未激活，2-禁用，3-在线，4-离线）
+     * @return 结果
+     */
+    public int updateDeviceStatus(String deviceNUm,int status);
 
     /**
      * 上报设备信息

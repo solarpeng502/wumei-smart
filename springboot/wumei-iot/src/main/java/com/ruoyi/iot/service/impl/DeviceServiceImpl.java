@@ -1,31 +1,32 @@
 package com.ruoyi.iot.service.impl;
 
-import java.beans.Transient;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.iot.domain.Device;
 import com.ruoyi.iot.domain.DeviceLog;
 import com.ruoyi.iot.domain.DeviceUser;
 import com.ruoyi.iot.mapper.DeviceLogMapper;
+import com.ruoyi.iot.mapper.DeviceMapper;
 import com.ruoyi.iot.mapper.DeviceUserMapper;
-import com.ruoyi.iot.model.*;
+import com.ruoyi.iot.model.DeviceAuthenticateModel;
+import com.ruoyi.iot.model.DeviceShortOutput;
 import com.ruoyi.iot.model.ThingsModelItem.*;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValueItemDao;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValueItemDto;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesInput;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesOutput;
+import com.ruoyi.iot.service.IDeviceService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import com.ruoyi.iot.mapper.DeviceMapper;
-import com.ruoyi.iot.domain.Device;
-import com.ruoyi.iot.service.IDeviceService;
+
+import java.beans.Transient;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.ruoyi.common.utils.SecurityUtils.getLoginUser;
 
@@ -69,6 +70,17 @@ public class DeviceServiceImpl implements IDeviceService {
     @Override
     public Device selectDeviceBySerialNumber(String serialNumber) {
         return deviceMapper.selectDeviceBySerialNumber(serialNumber);
+    }
+
+    /**
+     * 根据设备编号查询设备认证信息
+     *
+     * @param serialNumber 设备主键
+     * @return 设备
+     */
+    @Override
+    public DeviceAuthenticateModel selectDeviceAuthenticateBySerialNumber(String serialNumber) {
+        return deviceMapper.selectDeviceAuthenticateBySerialNumber(serialNumber);
     }
 
     /**
@@ -378,6 +390,20 @@ public class DeviceServiceImpl implements IDeviceService {
             device.setProductName(null);
         }
         return deviceMapper.updateDevice(device);
+    }
+
+    /**
+     * 更新设备状态
+     * @param deviceNum 设备编号
+     * @param status 设备状态（1-未激活，2-禁用，3-在线，4-离线）
+     * @return 结果
+     */
+    @Override
+    public int updateDeviceStatus(String deviceNum,int status) {
+        Device device=new Device();
+        device.setStatus(status);
+        device.setSerialNumber(deviceNum);
+        return deviceMapper.updateDeviceStatus(device);
     }
 
     /**
