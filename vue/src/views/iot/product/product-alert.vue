@@ -1,5 +1,6 @@
 <template>
 <div class="app-container">
+<div style="height:50px; color:#F56C6C">该功能下个版本发布</div>
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
         <el-form-item label="告警名称" prop="alertName">
             <el-input v-model="queryParams.alertName" placeholder="请输入告警名称" clearable size="small" @keyup.enter.native="handleQuery" />
@@ -215,7 +216,7 @@
 
         </el-form>
         <div slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="submitForm">确 定</el-button>
+            <el-button type="primary" @click="submitForm" disabled>确 定</el-button>
             <el-button @click="cancel">取 消</el-button>
         </div>
     </el-dialog>

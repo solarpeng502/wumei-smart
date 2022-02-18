@@ -1,5 +1,6 @@
 <template>
 <el-row :gutter="10">
+<div style="height:50px; color:#F56C6C;margin-left:20px;">该功能下个版本发布</div>
     <el-col :span="14">
         <el-table v-loading="loading" :data="modelList" border style="margin-bottom:60px;margin-top:20px;">
             <el-table-column label="名称" align="center" prop="modelName" />

@@ -33,11 +33,6 @@
                                 <el-option v-for="dict in dict.type.iot_vertificate_method" :key="dict.value" :label="dict.label" :value="parseInt(dict.value)"></el-option>
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="产品秘钥" prop="mqttPassword">
-                            <el-input v-model="form.mqttPassword" placeholder="自动生成" readonly :type="keyInputType">
-                                <el-button slot="append" icon="el-icon-view" style="font-size:18px;" @click="changeInputType('key')"></el-button>
-                            </el-input>
-                        </el-form-item>
                         <el-form-item label="Mqtt账号" prop="mqttAccount">
                             <el-input v-model="form.mqttAccount" placeholder="自动生成" readonly :type="accountInputType">
                                 <el-button slot="append" icon="el-icon-view" style="font-size:18px;" @click="changeInputType('account')"></el-button>
@@ -46,6 +41,11 @@
                         <el-form-item label="Mqtt密码" prop="mqttPassword">
                             <el-input v-model="form.mqttPassword" placeholder="自动生成" readonly :type="passwordInputType">
                                 <el-button slot="append" icon="el-icon-view" style="font-size:18px;" @click="changeInputType('password')"></el-button>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item label="产品秘钥" prop="mqttSecret">
+                            <el-input v-model="form.mqttSecret" placeholder="自动生成" readonly :type="keyInputType">
+                                <el-button slot="append" icon="el-icon-view" style="font-size:18px;" @click="changeInputType('key')"></el-button>
                             </el-input>
                         </el-form-item>
                     </el-col>
@@ -109,7 +109,7 @@ export default {
         return {
             // 输入框类型
             keyInputType: "password",
-            accountInputType: "password",
+            accountInputType: "text",
             passwordInputType: "password",
             // 选中选项卡
             activeName: 'basic',
@@ -177,6 +177,7 @@ export default {
                 vertificateMethod: 3,
                 mqttAccount: null,
                 mqttPassword: null,
+                mqttSecret:null,
                 remark: null
             };
             this.resetForm("form");

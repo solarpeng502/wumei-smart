@@ -286,6 +286,9 @@
 import mqtt from 'mqtt'
 import * as echarts from 'echarts';
 import {
+    getToken
+} from "@/utils/auth";
+import {
     listDeviceShort,
     delDevice,
 } from "@/api/iot/device";
@@ -355,10 +358,10 @@ export default {
         connectMqtt() {
             let options = {
                 username: "xxx",
-                password: "xxxx",
+                password: getToken(),
                 cleanSession: false,
                 keepAlive: 60,
-                clientId: 'web_' + Math.random().toString(16).substr(2, 8),
+                clientId: 'web-' + Math.random().toString(16).substr(2, 8),
                 connectTimeout: 4000
             }
             this.client = mqtt.connect('ws://wumei.live:8083/mqtt', options);

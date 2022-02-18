@@ -1,6 +1,8 @@
 <template>
 <div style="padding:6px;">
+
     <el-card v-show="showSearch" style="margin-bottom:6px;">
+    <div style="height:50px; color:#F56C6C;margin-left:20px;">该功能下个版本发布</div>
         <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px" style="margin-bottom:-20px;">
             <el-form-item label="场景名称" prop="sceneName">
                 <el-input v-model="queryParams.sceneName" placeholder="请输入场景名称" clearable size="small" @keyup.enter.native="handleQuery" />
@@ -21,7 +23,7 @@
                 <el-button type="success" plain icon="el-icon-edit" size="mini" :disabled="single" @click="handleUpdate" v-hasPermi="['iot:scene:edit']">修改</el-button>
             </el-col>
             <el-col :span="1.5">
-                <el-button type="danger" plain icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleDelete" v-hasPermi="['iot:scene:remove']">删除</el-button>
+                <el-button type="danger" plain icon="el-icon-delete" size="mini" disabled @click="handleDelete" v-hasPermi="['iot:scene:remove']">删除</el-button>
             </el-col>
             <el-col :span="1.5">
                 <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" v-hasPermi="['iot:scene:export']">导出</el-button>
@@ -45,7 +47,7 @@
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
                     <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['iot:scene:edit']">修改</el-button>
-                    <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['iot:scene:remove']">删除</el-button>
+                    <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['iot:scene:remove']" disabled>删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -210,7 +212,7 @@
                 </el-row>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="submitForm">确 定</el-button>
+                <el-button type="primary" @click="submitForm" disabled>确 定</el-button>
                 <el-button @click="cancel">取 消</el-button>
             </div>
         </el-dialog>
