@@ -78,6 +78,15 @@ spring:
         max-active: 8
         # #连接池最大阻塞等待时间（使用负值表示没有限制）
         max-wait: -1ms
+# mqtt 配置  
+mqtt:
+    username: admin                           # 账号
+    password: admin                        # 密码
+    host-url: tcp://localhost:1883           # mqtt连接tcp地址
+    client-id: ${random.value}                # 客户端Id，不能相同，采用随机数 ${random.value}
+    default-topic: test                       # 默认主题
+    timeout: 300                              # 超时时间
+    keepalive: 100                            # 保持连接
 
 # token配置
 token:
