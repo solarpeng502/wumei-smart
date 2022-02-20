@@ -21,15 +21,7 @@ public class EmqxClient {
     @Autowired
     private EmqxService emqxService;
 
-    private static MqttClient client;
-
-    private static MqttClient getClient() {
-        return client;
-    }
-
-    private static void setClient(MqttClient client) {
-        EmqxClient.client = client;
-    }
+    public static MqttClient client;
 
     /**
      * 客户端连接
@@ -51,7 +43,7 @@ public class EmqxClient {
             options.setPassword(password.toCharArray());
             options.setConnectionTimeout(timeout);
             options.setKeepAliveInterval(keepalive);
-            EmqxClient.setClient(client);
+            EmqxClient.client=client;
             client.setCallback(emqxCallback);
             clientConnect(options,client);
         } catch (Exception e) {
@@ -92,7 +84,7 @@ public class EmqxClient {
         message.setQos(qos);
         message.setRetained(retained);
         message.setPayload(pushMessage.getBytes());
-        MqttTopic mTopic = EmqxClient.getClient().getTopic(topic);
+        MqttTopic mTopic = EmqxClient.client.getTopic(topic);
         if (null == mTopic) {
             logger.error("topic not exist");
         }
@@ -115,7 +107,7 @@ public class EmqxClient {
     public void subscribe(String topic, int qos) {
         logger.info("订阅主题" + topic);
         try {
-            EmqxClient.getClient().subscribe(topic, qos);
+            EmqxClient.client.subscribe(topic, qos);
         } catch (MqttException e) {
             e.printStackTrace();
         }

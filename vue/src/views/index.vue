@@ -1469,7 +1469,7 @@ export default {
                     orient: 'vertical',
                     left: 'right'
                 },
-                color: ['#E6A23C', '#F56C6C', '#409EFF'],
+                color: ['#E6A23C', '#F56C6C', '#DDD'],
                 series: [{
                     name: 'CPU使用率 %',
                     type: 'pie',
@@ -1516,7 +1516,7 @@ export default {
                     orient: 'vertical',
                     left: 'right'
                 },
-                color: ['#F56C6C', '#409EFF'],
+                color: ['#F56C6C', '#DDD'],
                 series: [{
                     name: '内存使用率 G',
                     type: 'pie',
@@ -1561,7 +1561,7 @@ export default {
                     orient: 'vertical',
                     left: 'right'
                 },
-                color: ['#F56C6C', '#409EFF'],
+                color: ['#F56C6C', '#DDD'],
                 series: [{
                     name: '磁盘状态 G',
                     type: 'pie',

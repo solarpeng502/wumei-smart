@@ -12,6 +12,7 @@
         <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
             <el-form ref="registerForm" :model="registerForm" :rules="registerRules" class="register-form" style="z-index:1000">
                 <h3 class="title">注册账号</h3>
+                <p style="text-align:center">账号可以用于学习和测试，请勿用于商业用途</p>
                 <el-form-item prop="username">
                     <el-input v-model="registerForm.username" type="text" auto-complete="off" placeholder="账号">
                         <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
@@ -46,7 +47,8 @@
                         <span v-else>注 册 中...</span>
                     </el-button>
                     <div style="float: right;margin-top:10px;">
-                        <router-link style="color:#fff;" :to="'/login'">使用已有账户登录 >> </router-link>
+                        <a style="margin-right:20px;" target="_blank" href="http://wumei.live">返回官网</a>
+                        <router-link style="color:#fff;font-size:16px;" :to="'/login'">使用已有账户登录 >> </router-link>
                     </div>
                 </el-form-item>
             </el-form>
@@ -56,7 +58,7 @@
 </div>
     <!--  底部  -->
     <div class="el-register-footer">
-        <span>Copyright © 2018-2021 wumei.live All Rights Reserved.</span>
+         <span>Copyright © 2018-2021 <a target="_blank" href="http://wumei.live">wumei smart</a> All Rights Reserved.</span>
     </div>
 </div>
 </template>
@@ -206,7 +208,6 @@ export default {
     h2 {
         font-size: 24px;
         margin-top: -12px;
-        margin-bottom: 60px;
     }
 }
 
@@ -220,8 +221,10 @@ export default {
 .register-form {
     border-radius: 6px;
     background: #ffffff;
-    background-color: rgba(250, 250, 250, 0.4);
+    background-color: rgba(250, 250, 250, 0.2);
+    border: 1px solid #fff;
     padding: 25px 25px 5px 25px;
+    margin:20px;
 
     .el-input {
         height: 38px;

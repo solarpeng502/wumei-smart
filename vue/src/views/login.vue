@@ -1,7 +1,7 @@
 <template>
 <div class="login">
 
-    <div style="width:700px;padding:20px;">
+    <div style="width:520px;padding:20px;">
         <el-row :gutter="10">
             <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                 <div class="login-top">
@@ -9,17 +9,10 @@
                     <h2>wumei smart open source iot platform</h2>
                 </div>
             </el-col>
-            <el-col :xs="24" :sm="9" :md="9" :lg="9" :xl="9">
-                <div class="login-left">
-                    <h3>系统登录</h3>
-                    <p>简单易用的生活物联网平台。可用于企业搭建私域物联网，个人学习和搭建自己的智能家居平台，以及手机和电脑的监控。<span style="color:#000">项目开发中，请勿删除测试数据。</span></p>
-                    <div style="float: right;margin-top:10px;" v-if="register">
-                        <router-link style="color:#fff;" :to="'/register'">立即注册 >></router-link>
-                    </div>
-                </div>
-            </el-col>
-            <el-col :xs="24" :sm="15" :md="15" :lg="15" :xl="15">
+            <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                 <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" style="z-index:1000">
+                    <h3 class="title">账号登录</h3>
+                    <p style="text-align:center">项目开发中，请不要删除数据</p>
                     <el-form-item prop="username">
                         <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
                             <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
@@ -38,20 +31,25 @@
                             <img :src="codeUrl" @click="getCode" class="login-code-img" />
                         </div>
                     </el-form-item>
-                    <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
+                    <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;color:#000;">记住密码</el-checkbox>
                     <el-form-item style="width:100%;">
                         <el-button :loading="loading" size="medium" type="primary" style="width:100%;" @click.native.prevent="handleLogin">
                             <span v-if="!loading">登 录</span>
                             <span v-else>登 录 中...</span>
                         </el-button>
+                        <div style="float: right;margin-top:10px;" v-if="register">
+                            <a style="margin-right:20px;" target="_blank" href="http://wumei.live">返回官网</a>
+                            <router-link style="color:#fff;font-size:16px;" :to="'/register'">立即注册 >></router-link>
+                        </div>
                     </el-form-item>
+
                 </el-form>
             </el-col>
         </el-row>
     </div>
     <!--  底部  -->
     <div class="el-login-footer">
-        <span>Copyright © 2018-2021 wumei.live All Rights Reserved.</span>
+        <span>Copyright © 2018-2021 <a target="_blank" href="http://wumei.live">wumei smart</a> All Rights Reserved.</span>
     </div>
 </div>
 </template>
@@ -180,6 +178,13 @@ export default {
     overflow: auto;
 }
 
+.title {
+    margin: 0px auto 30px auto;
+    text-align: center;
+    color: #333;
+    font-size: 24px;
+}
+
 .login-top {
     color: #fff;
     text-align: center;
@@ -193,30 +198,6 @@ export default {
     h2 {
         font-size: 24px;
         margin-top: -12px;
-        margin-bottom: 60px;
-    }
-}
-
-.login-left {
-    margin-bottom: 10px;
-    text-align: center;
-    color: #fff;
-    float: right;
-    border: 1px solid #fff;
-    border-radius: 6px;
-    padding: 20px;
-    height: 308px;
-    h3 {
-        margin: 0;
-        font-weight: bold;
-        font-size:20px;
-        color:#333;
-    }
-
-    p {
-        text-align: justify;
-        text-indent: 32px;
-        line-height: 28px;
     }
 }
 
@@ -224,8 +205,8 @@ export default {
     border-radius: 6px;
     background-color: rgba(250, 250, 250, 0.2);
     border: 1px solid #fff;
-    padding: 25px;
-    padding-bottom: 1px;
+    padding: 25px 25px 5px 25px;
+    margin: 20px;
     margin-bottom: 100px;
 
     .el-input {

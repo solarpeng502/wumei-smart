@@ -357,17 +357,17 @@ export default {
         /** 连接Mqtt */
         connectMqtt() {
             let options = {
-                username: "xxx",
+                username: "wumei-smart",
                 password: getToken(),
                 cleanSession: false,
                 keepAlive: 60,
                 clientId: 'web-' + Math.random().toString(16).substr(2, 8),
-                connectTimeout: 4000
+                connectTimeout: 60000
             }
-            this.client = mqtt.connect('ws://wumei.live:8083/mqtt', options);
+            this.client = mqtt.connect('wss://iot.wumei.live/mqtt', options);
             this.client.on("connect", (e) => {
                 console.log("成功连接服务器:", e);
-                //订阅三个名叫'top/#', 'three/#'和'#'的主题
+                // 订阅三个名叫'top/#', 'three/#'和'#'的主题
                 this.client.subscribe(['top/#', 'three/#', '#'], {
                     qos: 1
                 }, (err) => {

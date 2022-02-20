@@ -111,7 +111,7 @@ public class ToolController extends BaseController {
             if (clientid.startsWith("server")) {
                 // 服务端配置账号认证
                 if (mqttConfig.getusername().equals(username) && mqttConfig.getpassword().equals(password)) {
-                    System.out.println("-----------认证成功---------------");
+                    System.out.println("-----------认证成功,clientId:"+clientid+"---------------");
                     return ResponseEntity.ok().body("ok");
                 }
             } else if (clientid.startsWith("web") || clientid.startsWith("phone")) {
@@ -122,10 +122,10 @@ public class ToolController extends BaseController {
                 }
                 try {
                     Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
-                    System.out.println("-----------认证成功---------------");
+                    System.out.println("-----------认证成功,clientId:"+clientid+"---------------");
                     return ResponseEntity.ok().body("ok");
                 } catch (Exception ex) {
-                    return returnUnauthorized(ex.getMessage());
+                    return returnUnauthorized(clientid,username,password,ex.getMessage());
                 }
             } else {
                 // 设备认证
@@ -139,18 +139,25 @@ public class ToolController extends BaseController {
                         && username.equals(model.getMqttAccount())
                         && expireTime > System.currentTimeMillis()
                         && model.getStatus() != 2) {
-                    System.out.println("-----------认证成功---------------");
+                    System.out.println("-----------认证成功,clientId:"+clientid+"---------------");
                     return ResponseEntity.ok().body("ok");
                 }
             }
         } catch (Exception ex) {
-            return returnUnauthorized(ex.getMessage());
+            return returnUnauthorized(clientid,username,password,ex.getMessage());
         }
-        return returnUnauthorized("");
+        return returnUnauthorized(clientid,username,password,"");
     }
 
-    private ResponseEntity returnUnauthorized(String message) {
-        System.out.println("-----------认证失败" + message + "---------------");
+    private ResponseEntity returnUnauthorized(String clientid,String username,String password,String message) {
+        System.out.println("认证失败："+message
+                +"\nclientid:"+clientid
+                +"\nusername:"+username
+                +"\npassword:"+password);
+        log.error("认证失败："+message
+                +"\nclientid:"+clientid
+                +"\nusername:"+username
+                +"\npassword:"+password);
         return ResponseEntity.status(401).body("Unauthorized");
     }
 

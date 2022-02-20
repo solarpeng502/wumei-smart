@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * @Classname PushCallback
+ * @Classname MqttCallback
  * @Description 消费监听类
  */
 @Component
@@ -16,12 +16,9 @@ public class EmqxCallback implements MqttCallback {
 
     @Autowired
     private MqttConfig mqttConfig;
-    @Autowired
-    private EmqxClient emqxClient;
+
     @Autowired
     private EmqxService emqxService;
-
-    private static MqttClient client;
 
     @Override
     public void connectionLost(Throwable throwable) {
@@ -30,8 +27,8 @@ public class EmqxCallback implements MqttCallback {
             while(true) {
                 logger.info("mqtt连接断开，重新连接中...");
                 Thread.sleep(5000);
-                client.reconnect();
-                if(client.isConnected()){
+                EmqxClient.client.reconnect();
+                if(EmqxClient.client.isConnected()){
                     logger.info("mqtt已经重新连接");
                     break;
                 }
