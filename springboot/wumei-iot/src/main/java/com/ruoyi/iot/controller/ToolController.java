@@ -1,5 +1,6 @@
 package com.ruoyi.iot.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
@@ -149,6 +150,7 @@ public class ToolController extends BaseController {
         return returnUnauthorized(clientid,username,password,"");
     }
 
+    // 返回认证信息
     private ResponseEntity returnUnauthorized(String clientid,String username,String password,String message) {
         System.out.println("认证失败："+message
                 +"\nclientid:"+clientid
@@ -183,6 +185,16 @@ public class ToolController extends BaseController {
             emqxService.publishStatus(device.getProductId(), device.getSerialNumber(), 3);
         }
         return AjaxResult.success();
+    }
+
+    @ApiOperation("获取NTP时间")
+    @GetMapping("/ntp")
+    public JSONObject ntp(@RequestParam Long deviceSendTime){
+        JSONObject ntpJson = new JSONObject();
+        ntpJson.put("deviceSendTime", deviceSendTime);
+        ntpJson.put("serverRecvTime", System.currentTimeMillis());
+        ntpJson.put("serverSendTime", System.currentTimeMillis());
+        return ntpJson;
     }
 
     /**
