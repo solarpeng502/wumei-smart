@@ -8,7 +8,8 @@
 
 #include "Helper.h"
 
-long lastMqttConn;    //上次mqtt连接时间
+long lastMqttConn;    // 上次mqtt连接时间
+long lastPublish;     // 上次发布监测数据时间
 
 /**
  * 启动
@@ -29,13 +30,13 @@ void setup()
  */
 void loop()
 {
-  //Wifi掉线重连
+  // Wifi掉线重连
   if (WiFi.status() != WL_CONNECTED)
   {
     connectWifi();
   }
 
-  //Mqtt重连，间隔30秒
+  // Mqtt非阻塞重连，间隔30秒
   if (WiFi.status() == WL_CONNECTED)
   {
     long now = millis();
@@ -52,62 +53,15 @@ void loop()
       mqttClient.loop();
     }
   }
+
+  // 非阻塞发布实时监测数据,间隔默认600毫秒
+  if(WiFi.status() == WL_CONNECTED && publishNum>0){
+    long now = millis();
+    if (now - lastPublish > publishInterval)
+      {
+        lastPublish = now;
+        publishNum--;
+        publishMonitor();
+      }
+  }
 }
-
-
-
-
-
-
-
-
-/**
- * 1.更新设备状态
- * 
- */
-void subscribeUpdateStatus(){
-  // client.subscribe("status/set/"+(String)deviceNum, [](const String & payload) {  
-  //   StaticJsonDocument<1024> doc; //1024字节内存池容量
-  //   //解析JSON
-  //   DeserializationError error = deserializeJson(doc, payload);
-  //   if (error) {
-  //     Serial.print(F("deserializeJson() failed: "));
-  //     Serial.println(error.f_str());
-  //     return;
-  //   }
-  
-  //   // 获取状态
-  //   const char* deviceNum = doc["deviceNum"];  
-  //   Serial.println("deviceNum:"+(String)deviceNum);
-    
-  //   int relayStatus = doc["relayStatus"];  
-  //   Serial.print("relayStatus:");
-  //   Serial.println(relayStatus);
-
-  //   // 最后发布设备状态
-  //   publishStatus();
-  // });
-}
-
-
-
-/**
- * 1.发布设备信息
- * 
- */
-void publishDeviceInfo(){
-  // StaticJsonDocument<300> doc;
-  // doc["deviceNum"] = (String)deviceNum;
-  // doc["categoryId"] = productId;
-  // doc["firmwareVersion"] = "1.0";
-  // doc["ownerId"]= (String)userId;
-  // Serial.print("publish device info:");
-  // serializeJson(doc, Serial);
-  // //发布  
-  // String output;
-  // serializeJson(doc, output);
-  // const char *msg=output.c_str();
-  // client.publish("device_info",msg); 
-}
-
-

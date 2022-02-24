@@ -10,32 +10,41 @@
 
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
-
-char *deviceNum = "ADEF5561"; 
-char *userId="1";
+// 设备信息
+String deviceNum = "ADEF5561"; 
+String userId="1";
+String productId="1"; 
 float rssi=0;
 float firmwareVersion=1.1;
-long productId=1; 
-
+// wifi
 char *wifiSsid="huawei";
 char *wifiPwd="15208747707";
-
+// mqtt
 char *mqttHost="wumei.live";
 int mqttPort=1883;
-
 char *mqttUserName="wumei-smart";
 char *mqttPwd="PARI266S5L8K5475";
 char mqttSecret[17]="KHR00FS8T30ISD7S";
 char wumei_iv[17]="wumei-smart-open"; 
-
+int publishNum=0;
+long publishInterval=600;
+// ntp
 String ntpServer="http://wumei.live:8080/iot/tool/ntp?deviceSendTime=";
 
-
-// Mqtt回调
-void callback(char *topic, byte *payload, unsigned int length)
-{
-  
-}
+// 订阅的主题
+String sInfoTopic="/"+productId+"/"+deviceNum+"/info/get";
+String sNtpTopic = "/"+productId+"/"+deviceNum+"/ntp/get";
+String sPropertyTopic="/"+productId+"/"+deviceNum+"/property/get";
+String sFunctionTopic="/"+productId+"/"+deviceNum+"/function/get";
+String sMonitorTopic="/"+productId+"/"+deviceNum+"/monitor/get";
+String sOtaTopic = "/"+productId+"/"+deviceNum+"/ota/get";
+// 发布的主题
+String pInfoTopic="/"+productId+"/"+deviceNum+"/info/post";
+String pNtpTopic = "/"+productId+"/"+deviceNum+"/ntp/post";
+String pPropertyTopic="/"+productId+"/"+deviceNum+"/property/post";
+String pFunctionTopic="/"+productId+"/"+deviceNum+"/function/post";
+String pMonitorTopic="/"+productId+"/"+deviceNum+"/monitor/post";
+String pEventTopic="/"+productId+"/"+deviceNum+"/event/post";
 
 // 连接wifi
 void connectWifi()
@@ -65,16 +74,18 @@ void connectMqtt()
     mqttClient.setServer(mqttHost, mqttPort);
     mqttClient.setCallback(callback);
     //连接
-    bool connectResult = mqttClient.connect(deviceNum, mqttUserName, encryptPassword.c_str());
+    bool connectResult = mqttClient.connect(deviceNum.c_str(), mqttUserName, encryptPassword.c_str());
     if (connectResult)
     {
         printMsg("连接成功");
-        //发布设备状态
-        // publishState(client, deviceId, apiKey);
-        //订阅
-        printMsg("订阅云端数据");
-        // String switchTopic = "set/switch/" + (String)deviceId;
-        // mqttClient.subscribe(switchTopic.c_str());
+        // 订阅(设备信息、OTA、NTP、属性、功能、实时监测)               
+        mqttClient.subscribe(sInfoTopic.c_str());
+        mqttClient.subscribe(sOtaTopic.c_str());
+        mqttClient.subscribe(sNtpTopic.c_str());
+        mqttClient.subscribe(sPropertyTopic.c_str());
+        mqttClient.subscribe(sFunctionTopic.c_str());
+        mqttClient.subscribe(sMonitorTopic.c_str());
+        printMsg("已订阅云端数据"); 
     }
     else
     {
@@ -83,15 +94,122 @@ void connectMqtt()
     }
 }
 
-//打印提示信息
-void printMsg(String tips)
+// Mqtt回调
+void callback(char *topic, byte *payload, unsigned int length)
 {
-    Serial.print("\r\n[");
-    Serial.print(millis());
-    Serial.print("ms]");
-    Serial.print(tips);
+
+  if(strcmp(topic, sInfoTopic.c_str()) == 0){
+    // 获取设备信息判断是否启用设备影子，并发布信息
+
+    publishInfo();
+  }else if(strcmp(topic, sOtaTopic.c_str()) == 0){
+    // Http下载固件，设备升级
+
+  }else if(strcmp(topic, sNtpTopic.c_str()) == 0){
+    // 计算设备当前时间：(${serverRecvTime} + ${serverSendTime} + ${deviceRecvTime} - ${deviceSendTime}) / 2
+
+  }else if(strcmp(topic, sPropertyTopic.c_str()) == 0){
+    // 根据属性，设备修改对应属性,并发布属性
+
+
+    publishProperty();
+  }else if(strcmp(topic, sFunctionTopic.c_str()) == 0){
+    // 根据功能，设备执行对应功能,并发布功能
+
+
+    publishFunction();
+  }else if(strcmp(topic, sMonitorTopic.c_str()) == 0){
+    // 设置对应的实时监测次数和间隔
+
+    
+  }
 }
 
+
+// 发布设备信息
+void publishInfo(){
+  StaticJsonDocument<256> doc;
+  doc["rssi"] = WiFi.RSSI();
+  doc["firmwareVersion"] = firmwareVersion;
+  doc["status"] = 3; // （1-未激活，2-禁用，3-在线，4-离线）
+  doc["userId"]= (String)userId;
+  Serial.print("发布设备信息:");
+  serializeJson(doc, Serial);
+  //发布  
+  String output;
+  serializeJson(doc, output);
+  const char *msg=output.c_str();
+  mqttClient.publish(pInfoTopic.c_str(),msg); 
+}
+
+// 发布时钟同步信息
+void publishNtp(){
+  StaticJsonDocument<128> doc;
+  doc["deviceSendTime"] = millis();
+  Serial.print("发布NTP信息:");
+  serializeJson(doc, Serial);
+  //发布  
+  String output;
+  serializeJson(doc, output);
+  const char *msg=output.c_str();
+  mqttClient.publish(pInfoTopic.c_str(),msg); 
+}
+
+// 发布属性
+void publishProperty(){
+  StaticJsonDocument<1024> doc;
+  // 复制物模型中的属性
+  doc["property"] = 0;
+  Serial.print("发布属性:");
+  serializeJson(doc, Serial);
+  //发布  
+  String output;
+  serializeJson(doc, output);
+  const char *msg=output.c_str();
+  mqttClient.publish(pInfoTopic.c_str(),msg); 
+}
+
+// 发布功能
+void publishFunction(){
+  StaticJsonDocument<1024> doc;
+  // 复制物模型中的功能
+  doc["function"] = 0;
+  Serial.print("发布功能:");
+  serializeJson(doc, Serial);
+  //发布  
+  String output;
+  serializeJson(doc, output);
+  const char *msg=output.c_str();
+  mqttClient.publish(pInfoTopic.c_str(),msg); 
+}
+
+// 发布事件
+void publishEvent(){
+  StaticJsonDocument<1024> doc;
+  // 复制物模型中的事件
+  doc["event"] = 0;
+  Serial.print("发布事件:");
+  serializeJson(doc, Serial);
+  //发布  
+  String output;
+  serializeJson(doc, output);
+  const char *msg=output.c_str();
+  mqttClient.publish(pInfoTopic.c_str(),msg); 
+}
+
+// 发布实时监测数据
+void publishMonitor(){
+  StaticJsonDocument<512> doc;
+  // 复制物模型中的属性（实时监测模型）
+  doc["monitor"] = 0;
+  Serial.print("发布事件:");
+  serializeJson(doc, Serial);
+  //发布  
+  String output;
+  serializeJson(doc, output);
+  const char *msg=output.c_str();
+  mqttClient.publish(pInfoTopic.c_str(),msg); 
+}
 
 // 生成密码
 String generationPwd(){
@@ -140,6 +258,15 @@ String getTime(){
     }
     delay(500);
   }
+}
+
+//打印提示信息
+void printMsg(String tips)
+{
+    Serial.print("\r\n[");
+    Serial.print(millis());
+    Serial.print("ms]");
+    Serial.print(tips);
 }
 
 // 加密 (AES-CBC-128-pkcs5padding)
