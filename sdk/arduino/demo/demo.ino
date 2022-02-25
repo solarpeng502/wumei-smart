@@ -18,7 +18,7 @@ void setup()
 {
   //打开串行端口：
   Serial.begin(115200);
-  printMsg("wumei smart device starting...");  
+  printMsg("wumei smart device starting...");
   //连接WIFI
   connectWifi();
   //连接MQTT

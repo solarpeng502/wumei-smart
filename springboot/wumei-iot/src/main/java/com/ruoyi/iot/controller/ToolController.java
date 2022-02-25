@@ -145,6 +145,7 @@ public class ToolController extends BaseController {
                 }
             }
         } catch (Exception ex) {
+            // ex.printStackTrace();
             return returnUnauthorized(clientid,username,password,ex.getMessage());
         }
         return returnUnauthorized(clientid,username,password,"");
@@ -167,22 +168,29 @@ public class ToolController extends BaseController {
     @ApiOperation("mqtt钩子处理")
     @PostMapping("/mqtt/webhook")
     public AjaxResult webHookProcess(@RequestBody MqttClientConnectModel model) {
-        System.out.println("webhook:" + model.getAction());
-        // 过滤服务端、web端和手机端
-        if (model.getClientid().startsWith("server") || model.getClientid().startsWith("web") || model.getClientid().startsWith("phone")) {
-            return AjaxResult.success();
-        }
+        try {
+            System.out.println("webhook:" + model.getAction());
+            // 过滤服务端、web端和手机端
+            if (model.getClientid().startsWith("server") || model.getClientid().startsWith("web") || model.getClientid().startsWith("phone")) {
+                return AjaxResult.success();
+            }
 
-        Device device = deviceService.selectDeviceBySerialNumber(model.getClientid());
-        // 设备状态（1-未激活，2-禁用，3-在线，4-离线）
-        if (model.getAction().equals("client_disconnected")) {
-            // TODO 更新设备的地址
-            String ip = model.getIpaddress();
-            deviceService.updateDeviceStatus(device.getSerialNumber(), 4);
-            emqxService.publishStatus(device.getProductId(), device.getSerialNumber(), 4);
-        } else if (model.getAction().equals("client_connected")) {
-            deviceService.updateDeviceStatus(device.getSerialNumber(), 3);
-            emqxService.publishStatus(device.getProductId(), device.getSerialNumber(), 3);
+            Device device = deviceService.selectDeviceBySerialNumber(model.getClientid());
+            // 设备状态（1-未激活，2-禁用，3-在线，4-离线）
+            if (model.getAction().equals("client_disconnected")) {
+                String ip = model.getIpaddress();
+                deviceService.updateDeviceStatus(device.getSerialNumber(), 4);
+                emqxService.publishStatus(device.getProductId(), device.getSerialNumber(), 4);
+            } else if (model.getAction().equals("client_connected")) {
+                // TODO 更新设备的地址
+
+                deviceService.updateDeviceStatus(device.getSerialNumber(), 3);
+                emqxService.publishStatus(device.getProductId(), device.getSerialNumber(), 3);
+            }
+        }catch(Exception ex){
+            // ex.printStackTrace();
+            System.out.println("发生错误："+ex.getMessage());
+            log.error("发生错误："+ex.getMessage());
         }
         return AjaxResult.success();
     }

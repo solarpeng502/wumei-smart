@@ -9,7 +9,7 @@
 #include "Helper.h"
 
 WiFiClient wifiClient;
-PubSubClient mqttClient(wifiClient);
+PubSubClient mqttClient;
 // 设备信息
 String deviceNum = "ADEF5561"; 
 String userId="1";
@@ -71,6 +71,7 @@ void connectMqtt()
     String password=generationPwd();
     String encryptPassword=encrypt(password,mqttSecret,wumei_iv);
     printMsg("密码(已加密)："+encryptPassword);
+    mqttClient.setClient(wifiClient);
     mqttClient.setServer(mqttHost, mqttPort);
     mqttClient.setCallback(callback);
     //连接
@@ -78,14 +79,17 @@ void connectMqtt()
     if (connectResult)
     {
         printMsg("连接成功");
-        // 订阅(设备信息、OTA、NTP、属性、功能、实时监测)               
-        mqttClient.subscribe(sInfoTopic.c_str());
-        mqttClient.subscribe(sOtaTopic.c_str());
-        mqttClient.subscribe(sNtpTopic.c_str());
-        mqttClient.subscribe(sPropertyTopic.c_str());
-        mqttClient.subscribe(sFunctionTopic.c_str());
-        mqttClient.subscribe(sMonitorTopic.c_str());
-        printMsg("已订阅云端数据"); 
+        // 订阅(设备信息、OTA、NTP、属性、功能、实时监测) ,订阅4个以上主题会不断重连，未解决问题          
+        mqttClient.subscribe(sInfoTopic.c_str(),1);
+        // mqttClient.subscribe(sOtaTopic.c_str(),1);
+        // mqttClient.subscribe(sNtpTopic.c_str(),1);
+        mqttClient.subscribe(sPropertyTopic.c_str(),1);
+        mqttClient.subscribe(sFunctionTopic.c_str(),1);
+        mqttClient.subscribe(sMonitorTopic.c_str(),1);
+        printMsg("订阅主题："+sInfoTopic);
+        printMsg("订阅主题："+sPropertyTopic);
+        printMsg("订阅主题："+sFunctionTopic);
+        printMsg("订阅主题："+sMonitorTopic);        
     }
     else
     {
@@ -97,6 +101,22 @@ void connectMqtt()
 // Mqtt回调
 void callback(char *topic, byte *payload, unsigned int length)
 {
+  printMsg("接收数据：");
+  String data="";
+  for (int i = 0; i < length; i++)
+  {
+    Serial.print((char)payload[i]);
+    data+=(char)payload[i];
+  }
+  
+  StaticJsonDocument<1024> doc; //1024字节内存池容量
+  //解析JSON
+  DeserializationError error = deserializeJson(doc, payload);
+  if (error) {
+      Serial.print(F("deserializeJson() failed: "));
+      Serial.println(error.f_str());
+      return;
+    }
 
   if(strcmp(topic, sInfoTopic.c_str()) == 0){
     // 获取设备信息判断是否启用设备影子，并发布信息
@@ -107,15 +127,23 @@ void callback(char *topic, byte *payload, unsigned int length)
 
   }else if(strcmp(topic, sNtpTopic.c_str()) == 0){
     // 计算设备当前时间：(${serverRecvTime} + ${serverSendTime} + ${deviceRecvTime} - ${deviceSendTime}) / 2
-
+    float deviceSendTime = doc["deviceSendTime"];
+    float serverSendTime = doc["serverSendTime"];
+    float serverRecvTime = doc["serverRecvTime"];
+    float deviceRecvTime = millis();
+    float now=(serverSendTime+serverRecvTime+deviceRecvTime-deviceSendTime)/2;
+    printMsg("当前时间："+String(now,0));
   }else if(strcmp(topic, sPropertyTopic.c_str()) == 0){
     // 根据属性，设备修改对应属性,并发布属性
 
-
+    printMsg("修改引脚电平");
+    pinMode(15,OUTPUT);
+    digitalWrite(15, HIGH);
+    delay(3000);
+    digitalWrite(15,LOW);
     publishProperty();
   }else if(strcmp(topic, sFunctionTopic.c_str()) == 0){
     // 根据功能，设备执行对应功能,并发布功能
-
 
     publishFunction();
   }else if(strcmp(topic, sMonitorTopic.c_str()) == 0){
@@ -152,7 +180,7 @@ void publishNtp(){
   String output;
   serializeJson(doc, output);
   const char *msg=output.c_str();
-  mqttClient.publish(pInfoTopic.c_str(),msg); 
+  mqttClient.publish(pNtpTopic.c_str(),msg); 
 }
 
 // 发布属性
@@ -166,7 +194,7 @@ void publishProperty(){
   String output;
   serializeJson(doc, output);
   const char *msg=output.c_str();
-  mqttClient.publish(pInfoTopic.c_str(),msg); 
+  mqttClient.publish(pPropertyTopic.c_str(),msg); 
 }
 
 // 发布功能
@@ -180,7 +208,7 @@ void publishFunction(){
   String output;
   serializeJson(doc, output);
   const char *msg=output.c_str();
-  mqttClient.publish(pInfoTopic.c_str(),msg); 
+  mqttClient.publish(pFunctionTopic.c_str(),msg); 
 }
 
 // 发布事件
@@ -194,7 +222,7 @@ void publishEvent(){
   String output;
   serializeJson(doc, output);
   const char *msg=output.c_str();
-  mqttClient.publish(pInfoTopic.c_str(),msg); 
+  mqttClient.publish(pEventTopic.c_str(),msg); 
 }
 
 // 发布实时监测数据
@@ -208,7 +236,7 @@ void publishMonitor(){
   String output;
   serializeJson(doc, output);
   const char *msg=output.c_str();
-  mqttClient.publish(pInfoTopic.c_str(),msg); 
+  mqttClient.publish(pMonitorTopic.c_str(),msg); 
 }
 
 // 生成密码
