@@ -38,7 +38,12 @@ module.exports = {
         pathRewrite: {
           ['^' + process.env.VUE_APP_BASE_API]: ''
         }
-      }
+      },
+      ['/api/v4']: {
+        target: `http://wumei.live:8081`,
+        changeOrigin: true,
+        logLevel: 'debug',
+      },
     },
     disableHostCheck: true
   },

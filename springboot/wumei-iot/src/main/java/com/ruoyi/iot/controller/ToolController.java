@@ -109,7 +109,7 @@ public class ToolController extends BaseController {
     @PostMapping("/mqtt/auth")
     public ResponseEntity mqttAuth(@RequestParam String clientid, @RequestParam String username, @RequestParam String password) throws Exception {
         try {
-            if (clientid.startsWith("server")) {
+            if (clientid.startsWith("server") || clientid.startsWith("test")) {
                 // 服务端配置账号认证
                 if (mqttConfig.getusername().equals(username) && mqttConfig.getpassword().equals(password)) {
                     System.out.println("-----------认证成功,clientId:"+clientid+"---------------");
