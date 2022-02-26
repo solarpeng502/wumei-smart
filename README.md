@@ -55,12 +55,13 @@
     - 相关技术：WPF
     - 开发工具：Visual Studio
 
-### 四、相关文档（权限管理基于ruoyi-vue;安卓UI基于XUI，消息服务器基于EMQX4.0开源版）
-* [物美智能官网](http://wumei.live/)
-* [项目文档](http://wumei.live/kerwincui/document/wiki/)
-* [权限管理系统ruoyi-vue](https://gitee.com/y_project/RuoYi-Vue)
-* [安卓UI框架 XUI](https://github.com/xuexiangjys/XUI)
-* [Mqtt消息服务器EMQX4.0](https://github.com/emqx/emqx)
+### 四、相关文档
+#### 权限管理基于ruoyi-vue系统，Android基于XUI框架，消息服务器基于EMQX4.0开源版
+* [物美智能官网 >>](http://wumei.live/)
+* [项目文档 >>](http://wumei.live/kerwincui/document/wiki/)
+* [权限管理系统ruoyi-vue >>](https://gitee.com/y_project/RuoYi-Vue)
+* [安卓UI框架 XUI >>](https://github.com/xuexiangjys/XUI)
+* [Mqtt消息服务器EMQX4.0 >>](https://github.com/emqx/emqx)
 
 ### 五、其他
 * 互助交流群：1073236354
