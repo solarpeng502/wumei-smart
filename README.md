@@ -34,7 +34,8 @@
 - 桌面端模拟器/监控（进度0%）
 - 安卓端模拟器/监控（进度0%）
 - 移动端（进度10%）
- 
+
+
 ### 三、技术栈    
 * 服务端
     - 相关技术：Spring boot、MyBatis、Spring Security、Jwt、Mysql、Redis、TDengine、EMQX、Mqtt等
@@ -55,20 +56,24 @@
     - 相关技术：WPF
     - 开发工具：Visual Studio
 
+
 ### 四、项目目录
 spring-boot ---------------------------------------------------- 后端<br/>
 vue ------------------------------------------------------------- 前端<br />
 docker ---------------------------------------------------------- docker部署文件<br />
 SDK ------------------------------------------------------------- 硬件SDK<br />
-download ------------------------------------------------------- 工具下载<br />
+download ------------------------------------------------------- 工具下载<br /><br/>
+
 
 ### 五、相关文档
-#### 权限管理基于ruoyi-vue系统，Android基于XUI框架，消息服务器基于EMQX4.0开源版
+##### 权限管理基于ruoyi-vue系统，Mqtt消息服务器基于EMQX4.0开源版，Android模拟器基于XUI框架，
 * [物美智能官网 >>](http://wumei.live/)
 * [项目文档 >>](http://wumei.live/kerwincui/document/wiki/)
 * [权限管理系统ruoyi-vue >>](https://gitee.com/y_project/RuoYi-Vue)
-* [安卓UI框架 XUI >>](https://github.com/xuexiangjys/XUI)
 * [Mqtt消息服务器EMQX4.0 >>](https://github.com/emqx/emqx)
+* [安卓UI框架 XUI >>](https://github.com/xuexiangjys/XUI)
+* [ESP8266 Core For Arduino](https://github.com/esp8266/Arduino)
+
 
 ### 六、其他
 * 互助交流群：1073236354
@@ -76,4 +81,15 @@ download ------------------------------------------------------- 工具下载<br
 
 
 ### 七、界面图片
+* web端
+
+
+* 手机端（开发中）
+
+
+* 电脑端监控/模拟器（开发中）
+
+
+* 安卓端监控/模拟器（开发中）
+
 
