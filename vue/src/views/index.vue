@@ -9,10 +9,101 @@
 
         <el-col :span="10">
             <el-card style="margin:-10px;" shadow="hover">
-                <div ref="myChart" style="height:290px;"></div>
+                <div style="height:270px;">
+                    <h3 style="font-weight:bold">Mqtt 统计指标</h3>
+                    <el-descriptions :column="3" border>
+                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
+                            <template slot="label">
+                                <i class="el-icon-s-data"></i>
+                                发送字节
+                            </template>
+                            <el-link type="success" :underline="false">{{this.static["bytes.sent"]}}</el-link>
+                        </el-descriptions-item>
+                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;" contentStyle="">
+                            <template slot="label">
+                                <i class="el-icon-s-data"></i>
+                                接收字节
+                            </template>
+                            <el-link type="primary" :underline="false">{{this.static["bytes.received"]}}</el-link>
+                        </el-descriptions-item>
+                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
+                            <template slot="label">
+                                <i class="el-icon-s-data"></i>
+                                认证次数
+                            </template>
+                            <el-link type="danger" :underline="false">{{this.static["client.authenticate"]}}</el-link>
+                        </el-descriptions-item>
+
+                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
+                            <template slot="label">
+                                <i class="el-icon-s-data"></i>
+                                发送报文数
+                            </template>
+                            <el-link type="success" :underline="false">{{this.static["packets.sent"]}}</el-link>
+                        </el-descriptions-item>
+                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
+                            <template slot="label">
+                                <i class="el-icon-s-data"></i>
+                                接收报文数
+                            </template>
+                            <el-link type="primary" :underline="false">{{this.static["packets.received"]}}</el-link>
+                        </el-descriptions-item>
+                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
+                            <template slot="label">
+                                <i class="el-icon-s-data"></i>
+                                连接次数
+                            </template>
+                            <el-link type="danger" :underline="false">{{this.static["client.connected"]}}</el-link>
+                        </el-descriptions-item>
+
+                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
+                            <template slot="label">
+                                <i class="el-icon-s-data"></i>
+                                发送消息
+                            </template>
+                            <el-link type="success" :underline="false">{{this.static["messages.sent"]}}</el-link>
+                        </el-descriptions-item>
+                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
+                            <template slot="label">
+                                <i class="el-icon-s-data"></i>
+                                接收消息
+                            </template>
+                            <el-link type="primary" :underline="false">{{this.static["messages.received"]}}</el-link>
+                        </el-descriptions-item>
+                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
+                            <template slot="label">
+                                <i class="el-icon-s-data"></i>
+                                丢弃消息
+                            </template>
+                            <el-link type="danger" :underline="false">{{this.static["delivery.dropped"]}}</el-link>
+                        </el-descriptions-item>
+
+                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
+                            <template slot="label">
+                                <i class="el-icon-s-data"></i>
+                                创建会话数
+                            </template>
+                            <el-link type="success" :underline="false">{{this.static["session.created"]}}</el-link>
+                        </el-descriptions-item>
+                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
+                            <template slot="label">
+                                <i class="el-icon-s-data"></i>
+                                终结会话数
+                            </template>
+                            <el-link type="primary" :underline="false">{{this.static["session.terminated"]}}</el-link>
+                        </el-descriptions-item>
+                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
+                            <template slot="label">
+                                <i class="el-icon-s-data"></i>
+                                订阅次数
+                            </template>
+                            <el-link type="danger" :underline="false">{{this.static["client.subscribe"]}}</el-link>
+                        </el-descriptions-item>
+                    </el-descriptions>
+                </div>
             </el-card>
             <el-card style="margin:-10px;margin-top:20px;" shadow="hover">
-                <div ref="myChart1" style="height:298px;"></div>
+                <div ref="statsChart" style="height:298px;"></div>
             </el-card>
         </el-col>
 
@@ -94,11 +185,19 @@ require('echarts/extension/bmap/bmap')
 import {
     getServer
 } from "@/api/monitor/server";
+import {
+    getMqttStats,
+    statisticMqtt
+} from "@/api/iot/emqx";
 
 export default {
     name: "Index",
     data() {
         return {
+            // emqx状态数据
+            stats: {},
+            // emqx统计信息
+            static: {},
             // 版本号
             version: "3.8.0",
             // 服务器信息
@@ -127,20 +226,33 @@ export default {
         };
     },
     created() {
-        this.getList();
+        this.getServer();
+        this.getMqttStats();
+        this.statisticMqtt();
         this.$nextTick(() => {
             loadBMap().then(() => {
                 this.getmap();
-
             });
-            this.drawLine();
-            this.drawLine1();
         })
 
     },
     methods: {
+        /** 查询emqx统计*/
+        statisticMqtt() {
+            statisticMqtt().then(response => {
+                console.log(response);
+                this.static = response.data.data[0].metrics;
+            })
+        },
+        /** 查询emqx状态数据*/
+        getMqttStats() {
+            getMqttStats().then(response => {
+                this.stats = response.data.data[0].stats;
+                this.drawStats();
+            })
+        },
         /** 查询服务器信息 */
-        getList() {
+        getServer() {
             getServer().then(response => {
                 this.server = response.data;
                 this.$nextTick(() => {
@@ -151,6 +263,7 @@ export default {
             });
         },
 
+        /** 地图 */
         getmap() {
             var myChart = echarts.init(this.$refs.map);
             var option;
@@ -1321,94 +1434,15 @@ export default {
             option && myChart.setOption(option);
 
         },
-        drawLine() {
+        /** EMQX状态统计 */
+        drawStats() {
             // 基于准备好的dom，初始化echarts实例
-            let myChart = echarts.init(this.$refs.myChart);
-            // 绘制图表
-            myChart.setOption({
-                title: {
-                    text: "Mqtt数据接收和发送",
-                    left: "5%"
-                },
-                tooltip: {
-                    trigger: "axis"
-                },
-                legend: {
-                    data: ["接收", "发送"],
-                    right: "5%"
-                },
-                grid: {
-                    left: "5%",
-                    right: "6%",
-                    bottom: "10%",
-                    containLabel: true
-                },
-                xAxis: {
-                    type: "category",
-                    boundaryGap: false,
-                    data: ["08-12", "08-13", "08-14", "08-15", "08-16", "08-17", "08-18"],
-                    axisLine: {
-                        lineStyle: {
-                            color: "#999",
-                            width: 0.1
-                        }
-                    },
-                    splitLine: {
-                        show: true,
-                        lineStyle: {
-                            color: "#999",
-                            width: 0.1
-                        }
-                    }
-                },
-                yAxis: {
-                    type: "value",
-                    axisLine: {
-                        lineStyle: {
-                            color: "#999",
-                            width: 0.1
-                        }
-                    }
-                },
-                series: [{
-                        name: "接收",
-                        type: "line",
-                        data: [5, 20, 36, 10, 10, 20, 0],
-                        areaStyle: {
-                            color: "rgb(237,252,245)"
-                        },
-                        smooth: true,
-                        itemStyle: {
-                            normal: {
-                                color: "#53e59d"
-                            }
-                        }
-                    },
-                    {
-                        name: "发送",
-                        type: "line",
-                        data: [15, 0, 36, 10, 10, 0, 0],
-                        areaStyle: {
-                            color: "rgb(220,247,245)"
-                        },
-                        smooth: true,
-                        itemStyle: {
-                            normal: {
-                                color: "#43c4fd"
-                            }
-                        }
-                    }
-                ]
-            });
-        },
-        drawLine1() {
-            // 基于准备好的dom，初始化echarts实例
-            let myChart = echarts.init(this.$refs.myChart1);
+            let myChart = echarts.init(this.$refs.statsChart);
             var option;
 
             option = {
                 title: {
-                    text: '统计数据'
+                    text: 'Mqtt 状态数据'
                 },
                 tooltip: {
                     trigger: 'axis',
@@ -1429,20 +1463,21 @@ export default {
                 },
                 yAxis: {
                     type: 'category',
-                    data: ['设备数', '设备在线', '设备离线', '产品数', '用户数', '分享用户']
+                    axisLabel: {fontSize:14},
+                    data: ['连接数量', '会话数量', '主题数量', '订阅数量', '路由数量', '保留消息']
                 },
                 series: [{
-                        name: '总量',
+                        name: '历史最大数',
                         type: 'bar',
-                        data: [1000, 600, 400, 210, 128, 50],
+                        data: [this.stats["connections.max"], this.stats["sessions.max"], this.stats["topics.max"], this.stats["subscribers.max"], this.stats["routes.max"], this.stats["retained.max"]],
                         itemStyle: {
                             color: '#409EFF'
                         }
                     },
                     {
-                        name: '新增',
+                        name: '当前数量',
                         type: 'bar',
-                        data: [100, 300, 100, 20, 15, 11],
+                        data: [this.stats["connections.count"], this.stats["sessions.count"], this.stats["topics.count"], this.stats["subscribers.count"], this.stats["routes.count"], this.stats["retained.count"]],
                         itemStyle: {
                             color: '#67C23A'
                         }
