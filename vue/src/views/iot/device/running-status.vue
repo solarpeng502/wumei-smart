@@ -87,13 +87,6 @@
                 </el-row>
         </el-col>
     </el-row>
-
-    <el-form label-width="100px" style="margin-top:50px;margin-bottom:150px;">
-        <el-form-item style="text-align: center;margin-left:-100px;margin-top:10px;">
-            <el-button size="small" @click="goBack" type="info">返 回</el-button>
-        </el-form-item>
-    </el-form>
-
 </div>
 </template>
 
@@ -144,17 +137,6 @@ export default {
 
     },
     methods: {
-        /** 返回按钮 */
-        goBack() {
-            const obj = {
-                path: "/iot/device",
-                query: {
-                    t: Date.now(),
-                    pageNum: this.$route.query.pageNum
-                }
-            };
-            this.$tab.closeOpenPage(obj);
-        },
         generateMap() {
             for (let i = 0; i < this.deviceInfo.readOnlyList.length; i++) {
                 if (!(this.deviceInfo.readOnlyList[i].type == "decimal" || this.deviceInfo.readOnlyList[i].type == "integer")) {

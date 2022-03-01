@@ -9,14 +9,14 @@
                         <el-form-item label="设备名称" prop="deviceName">
                             <el-input v-model="form.deviceName" placeholder="请输入设备名称" />
                         </el-form-item>
-                        <el-form-item label="所属产品" prop="productName">
-                            <span style="color:#409EFF">{{form.productName}}</span>
-                            <el-button type="info" size="mini" style="margin-left:10px;float:right;" @click="selectProduct">选择产品</el-button>
-                        </el-form-item>
                         <el-form-item label="设备编号" prop="serialNumber">
                             <el-input v-model="form.serialNumber" placeholder="请输入设备编号">
                                 <el-button slot="append" @click="generateNum">生成</el-button>
                             </el-input>
+                        </el-form-item>
+                        <el-form-item label="所属产品" prop="productName">
+                            <span style="color:#409EFF">{{form.productName}}</span>
+                            <el-button type="info" size="mini" style="margin-left:10px;float:right;" @click="selectProduct">选择产品</el-button>
                         </el-form-item>
                         <el-form-item label="固件版本" prop="firmwareVersion">
                             <el-input v-model="form.firmwareVersion" placeholder="请输入固件版本" type="number"><template slot="prepend">Version</template></el-input>
