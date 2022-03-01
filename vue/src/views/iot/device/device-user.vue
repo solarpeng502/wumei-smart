@@ -1,6 +1,5 @@
 <template>
-<div class="app-container">
-
+<div style="padding-left:20px;">
     <el-row :gutter="10" class="mb8">
         <el-col :span="1.5">
             <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="selectUser" v-hasPermi="['iot:deviceUser:add']">分享设备</el-button>

@@ -1,8 +1,9 @@
 <template>
 <el-card style="margin:6px;padding-bottom:100px;">
-    <el-tabs v-model="activeName">
-        <el-tab-pane label="基本信息" name="basic" style="margin-top:20px;">
-            <el-form ref="form" :model="form" :rules="rules" label-width="90px">
+    <el-tabs v-model="activeName" tab-position="left" style="padding:10px;">
+        <el-tab-pane name="basic">
+            <span slot="label"> * 基本信息</span>
+            <el-form ref="form" :model="form" :rules="rules" label-width="100px">
                 <el-row :gutter="100">
                     <el-col :span="7">
                         <el-form-item label="设备名称" prop="deviceName">
@@ -43,7 +44,7 @@
                                 <el-option v-for="dict in dict.type.iot_device_status" :key="dict.value" :label="dict.label" :value="parseInt(dict.value)"></el-option>
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="激活时间" prop="activeTime" >
+                        <el-form-item label="激活时间" prop="activeTime">
                             <el-date-picker clearable v-model="form.activeTime" type="date" value-format="yyyy-MM-dd" placeholder="选择激活时间" disabled style="width:100%">
                             </el-date-picker>
                         </el-form-item>
@@ -79,7 +80,6 @@
             <el-form label-width="100px" style="margin-top:50px;">
                 <el-form-item style="text-align: center;margin-left:-100px;margin-top:10px;">
                     <el-button size="small" type="primary" @click="submitForm">保 存</el-button>
-                    <el-button size="small" @click="goBack" type="info">返 回</el-button>
                 </el-form-item>
             </el-form>
 
@@ -87,24 +87,38 @@
             <product-list ref="productList" :productId="form.productId" @productEvent="getProductData($event)" />
         </el-tab-pane>
 
-        <el-tab-pane label="运行状态" name="runningStatus" :disabled="form.deviceId==undefined">
+        <el-tab-pane name="runningStatus" :disabled="form.deviceId==undefined">
+            <span slot="label"> * 运行状态</span>
             <running-status ref="runningStatus" :device="form" />
         </el-tab-pane>
 
-        <el-tab-pane label="设备定时" name="deviceTimer" :disabled="form.deviceId==undefined">
+        <el-tab-pane name="deviceTimer" :disabled="form.deviceId==undefined">
+            <span slot="label">设备定时</span>
             <device-timer ref="deviceTimer" :device="form" />
         </el-tab-pane>
 
-        <el-tab-pane label="设备用户" name="deviceUser" :disabled="form.deviceId==undefined">
+        <el-tab-pane name="deviceUser" :disabled="form.deviceId==undefined">
+            <span slot="label">设备用户</span>
             <device-user ref="deviceUser" :device="form" @userEvent="getUserData($event)" />
         </el-tab-pane>
 
-        <el-tab-pane label="设备日志" name="deviceLog" :disabled="form.deviceId==undefined">
+        <el-tab-pane name="deviceLog" :disabled="form.deviceId==undefined">
+            <span slot="label">设备日志</span>
             <device-log ref="deviceLog" :device="form" />
         </el-tab-pane>
 
-        <el-tab-pane label="监测统计" name="deviceStastic" :disabled="form.deviceId==undefined">
+        <el-tab-pane name="deviceStastic" :disabled="form.deviceId==undefined">
+            <span slot="label">监测统计</span>
             <device-statistic ref="deviceStatistic" :device="form" />
+        </el-tab-pane>
+
+        <el-tab-pane label="" disabled name="01" />
+        <el-tab-pane label="" disabled name="02" />
+        <el-tab-pane label="" disabled name="03" />
+        <el-tab-pane name="05">
+            <span slot="label">
+                <el-button type="info" size="mini" @click="goBack()">返回列表</el-button>
+            </span>
         </el-tab-pane>
     </el-tabs>
 

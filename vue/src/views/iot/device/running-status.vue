@@ -1,5 +1,5 @@
 <template>
-<div style="margin-top:20px;">
+<div style="padding-left:20px;">
     <el-row :gutter="80">
         <el-col :span="8">
             <el-descriptions :column="1" border :title="title">

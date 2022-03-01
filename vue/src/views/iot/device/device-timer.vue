@@ -1,5 +1,5 @@
 <template>
-<div class="app-container">
+<div style="padding-left:20px;">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="70px">
         <el-form-item label="定时名称" prop="jobName">
             <el-input v-model="queryParams.jobName" placeholder="请输入定时名称" clearable size="small" @keyup.enter.native="handleQuery" />
@@ -268,13 +268,15 @@ export default {
         // 获取到父组件传递的device后
         device: function (newVal, oldVal) {
             this.deviceInfo = newVal;
-            // 获取缓存的Json物模型
-            cacheJsonThingsModel(newVal.productId).then(response => {
-                this.thingsModel = JSON.parse(response.data);
-                // 过滤监测数据，监测数据未只读
-                // this.thingsModel.properties = this.thingsModel.properties.filter(item => item.isMonitor == 0);
-                this.getList();
-            });
+            if (this.deviceInfo && this.deviceInfo.deviceId != 0) {
+                // 获取缓存的Json物模型
+                cacheJsonThingsModel(deviceInfo.productId).then(response => {
+                    this.thingsModel = JSON.parse(response.data);
+                    // 过滤监测数据，监测数据未只读
+                    // this.thingsModel.properties = this.thingsModel.properties.filter(item => item.isMonitor == 0);
+                    this.getList();
+                });
+            }
         }
     },
     data() {

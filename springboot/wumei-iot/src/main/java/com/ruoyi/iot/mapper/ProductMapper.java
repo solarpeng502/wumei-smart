@@ -1,8 +1,9 @@
 package com.ruoyi.iot.mapper;
 
-import java.util.List;
 import com.ruoyi.iot.domain.Product;
 import com.ruoyi.iot.model.IdAndName;
+
+import java.util.List;
 
 /**
  * 产品Mapper接口
@@ -51,6 +52,14 @@ public interface ProductMapper
      * @return 结果
      */
     public int updateProduct(Product product);
+
+    /**
+     * 发布产品
+     *
+     * @param productId 产品ID
+     * @return 结果
+     */
+    public int publishProduct(Long productId);
 
     /**
      * 修改物模型JSON

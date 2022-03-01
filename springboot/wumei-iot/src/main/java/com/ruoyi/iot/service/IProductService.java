@@ -1,8 +1,9 @@
 package com.ruoyi.iot.service;
 
-import java.util.List;
 import com.ruoyi.iot.domain.Product;
 import com.ruoyi.iot.model.IdAndName;
+
+import java.util.List;
 
 /**
  * 产品Service接口
@@ -50,6 +51,14 @@ public interface IProductService
      * @return 结果
      */
     public int updateProduct(Product product);
+
+    /**
+     * 发布产品
+     *
+     * @param productId 产品
+     * @return 结果
+     */
+    public int publishProduct(Long productId);
 
     /**
      * 批量删除产品

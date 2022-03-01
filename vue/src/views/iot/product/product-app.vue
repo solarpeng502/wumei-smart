@@ -1,43 +1,45 @@
 <template>
-<el-row :gutter="10">
-<div style="height:50px; color:#F56C6C;margin-left:20px;">该功能下个版本发布</div>
-    <el-col :span="14">
-        <el-table v-loading="loading" :data="modelList" border style="margin-bottom:60px;margin-top:20px;">
-            <el-table-column label="名称" align="center" prop="modelName" />
-            <el-table-column label="标识符" align="center" prop="identifier" />
-            <el-table-column label="物模型类别" align="center" prop="type">
-                <template slot-scope="scope">
-                    <dict-tag :options="dict.type.iot_things_type" :value="scope.row.type" />
-                </template>
-            </el-table-column>
-            <el-table-column label="数据类型" align="center" prop="datatype">
-                <template slot-scope="scope">
-                    <dict-tag :options="dict.type.iot_data_type" :value="scope.row.datatype" />
-                </template>
-            </el-table-column>
-            <el-table-column label="部件" align="center" prop="part">
-                <template slot-scope="scope">
-                    {{scope.row.part}} 系统定义的部件
-                </template>
-            </el-table-column>
-        </el-table>
+<div style="padding-left:20px;">
+    <el-row :gutter="10">
+        <el-col :span="14">
+         <el-link type="danger" style="padding-top:5px" :underline="false">该功能，未完成</el-link>
+            <el-table v-loading="loading" :data="modelList" border style="margin-bottom:60px;margin-top:20px;">
+                <el-table-column label="名称" align="center" prop="modelName" />
+                <el-table-column label="标识符" align="center" prop="identifier" />
+                <el-table-column label="物模型类别" align="center" prop="type">
+                    <template slot-scope="scope">
+                        <dict-tag :options="dict.type.iot_things_type" :value="scope.row.type" />
+                    </template>
+                </el-table-column>
+                <el-table-column label="数据类型" align="center" prop="datatype">
+                    <template slot-scope="scope">
+                        <dict-tag :options="dict.type.iot_data_type" :value="scope.row.datatype" />
+                    </template>
+                </el-table-column>
+                <el-table-column label="部件" align="center" prop="part">
+                    <template slot-scope="scope">
+                        {{scope.row.part}} 系统定义的部件
+                    </template>
+                </el-table-column>
+            </el-table>
 
-        <el-divider>高级功能</el-divider>
-        <el-form ref="form" :model="form"  label-width="100px">
-            <el-form-item label="自定义页面" prop="page">
-                <el-input v-model="form.page" placeholder="请输入自定义页面" />
-            </el-form-item>
-        </el-form>
+            <el-divider>高级功能</el-divider>
+            <el-form ref="form" :model="form" label-width="100px">
+                <el-form-item label="自定义页面" prop="page">
+                    <el-input v-model="form.page" placeholder="请输入自定义页面" />
+                </el-form-item>
+            </el-form>
 
-    </el-col>
-    <el-col :span="8" :offset="2">
-        <div class="phone">
-            <div class="phone-container"></div>
-        </div>
-        <div style="text-align:center;margin-top:15px;width:370px;">界面展示</div>
-    </el-col>
+        </el-col>
+        <el-col :span="8" :offset="2">
+            <div class="phone">
+                <div class="phone-container"></div>
+            </div>
+            <div style="text-align:center;margin-top:15px;width:370px;">界面展示</div>
+        </el-col>
 
-</el-row>
+    </el-row>
+</div>
 </template>
 
 <script>
@@ -56,7 +58,7 @@ export default {
     data() {
         return {
             // 遮罩层
-            loading: true,
+            loading: false,
             // 产品物模型表格数据
             modelList: [],
             // 弹出层标题
@@ -74,8 +76,10 @@ export default {
         // 获取到父组件传递的productId后，刷新列表
         product: function (newVal, oldVal) {
             this.productInfo = newVal;
-            this.queryParams.productId = this.productInfo.productId;
-            this.getList();
+            if (this.productInfo && this.productInfo.productId != 0) {
+                this.queryParams.productId = this.productInfo.productId;
+                this.getList();
+            }
         }
     },
     created() {

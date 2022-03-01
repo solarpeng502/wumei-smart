@@ -1,17 +1,17 @@
 <template>
-<div style="padding:6px;">
+<div style="padding-left:20px;">
     <el-row :gutter="10" class="mb8">
         <el-col :span="1.5">
-            <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
+            <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd" v-if="productInfo.status==1">新增</el-button>
         </el-col>
         <el-col :span="1.5">
-            <el-button type="success" plain icon="el-icon-plus" size="mini" @click="handleSelect">导入通用物模型</el-button>
+            <el-button type="success" plain icon="el-icon-plus" size="mini" @click="handleSelect" v-if="productInfo.status==1">导入通用物模型</el-button>
         </el-col>
         <el-col :span="1.5">
             <el-button type="info" plain icon="el-icon-plus" size="mini" @click="handleOpenThingsModel">查看物模型</el-button>
         </el-col>
         <el-col :span="1.5">
-            <el-link type="danger" style="padding-top:8px">注意：标识符不能重复</el-link>
+            <el-link type="danger" style="padding-top:5px" :underline="false">注意：标识符不能重复</el-link>
         </el-col>
         <right-toolbar @queryTable="getList"></right-toolbar>
     </el-row>
@@ -39,7 +39,7 @@
                 <dict-tag :options="dict.type.iot_data_type" :value="scope.row.datatype" />
             </template>
         </el-table-column>
-        <el-table-column label="数据定义" align="left" prop="specs" min-width="120">
+        <el-table-column label="数据定义" align="left" prop="specs" min-width="150" class-name="specsColor">
             <template slot-scope="scope">
                 <div v-html="formatSpecsDisplay(scope.row.specs)"></div>
             </template>
@@ -182,6 +182,11 @@
     </el-dialog>
 </div>
 </template>
+<style>
+.specsColor {
+    background-color: #fcfcfc;
+}
+</style>
 
 <script>
 import productSelectTemplate from "./product-select-template";
@@ -208,6 +213,16 @@ export default {
             default: null
         }
     },
+    watch: {
+        // 获取到父组件传递的productId后，刷新列表
+        product: function (newVal, oldVal) {
+            this.productInfo = newVal;
+            if (this.productInfo && this.productInfo.productId != 0) {
+                this.queryParams.productId = this.productInfo.productId;
+                this.getList();
+            }
+        }
+    },
     data() {
         return {
             // 物模型
@@ -217,7 +232,7 @@ export default {
             // 子组件选中的id数组
             templateIds: [],
             // 遮罩层
-            loading: true,
+            loading: false,
             // 选中数组
             ids: [],
             // 非单个禁用
@@ -271,14 +286,6 @@ export default {
                 }, ],
             },
         };
-    },
-    watch: {
-        // 获取到父组件传递的productId后，刷新列表
-        product: function (newVal, oldVal) {
-            this.productInfo = newVal;
-            this.queryParams.productId = this.productInfo.productId;
-            this.getList();
-        }
     },
     created() {
 
@@ -420,8 +427,8 @@ export default {
                     productName: this.productInfo.productName,
                     templateIds: this.templateIds
                 }
-                importModel(importData).then(response => {     
-                    this.$modal.msgSuccess(response.msg);               
+                importModel(importData).then(response => {
+                    this.$modal.msgSuccess(response.msg);
                     this.openSelect = false;
                     this.$refs.productSelectTemplate.$refs.selectTemplateTable.clearSelection();
                     this.getList();
@@ -537,10 +544,10 @@ export default {
         formatSpecsDisplay(json) {
             let specs = JSON.parse(json);
             if (specs.type === "integer" || specs.type === "decimal") {
-                return "最大值：<span style=\"color:#F56C6C\">" + specs.max +
-                    "</span><br />最小值：<span style=\"color:#F56C6C\">" + specs.min +
-                    "</span><br />步长：<span style=\"color:#F56C6C\">" + specs.step +
-                    "</span><br />单位：<span style=\"color:#F56C6C\">" + specs.unit;
+                return "<span style='width:50%;display:inline-block;'>最大值：<span style=\"color:#F56C6C\">" + specs.max +
+                    "</span></span>最小值：<span style=\"color:#F56C6C\">" + specs.min +
+                    "</span><br /><span style='width:50%;display:inline-block;'>步长：<span style=\"color:#F56C6C\">" + specs.step +
+                    "</span></span>单位：<span style=\"color:#F56C6C\">" + specs.unit;
             } else if (specs.type === "string") {
                 return "最大长度：<span style=\"color:#F56C6C\">" + specs.maxLength + "</span>";
             } else if (specs.type === "array") {
@@ -548,12 +555,15 @@ export default {
             } else if (specs.type === "enum") {
                 let items = "";
                 for (let i = 0; i < specs.enumList.length; i++) {
-                    items = items + specs.enumList[i].value + "：<span style='color:#F56C6C'>" + specs.enumList[i].text + "</span><br/>"
+                    items = items + "<span style='width:50%;display:inline-block;'>" + specs.enumList[i].value + "：<span style='color:#F56C6C'>" + specs.enumList[i].text + "</span></span>"
+                    if (i > 0 && i % 2 != 0) {
+                        items = items + "<br />"
+                    }
                 }
                 return items;
             } else if (specs.type === "bool") {
-                return "0：<span style=\"color:#F56C6C\">" + specs.falseText +
-                    "</span><br />1：<span style=\"color:#F56C6C\">" + specs.trueText
+                return "<span style='width:50%;display:inline-block;'>0：<span style=\"color:#F56C6C\">" + specs.falseText +
+                    "</span></span>1：<span style=\"color:#F56C6C\">" + specs.trueText
             }
         },
 

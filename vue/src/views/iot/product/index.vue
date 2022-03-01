@@ -52,7 +52,10 @@
                     <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else></el-image>
                     <el-descriptions :column="2" size="medium" :title="item.productName" style="padding:10px;">
                         <template slot="extra">
-                            <dict-tag :options="dict.type.iot_product_status" :value="item.status" size="medium" />
+                            <el-button type="success" size="mini" style="padding:5px;" v-if="item.status==2">已发布</el-button>
+                            <el-tooltip class="item" effect="dark" content="现在发布" placement="top-start">
+                                <el-button type="" size="mini" style="padding:5px;" v-if="item.status==1" @click="publishProduct(item.productId)">未发布</el-button>
+                            </el-tooltip>
                         </template>
                         <el-descriptions-item label="分类名称">
                             <el-link type="primary" :underline="false">{{item.categoryName}}</el-link>
@@ -78,9 +81,8 @@
                     </el-descriptions>
                     <el-button-group style="padding:0 10px 20px 10px;">
                         <el-button size="mini" type="primary" icon="el-icon-edit" @click="handleEditProduct(item)" v-hasPermi="['tool:gen:edit']">详情</el-button>
-                        <el-button size="mini" type="danger" icon="el-icon-delete" @click="handleDelete(item)" v-hasPermi="['iot:product:remove']">删除</el-button>
-                        <el-button size="mini" type="success" icon="el-icon-edit" @click="handleGeneratorSDK(item)" v-hasPermi="['iot:product:edit']">下载SDK</el-button>
-                        <el-button size="mini" type="info">物模型</el-button>
+                        <el-button size="mini" type="danger" icon="el-icon-delete" @click="handleDelete(item)" v-hasPermi="['iot:product:remove']" v-if="item.status!=2">删除</el-button>
+                        <el-button size="mini" type="info" icon="el-icon-edit" @click="handleGeneratorSDK(item)" v-hasPermi="['iot:product:edit']">下载SDK</el-button>
                     </el-button-group>
                 </el-card>
             </el-col>
@@ -108,7 +110,10 @@
             <el-table-column label="分类名称" align="center" prop="categoryName" />
             <el-table-column label="状态" align="center" prop="status">
                 <template slot-scope="scope">
-                    <dict-tag :options="dict.type.iot_product_status" :value="scope.row.status" />
+                    <el-button type="success" size="mini" style="padding:5px;" v-if="scope.row.status==2">已发布</el-button>
+                    <el-tooltip class="item" effect="dark" content="现在发布" placement="top-start">
+                            <el-button type="" size="mini" style="padding:5px;" v-if="scope.row.status==1" @click="publishProduct(scope.row.productId)">未发布</el-button>
+                    </el-tooltip>
                 </template>
             </el-table-column>
             <el-table-column label="设备类型" align="center" prop="deviceType">
@@ -141,8 +146,8 @@
                 <template slot-scope="scope">
                     <div style="text-align:left;margin-left:10px;">
                         <el-button size="small" type="primary" icon="el-icon-edit" @click="handleEditProduct(scope.row)" v-hasPermi="['tool:gen:edit']" style="padding:5px;">详情</el-button>
-                        <el-button size="small" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['iot:product:remove']" style="padding:5px;">删除</el-button><br />
-                        <el-button size="small" type="success" icon="el-icon-edit" @click="handleGeneratorSDK(scope.row)" v-hasPermi="['iot:product:edit']" style="padding:5px;margin-top:8px;">生成设备端SDK</el-button>
+                        <el-button size="small" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['iot:product:remove']" style="padding:5px;" :disabled="scope.row.status!=1">删除</el-button><br />
+                        <el-button size="small" type="info" icon="el-icon-edit" @click="handleGeneratorSDK(scope.row)" v-hasPermi="['iot:product:edit']" style="padding:5px;margin-top:8px;">生成设备端SDK</el-button>
                     </div>
                 </template>
             </el-table-column>
@@ -152,6 +157,7 @@
 
         <!-- 下载SDK -->
         <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+            <el-link type="danger" style="padding-left:10px;" :underline="false">该功能暂未实现，参考教程和项目的SDK示例</el-link>
             <el-form label-width="80px">
                 <el-form-item label="选择设备">
                     <el-radio-group v-model="form.datatype">
@@ -160,7 +166,7 @@
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="downloadSdk">下 载</el-button>
+                <el-button type="primary" @click="downloadSdk" disabled>下 载</el-button>
                 <el-button @click="cancel">取 消</el-button>
             </div>
         </el-dialog>
@@ -173,6 +179,7 @@
 import {
     listProduct,
     delProduct,
+    publishProduct
 } from "@/api/iot/product";
 
 export default {
@@ -239,6 +246,21 @@ export default {
                 this.total = response.total;
                 this.loading = false;
             });
+        },
+        /** 发布产品 */
+        publishProduct(productId) {
+            this.$confirm('产品发布后不能再更改产品内容 ！', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                publishProduct(productId).then(response => {
+                    if (response.code == 200) {
+                        this.getList();
+                        this.$modal.alertSuccess("产品发布成功，可以去添加设备了");
+                    }
+                })
+            }).catch(() => {});
         },
         // 取消按钮
         cancel() {

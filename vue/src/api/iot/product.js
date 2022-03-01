@@ -43,6 +43,14 @@ export function updateProduct(data) {
   })
 }
 
+// 发布产品
+export function publishProduct(productId) {
+  return request({
+    url: '/iot/product/publish/'+productId,
+    method: 'put'
+  })
+}
+
 // 删除产品
 export function delProduct(productId) {
   return request({

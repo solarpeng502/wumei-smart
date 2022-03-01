@@ -1,6 +1,5 @@
 <template>
-<div class="app-container">
-<div style="height:50px; color:#F56C6C">该功能下个版本发布</div>
+<div style="padding-left:20px;">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
         <el-form-item label="告警名称" prop="alertName">
             <el-input v-model="queryParams.alertName" placeholder="请输入告警名称" clearable size="small" @keyup.enter.native="handleQuery" />
@@ -14,6 +13,10 @@
             <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
             <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
         </el-form-item>
+        <el-form-item>
+            <el-link type="danger" style="padding-top:5px" :underline="false">该功能，未完成</el-link>
+        </el-form-item>
+
     </el-form>
 
     <el-row :gutter="10" class="mb8">
@@ -255,20 +258,22 @@ export default {
         // 获取到父组件传递的productId后，刷新列表
         product: function (newVal, oldVal) {
             this.productInfo = newVal;
-            this.queryParams.productId = this.productInfo.productId;
-            this.getList();
-            // 获取缓存的Json物模型
-            cacheJsonThingsModel(newVal.productId).then(response => {
-                this.thingsModel = JSON.parse(response.data);
-            });
+            if (this.productInfo && this.productInfo.productId != 0) {
+                this.queryParams.productId = this.productInfo.productId;
+                this.getList();
+                // 获取缓存的Json物模型
+                cacheJsonThingsModel(newVal.productId).then(response => {
+                    this.thingsModel = JSON.parse(response.data);
+                });
+            }
         }
     },
     data() {
         return {
             // 物模型JSON
-            thingsModel:{},
+            thingsModel: {},
             // 遮罩层
-            loading: true,
+            loading: false,
             // 选中数组
             ids: [],
             // 非单个禁用

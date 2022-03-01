@@ -136,6 +136,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where product_id = #{productId}
     </update>
 
+    <update id="publishProduct" parameterType="Long">
+        update iot_product set status=2
+        where product_id = #{productId}
+    </update>
+
     <update id="updateThingsModelJson" parameterType="Product">
         update iot_product set things_models_json=#{thingsModelsJson}
         where product_id = #{productId}

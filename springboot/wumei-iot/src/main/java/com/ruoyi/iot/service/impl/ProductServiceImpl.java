@@ -130,6 +130,18 @@ public class ProductServiceImpl implements IProductService
     }
 
     /**
+     * 发布产品
+     *
+     * @param productId 产品Id
+     * @return 结果
+     */
+    @Override
+    public int publishProduct(Long productId)
+    {
+        return productMapper.publishProduct(productId);
+    }
+
+    /**
      * 批量删除产品
      * 
      * @param productIds 需要删除的产品主键

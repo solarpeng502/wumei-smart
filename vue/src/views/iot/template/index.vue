@@ -63,7 +63,7 @@
                     <dict-tag :options="dict.type.iot_data_type" :value="scope.row.datatype" />
                 </template>
             </el-table-column>
-            <el-table-column label="数据定义" align="left" prop="specs" min-width="150">
+            <el-table-column label="数据定义" align="left" prop="specs" min-width="150" class-name="specsColor">
                 <template slot-scope="scope">
                     <div v-html="formatSpecsDisplay(scope.row.specs)"></div>
                 </template>
@@ -187,6 +187,12 @@
     </el-card>
 </div>
 </template>
+
+<style>
+.specsColor {
+    background-color: #fcfcfc;
+}
+</style>
 
 <script>
 import {
@@ -449,10 +455,10 @@ export default {
         formatSpecsDisplay(json) {
             let specs = JSON.parse(json);
             if (specs.type === "integer" || specs.type === "decimal") {
-                return "最大值：<span style=\"color:#F56C6C\">" + specs.max +
-                    "</span><br />最小值：<span style=\"color:#F56C6C\">" + specs.min +
-                    "</span><br />步长：<span style=\"color:#F56C6C\">" + specs.step +
-                    "</span><br />单位：<span style=\"color:#F56C6C\">" + specs.unit;
+                return "<span style='width:50%;display:inline-block;'>最大值：<span style=\"color:#F56C6C\">" + specs.max +
+                    "</span></span>最小值：<span style=\"color:#F56C6C\">" + specs.min +
+                    "</span><br /><span style='width:50%;display:inline-block;'>步长：<span style=\"color:#F56C6C\">" + specs.step +
+                    "</span></span>单位：<span style=\"color:#F56C6C\">" + specs.unit;
             } else if (specs.type === "string") {
                 return "最大长度：<span style=\"color:#F56C6C\">" + specs.maxLength + "</span>";
             } else if (specs.type === "array") {
@@ -460,12 +466,15 @@ export default {
             } else if (specs.type === "enum") {
                 let items = "";
                 for (let i = 0; i < specs.enumList.length; i++) {
-                    items = items + specs.enumList[i].value + "：<span style='color:#F56C6C'>" + specs.enumList[i].text + "</span><br/>"
+                    items = items + "<span style='width:50%;display:inline-block;'>" + specs.enumList[i].value + "：<span style='color:#F56C6C'>" + specs.enumList[i].text + "</span></span>"
+                    if (i > 0 && i % 2 != 0) {
+                        items = items + "<br />"
+                    }
                 }
                 return items;
             } else if (specs.type === "bool") {
-                return "0：<span style=\"color:#F56C6C\">" + specs.falseText +
-                    "</span><br />1：<span style=\"color:#F56C6C\">" + specs.trueText
+                return "<span style='width:50%;display:inline-block;'>0：<span style=\"color:#F56C6C\">" + specs.falseText +
+                    "</span></span>1：<span style=\"color:#F56C6C\">" + specs.trueText
             }
         },
 

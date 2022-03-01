@@ -1,8 +1,9 @@
 <template>
 <el-card style="margin:6px;padding-bottom:100px;">
-    <el-tabs v-model="activeName">
-        <el-tab-pane label="基本信息" name="basic">
-            <el-form ref="form" :model="form" :rules="rules" label-width="80px" style="margin-top:20px;">
+    <el-tabs v-model="activeName" tab-position="left" style="padding:10px;">
+        <el-tab-pane name="basic">
+            <span slot="label"> * 基本信息</span>
+            <el-form ref="form" :model="form" :rules="rules" label-width="100px">
                 <el-row :gutter="100">
                     <el-col :span="7">
                         <el-form-item label="产品名称" prop="productName">
@@ -19,10 +20,13 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item label="备注信息" prop="remark">
-                            <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" rows="4" />
+                            <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" rows="7" />
                         </el-form-item>
                     </el-col>
                     <el-col :span="7">
+                        <el-form-item label="产品编号" prop="productId">
+                            <el-input v-model="form.productId" placeholder="自动生成" disabled />
+                        </el-form-item>
                         <el-form-item label="设备类型" prop="deviceType">
                             <el-select v-model="form.deviceType" placeholder="请选择设备类型" disabled style="width:100%">
                                 <el-option v-for="dict in dict.type.iot_device_type" :key="dict.value" :label="dict.label" :value="parseInt(dict.value)"></el-option>
@@ -34,17 +38,17 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item label="Mqtt账号" prop="mqttAccount">
-                            <el-input v-model="form.mqttAccount" placeholder="自动生成" readonly :type="accountInputType">
+                            <el-input v-model="form.mqttAccount" placeholder="自动生成" :disabled="!form.mqttAccount" readonly :type="accountInputType">
                                 <el-button slot="append" icon="el-icon-view" style="font-size:18px;" @click="changeInputType('account')"></el-button>
                             </el-input>
                         </el-form-item>
                         <el-form-item label="Mqtt密码" prop="mqttPassword">
-                            <el-input v-model="form.mqttPassword" placeholder="自动生成" readonly :type="passwordInputType">
+                            <el-input v-model="form.mqttPassword" placeholder="自动生成" :disabled="!form.mqttAccount" readonly :type="passwordInputType">
                                 <el-button slot="append" icon="el-icon-view" style="font-size:18px;" @click="changeInputType('password')"></el-button>
                             </el-input>
                         </el-form-item>
                         <el-form-item label="产品秘钥" prop="mqttSecret">
-                            <el-input v-model="form.mqttSecret" placeholder="自动生成" readonly :type="keyInputType">
+                            <el-input v-model="form.mqttSecret" placeholder="自动生成" :disabled="!form.mqttAccount" readonly :type="keyInputType">
                                 <el-button slot="append" icon="el-icon-view" style="font-size:18px;" @click="changeInputType('key')"></el-button>
                             </el-input>
                         </el-form-item>
@@ -58,24 +62,39 @@
 
                 <el-col :span="20">
                     <el-form-item style="text-align: center;margin:40px 0px;">
-                        <el-button type="primary" @click="submitForm(1)">提交</el-button>
-                        <el-button type="danger" @click="submitForm(2)" v-show="form.productId!=undefined">提交并发布</el-button>
-                        <el-button type="info" @click="goBack()">返回</el-button>
+                        <el-button type="primary" @click="submitForm()" v-if="form.status==1">提交</el-button>
                     </el-form-item>
                 </el-col>
             </el-form>
         </el-tab-pane>
 
-        <el-tab-pane label="物模型" name="things" :disabled="form.productId==undefined">
+        <el-tab-pane label="" name="things" :disabled="form.productId==0">
+            <span slot="label">* 定义物模型</span>
             <product-things-model ref="productThingsModel" :product="form" />
         </el-tab-pane>
 
-        <el-tab-pane label="告警" name="alert" :disabled="form.productId==undefined">
+        <el-tab-pane label="" name="alert" disabled>
+            <span slot="label"> 告警配置</span>
             <product-alert ref="productAlert" :product="form"></product-alert>
         </el-tab-pane>
 
-        <el-tab-pane label="APP自定义" name="productApp" :disabled="form.productId==undefined">
+        <el-tab-pane label="" name="productApp" disabled>
+            <span slot="label">自定义APP</span>
             <product-app ref="productApp" :product="form" />
+        </el-tab-pane>
+
+        <el-tab-pane label="" disabled name="01" />
+        <el-tab-pane label="" disabled name="02" />
+        <el-tab-pane label="" disabled name="03" />
+        <el-tab-pane v-if="form.status==1" name="04">
+            <span slot="label">
+                <el-button type="success" size="mini" @click="publishProduct()">发布产品</el-button>
+            </span>
+        </el-tab-pane>
+        <el-tab-pane name="05">
+            <span slot="label">
+                <el-button type="info" size="mini" @click="goBack()">返回列表</el-button>
+            </span>
         </el-tab-pane>
     </el-tabs>
 
@@ -93,7 +112,8 @@ import {
 import {
     getProduct,
     addProduct,
-    updateProduct
+    updateProduct,
+    publishProduct
 } from "@/api/iot/product";
 
 export default {
@@ -140,10 +160,9 @@ export default {
     created() {
         // 获取产品信息
         const productId = this.$route.query && this.$route.query.productId;
-        if (productId != 0) {
-            getProduct(productId).then(response => {
-                this.form = response.data;
-            });
+        this.form.productId = productId;
+        if (this.form.productId != 0) {
+            this.getProduct();
         }
         // 获取简短分类列表
         listShortCategory().then(response => {
@@ -163,6 +182,12 @@ export default {
             this.$tab.closeOpenPage(obj);
             this.reset();
         },
+        /** 获取产品信息 */
+        getProduct() {
+            getProduct(this.form.productId).then(response => {
+                this.form = response.data;
+            });
+        },
         // 表单重置
         reset() {
             this.form = {
@@ -177,29 +202,43 @@ export default {
                 vertificateMethod: 3,
                 mqttAccount: null,
                 mqttPassword: null,
-                mqttSecret:null,
+                mqttSecret: null,
                 remark: null
             };
             this.resetForm("form");
         },
         /** 提交按钮 */
-        submitForm(status) {
-            // 状态（1-未发布，2-已发布，不能修改）
-            this.form.status = status;
+        submitForm() {
             this.$refs["form"].validate(valid => {
                 if (valid) {
-                    if (this.form.productId != null) {
+                    if (this.form.productId != null && this.form.productId != 0) {
                         updateProduct(this.form).then(response => {
                             this.$modal.alertSuccess("修改成功");
                         });
                     } else {
                         addProduct(this.form).then(response => {
-                            this.$modal.alertSuccess("添加成功");
+                            this.$modal.alertSuccess("添加成功,可以开始定义物模型了");
                             this.form = response.data;
                         });
                     }
                 }
             });
+        },
+        /** 发布产品 */
+        publishProduct() {
+            this.$confirm('产品发布后不能再更改产品内容 ！', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                publishProduct(this.form.productId).then(response => {
+                    if (response.code == 200) {
+                        this.$modal.alertSuccess("产品发布成功，可以去添加设备了");
+                        this.form.status = 2; // 1=未发布，2-已发布
+                        this.goBack();
+                    }
+                })
+            }).catch(() => {});
         },
         /** 选择分类 */
         selectCategory(val) {

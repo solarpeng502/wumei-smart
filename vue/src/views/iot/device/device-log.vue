@@ -1,5 +1,5 @@
 <template>
-<div class="app-container">
+<div style="padding-left:20px;">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
         <el-form-item label="日志名称" prop="logName">
             <el-input v-model="queryParams.logName" placeholder="请输入日志名称" clearable size="small" @keyup.enter.native="handleQuery" />

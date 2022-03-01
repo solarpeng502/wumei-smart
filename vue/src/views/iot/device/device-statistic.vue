@@ -1,5 +1,5 @@
 <template>
-<div style="padding:6px;">
+<div style="padding-left:20px;">
     <el-row :gutter="10">
         <el-col :span="24" id="parent">
             <div id="monitor" ref="monitor" style="height:600px;width:1500px;"></div>
