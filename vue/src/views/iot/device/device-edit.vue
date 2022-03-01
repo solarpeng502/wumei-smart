@@ -88,7 +88,7 @@
         </el-tab-pane>
 
         <el-tab-pane name="runningStatus" :disabled="form.deviceId==undefined">
-            <span slot="label"> * 运行状态</span>
+            <span slot="label">运行状态</span>
             <running-status ref="runningStatus" :device="form" />
         </el-tab-pane>
 

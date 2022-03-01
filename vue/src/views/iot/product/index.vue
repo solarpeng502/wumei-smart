@@ -50,7 +50,10 @@
                     <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/telphone.jpg')]" :src="require('@/assets/images/telphone.jpg')" fit="cover" v-else-if="item.productId==4"></el-image>
                     <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/computer.jpg')]" :src="require('@/assets/images/computer.jpg')" fit="cover" v-else-if="item.productId==5"></el-image>
                     <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else></el-image>
-                    <el-descriptions :column="2" size="medium" :title="item.productName" style="padding:10px;">
+                    <el-descriptions :column="2" size="medium" style="padding:10px;">
+                        <template slot="title">
+                            <el-link type="" :underline="false" @click="handleEditProduct(item)" style="font-weight:bold;font-size:16px;">{{item.productName}}</el-link>
+                        </template>
                         <template slot="extra">
                             <el-button type="success" size="mini" style="padding:5px;" v-if="item.status==2">已发布</el-button>
                             <el-tooltip class="item" effect="dark" content="现在发布" placement="top-start">
@@ -112,7 +115,7 @@
                 <template slot-scope="scope">
                     <el-button type="success" size="mini" style="padding:5px;" v-if="scope.row.status==2">已发布</el-button>
                     <el-tooltip class="item" effect="dark" content="现在发布" placement="top-start">
-                            <el-button type="" size="mini" style="padding:5px;" v-if="scope.row.status==1" @click="publishProduct(scope.row.productId)">未发布</el-button>
+                        <el-button type="" size="mini" style="padding:5px;" v-if="scope.row.status==1" @click="publishProduct(scope.row.productId)">未发布</el-button>
                     </el-tooltip>
                 </template>
             </el-table-column>

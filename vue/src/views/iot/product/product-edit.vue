@@ -238,7 +238,9 @@ export default {
                         this.goBack();
                     }
                 })
-            }).catch(() => {});
+            }).catch(() => {
+                this.activeName = "basic";
+            });
         },
         /** 选择分类 */
         selectCategory(val) {

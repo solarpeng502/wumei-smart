@@ -267,12 +267,13 @@ export default {
     watch: {
         // 获取到父组件传递的device后
         device: function (newVal, oldVal) {
+            console.log(newVal);
             this.deviceInfo = newVal;
             if (this.deviceInfo && this.deviceInfo.deviceId != 0) {
                 // 获取缓存的Json物模型
-                cacheJsonThingsModel(deviceInfo.productId).then(response => {
+                cacheJsonThingsModel(this.deviceInfo.productId).then(response => {
                     this.thingsModel = JSON.parse(response.data);
-                    // 过滤监测数据，监测数据未只读
+                    // 过滤监测数据，监测数据为只读
                     // this.thingsModel.properties = this.thingsModel.properties.filter(item => item.isMonitor == 0);
                     this.getList();
                 });
@@ -288,7 +289,7 @@ export default {
             // 设备
             deviceInfo: {},
             // 遮罩层
-            loading: true,
+            loading: false,
             // 选中数组
             ids: [],
             // 非单个禁用
