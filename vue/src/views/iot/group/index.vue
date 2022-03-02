@@ -64,7 +64,7 @@
                     <el-input v-model="form.groupName" placeholder="请输入分组名称" />
                 </el-form-item>
                 <el-form-item label="分组排序" prop="groupOrder">
-                    <el-input v-model="form.groupOrder" placeholder="请输入分组排序" />
+                    <el-input v-model="form.groupOrder" type="integer" placeholder="请输入分组排序" />
                 </el-form-item>
                 <el-form-item label="备注" prop="remark">
                     <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -126,7 +126,7 @@ export default {
                 userName: null,
             },
             // 设备分组
-            deviceGroup:{},
+            deviceGroup: {},
             // 表单参数
             form: {},
             // 表单校验
@@ -137,10 +137,17 @@ export default {
                     trigger: "blur"
                 }],
                 groupOrder: [{
-                    required: true,
-                    message: "分组排序不能为空",
-                    trigger: "blur"
-                }],
+                        required: true,
+                        message: "分组排序不能为空,最大值为99",
+                        trigger: "blur"
+                    },
+                    {
+                        min: 1,
+                        max: 2,
+                        message: '范围在 0 到 99',
+                        trigger: 'blur'
+                    }
+                ],
             }
         };
     },
@@ -220,6 +227,7 @@ export default {
         selectDevice(row) {
             this.deviceGroup.groupId = row.groupId;
             this.openDeviceList = true;
+            this.$refs.deviceList.getDeviceIdsByGroupId();
         },
         /** 提交按钮 */
         submitForm() {

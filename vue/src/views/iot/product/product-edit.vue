@@ -83,15 +83,15 @@
             <product-app ref="productApp" :product="form" />
         </el-tab-pane>
 
-        <el-tab-pane label="" disabled name="01" />
-        <el-tab-pane label="" disabled name="02" />
-        <el-tab-pane label="" disabled name="03" />
-        <el-tab-pane v-if="form.status==1" name="04">
+        <el-tab-pane label="" disabled name="product01" />
+        <el-tab-pane label="" disabled name="product02" />
+        <el-tab-pane label="" disabled name="product03" />
+        <el-tab-pane v-if="form.status==1" name="product04">
             <span slot="label">
                 <el-button type="success" size="mini" @click="publishProduct()">发布产品</el-button>
             </span>
         </el-tab-pane>
-        <el-tab-pane name="05">
+        <el-tab-pane name="product05">
             <span slot="label">
                 <el-button type="info" size="mini" @click="goBack()">返回列表</el-button>
             </span>

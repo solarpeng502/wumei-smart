@@ -20,16 +20,6 @@
                 <dict-tag :options="dict.type.iot_device_status" :value="scope.row.status" />
             </template>
         </el-table-column>
-        <el-table-column label="固件版本" align="center" prop="firmwareVersion">
-            <template slot-scope="scope">
-                <span>v </span> {{scope.row.firmwareVersion}}
-            </template>
-        </el-table-column>
-        <el-table-column label="激活时间" align="center" prop="activeTime" width="150">
-            <template slot-scope="scope">
-                <span>{{ parseTime(scope.row.activeTime, '{y}-{m}-{d}') }}</span>
-            </template>
-        </el-table-column>
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
@@ -94,7 +84,6 @@ export default {
                 // 获取分组下的设备
                 this.queryParams.pageNum=1;
                 this.getDeviceIdsByGroupId();
-                this.getList();
             },
             immediate: true
         }
@@ -107,8 +96,7 @@ export default {
         getDeviceIdsByGroupId() {
             getDeviceIds(this.parentGroupId).then(response => {
                 this.ids = response.data;
-                console.log("网络赋值");
-                console.log(this.ids);
+                this.getList();
             });
         },
         /** 查询设备列表 */

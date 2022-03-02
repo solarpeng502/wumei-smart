@@ -42,12 +42,12 @@
     </el-card>
 
     <el-card style="padding-bottom:100px;">
-        <el-row :gutter="40" v-loading="loading" v-if="viewType=='card'">
-            <el-col :span="6" v-for="(item,index) in deviceList" :key="index" style="margin-bottom:40px;text-align:center;">
-                <el-card :body-style="{ padding: '15px'}" shadow="always">
+        <el-row :gutter="30" v-loading="loading" v-if="viewType=='card'">
+            <el-col :span="6" v-for="(item,index) in deviceList" :key="index" style="margin-bottom:30px;text-align:center;">
+                <el-card :body-style="{ padding: '20px'}" shadow="always">
                     <el-row type="flex" :gutter="10" justify="space-between">
                         <el-col :span="20" style="text-align:left;">
-                            <el-link type="" :underline="false" @click="handleEditDevice(item)" style="font-weight:bold;font-size:16px;line-height:32px;">{{item.deviceName}} v{{item.firmwareVersion}}</el-link>
+                            <el-link type="" :underline="false" @click="handleEditDevice(item)" style="font-weight:bold;font-size:16px;line-height:32px;">{{item.deviceName}} <span style="font-size:14px;font-weight:200">Version {{item.firmwareVersion}}</span></el-link>
                         </el-col>
                         <el-col :span="4">
                             <div style="font-size:28px;color:#ccc;">
@@ -59,9 +59,8 @@
                             </div>
                         </el-col>
                     </el-row>
-
                     <el-row :gutter="10">
-                        <el-col :span="12">
+                        <el-col :span="14">
                             <div style="text-align:left;line-height:40px;">
                                 <dict-tag :options="dict.type.iot_device_status" :value="item.status" size="small" style="width:60px;display:inline-block;" />
                                 <el-tooltip effect="light" content="设备影子" placement="right">
@@ -75,7 +74,7 @@
                                 <div>编号: {{item.serialNumber}}</div>
                             </div>
                         </el-col>
-                        <el-col :span="12">
+                        <el-col :span="10">
                             <div style="margin-top:10px;">
                                 <el-image style="width:100%;height:100px;" lazy :preview-src-list="[baseUrl+item.imgUrl]" :src="baseUrl+item.imgUrl" fit="cover" v-if="item.imgUrl!=null && item.imgUrl!=''"></el-image>
                                 <!-- 用于显示本地计算机、手机、树莓派等设备图片-->
@@ -88,11 +87,10 @@
                             </div>
                         </el-col>
                     </el-row>
-
-                    <el-descriptions :column="2" border size="mini" style="height:80px;overflow:hidden;margin-top:10px;">
+                    <el-descriptions :column="2" border size="mini" style="height:80px;overflow-y:auto;margin-top:10px;">
                         <el-descriptions-item v-for="subItem in item.readOnlyList" :key="subItem.id">
                             <template slot="label">
-                                <span style="white-space: nowrap;text-overflow: ellipsis">{{subItem.name}}</span>
+                                <span style="white-space: nowrap;text-overflow: ellipsis;width:40px;overflow:hidden;">{{subItem.name}}</span>
                             </template>
                             <el-link type="primary" :underline="false" style="white-space: nowrap;">{{subItem.value}} {{subItem.unit==null?"":subItem.unit}}</el-link>
                         </el-descriptions-item>
@@ -143,7 +141,7 @@
                             </el-input>
                         </el-descriptions-item>
                     </el-descriptions>
-                    <el-button-group style="padding:10px 10px 20px 10px;">
+                    <el-button-group style="padding:10px">
                         <el-button type="success" size="mini" icon="el-icon-odometer" @click="handleMonitor(item)" v-hasPermi="['iot:device:edit']">实时监测</el-button>
                         <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDelete(item)" v-hasPermi="['iot:device:remove']">删除</el-button>
                         <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleEditDevice(item)" v-hasPermi="['iot:device:edit']">查看详情 </el-button>
