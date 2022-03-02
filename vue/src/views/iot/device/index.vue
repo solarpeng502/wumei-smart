@@ -44,17 +44,12 @@
     <el-card style="padding-bottom:100px;">
         <el-row :gutter="40" v-loading="loading" v-if="viewType=='card'">
             <el-col :span="6" v-for="(item,index) in deviceList" :key="index" style="margin-bottom:40px;text-align:center;">
-                <el-card :body-style="{ padding: '0px'}" shadow="always">
-                    <el-image style="width:100%;height:90px;" lazy :preview-src-list="[baseUrl+item.imgUrl]" :src="baseUrl+item.imgUrl" fit="cover" v-if="item.imgUrl!=null && item.imgUrl!=''"></el-image>
-                    <!-- 用于显示本地计算机、手机、树莓派等设备图片-->
-                    <el-image style="width:100%;height:90px;" :preview-src-list="[require('@/assets/images/esp8266.jpg')]" :src="require('@/assets/images/esp8266.jpg')" fit="cover" v-else-if="item.productId==1"></el-image>
-                    <el-image style="width:100%;height:90px;" :preview-src-list="[require('@/assets/images/esp32.jpg')]" :src="require('@/assets/images/esp32.jpg')" fit="cover" v-else-if="item.productId==2"></el-image>
-                    <el-image style="width:100%;height:90px;" :preview-src-list="[require('@/assets/images/raspberry.jpg')]" :src="require('@/assets/images/raspberry.jpg')" fit="cover" v-else-if="item.productId==3"></el-image>
-                    <el-image style="width:100%;height:90px;" :preview-src-list="[require('@/assets/images/telphone.jpg')]" :src="require('@/assets/images/telphone.jpg')" fit="cover" v-else-if="item.productId==4"></el-image>
-                    <el-image style="width:100%;height:90px;" :preview-src-list="[require('@/assets/images/computer.jpg')]" :src="require('@/assets/images/computer.jpg')" fit="cover" v-else-if="item.productId==5"></el-image>
-                    <el-image style="width:100%;height:90px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else></el-image>
-                    <el-descriptions :column="2" size="medium" :title="item.deviceName+'（ v '+item.firmwareVersion+' ）'" style="padding:10px;">
-                        <template slot="extra">
+                <el-card :body-style="{ padding: '15px'}" shadow="always">
+                    <el-row type="flex" :gutter="10" justify="space-between">
+                        <el-col :span="20" style="text-align:left;">
+                            <el-link type="" :underline="false" @click="handleEditDevice(item)" style="font-weight:bold;font-size:16px;line-height:32px;">{{item.deviceName}} v{{item.firmwareVersion}}</el-link>
+                        </el-col>
+                        <el-col :span="4">
                             <div style="font-size:28px;color:#ccc;">
                                 <svg-icon v-if="item.status==3 && item.rssi >= '-55'" icon-class="wifi_4" />
                                 <svg-icon v-else-if="item.status==3 && item.rssi >= '-70' && item.rssi < '-55' " icon-class="wifi_3" />
@@ -62,25 +57,39 @@
                                 <svg-icon v-else-if="item.status==3 && item.rssi >= '-100' && item.rssi < '-85' " icon-class="wifi_1" />
                                 <svg-icon v-else icon-class="wifi_0" />
                             </div>
-                        </template>
-                        <el-descriptions-item label="设备状态">
-                            <dict-tag :options="dict.type.iot_device_status" :value="item.status" size="mini" />
-                        </el-descriptions-item>
-                        <el-descriptions-item label="产品名称">
-                            <el-link type="primary" :underline="false">{{item.productName}}</el-link>
-                        </el-descriptions-item>
-                        <el-descriptions-item label="设备影子">
-                            <dict-tag :options="dict.type.iot_is_enable" :value="item.isShadow" size="mini" />
-                        </el-descriptions-item>
-                        <el-descriptions-item label="激活时间">
-                            <span>{{ parseTime(item.activeTime, '{y}-{m}-{d}') }}</span>
-                        </el-descriptions-item>
-                        <el-descriptions-item label="设备编号">
-                            {{item.serialNumber}}
-                        </el-descriptions-item>
-                    </el-descriptions>
+                        </el-col>
+                    </el-row>
 
-                    <el-descriptions :column="2" border size="mini" style="padding:0 10px;height:80px;overflow:hidden;">
+                    <el-row :gutter="10">
+                        <el-col :span="12">
+                            <div style="text-align:left;line-height:40px;">
+                                <dict-tag :options="dict.type.iot_device_status" :value="item.status" size="small" style="width:60px;display:inline-block;" />
+                                <el-tooltip effect="light" content="设备影子" placement="right">
+                                    <dict-tag :options="dict.type.iot_is_enable" :value="item.isShadow" size="small" style="width:60px;display:inline-block;" />
+                                </el-tooltip>
+                            </div>
+                            <div style="font-size:14px;text-align:left;line-height:26px;">
+                                <div>产品: <el-link type="primary" :underline="false">{{item.productName}}</el-link>
+                                </div>
+                                <div>激活: {{ parseTime(item.activeTime, '{y}-{m}-{d}') }}</div>
+                                <div>编号: {{item.serialNumber}}</div>
+                            </div>
+                        </el-col>
+                        <el-col :span="12">
+                            <div style="margin-top:10px;">
+                                <el-image style="width:100%;height:100px;" lazy :preview-src-list="[baseUrl+item.imgUrl]" :src="baseUrl+item.imgUrl" fit="cover" v-if="item.imgUrl!=null && item.imgUrl!=''"></el-image>
+                                <!-- 用于显示本地计算机、手机、树莓派等设备图片-->
+                                <el-image style="width:100%;height:100px;" :preview-src-list="[require('@/assets/images/esp8266.jpg')]" :src="require('@/assets/images/esp8266.jpg')" fit="cover" v-else-if="item.productId==1"></el-image>
+                                <el-image style="width:100%;height:100px;" :preview-src-list="[require('@/assets/images/esp32.jpg')]" :src="require('@/assets/images/esp32.jpg')" fit="cover" v-else-if="item.productId==2"></el-image>
+                                <el-image style="width:100%;height:100px;" :preview-src-list="[require('@/assets/images/raspberry.jpg')]" :src="require('@/assets/images/raspberry.jpg')" fit="cover" v-else-if="item.productId==3"></el-image>
+                                <el-image style="width:100%;height:100px;" :preview-src-list="[require('@/assets/images/telphone.jpg')]" :src="require('@/assets/images/telphone.jpg')" fit="cover" v-else-if="item.productId==4"></el-image>
+                                <el-image style="width:100%;height:100px;" :preview-src-list="[require('@/assets/images/computer.jpg')]" :src="require('@/assets/images/computer.jpg')" fit="cover" v-else-if="item.productId==5"></el-image>
+                                <el-image style="width:100%;height:100px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else></el-image>
+                            </div>
+                        </el-col>
+                    </el-row>
+
+                    <el-descriptions :column="2" border size="mini" style="height:80px;overflow:hidden;margin-top:10px;">
                         <el-descriptions-item v-for="subItem in item.readOnlyList" :key="subItem.id">
                             <template slot="label">
                                 <span style="white-space: nowrap;text-overflow: ellipsis">{{subItem.name}}</span>

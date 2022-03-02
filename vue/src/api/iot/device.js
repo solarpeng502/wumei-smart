@@ -67,3 +67,11 @@ export function delDevice(deviceId) {
     method: 'delete'
   })
 }
+
+// 生成设备编号
+export function generatorDeviceNum() {
+  return request({
+    url: '/iot/device/generator',
+    method: 'get'
+  })
+}

@@ -11,12 +11,13 @@
                         </el-form-item>
                         <el-form-item label="设备编号" prop="serialNumber">
                             <el-input v-model="form.serialNumber" placeholder="请输入设备编号">
-                                <el-button slot="append" @click="generateNum">生成</el-button>
+                                <el-button slot="append" @click="generateNum" :disabled="genDisabled">生成</el-button>
                             </el-input>
                         </el-form-item>
                         <el-form-item label="所属产品" prop="productName">
-                            <span style="color:#409EFF">{{form.productName}}</span>
-                            <el-button type="info" size="mini" style="margin-left:10px;float:right;" @click="selectProduct">选择产品</el-button>
+                            <el-input readonly v-model="form.productName">
+                                <el-button slot="append" @click="selectProduct">选择产品</el-button>
+                            </el-input>
                         </el-form-item>
                         <el-form-item label="固件版本" prop="firmwareVersion">
                             <el-input v-model="form.firmwareVersion" placeholder="请输入固件版本" type="number"><template slot="prepend">Version</template></el-input>
@@ -138,7 +139,8 @@ import {
 import {
     getDevice,
     addDevice,
-    updateDevice
+    updateDevice,
+    generatorDeviceNum
 } from "@/api/iot/device";
 
 export default {
@@ -154,6 +156,8 @@ export default {
     },
     data() {
         return {
+            // 生成设备编码是否禁用
+            genDisabled: false,
             // 选中选项卡
             activeName: 'basic',
             // 遮罩层
@@ -323,13 +327,13 @@ export default {
         },
         // 生成随机字母和数字
         generateNum() {
-            var chars = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
-            var res = "";
-            for (var i = 0; i < 15; i++) {
-                var id = Math.floor(Math.random() * 36);
-                res += chars[id];
-            }
-            this.form.serialNumber = "D" + res;
+            this.genDisabled = true;
+            generatorDeviceNum().then(response => {
+                this.form.serialNumber = response.data;
+                setTimeout(() => {
+                    this.genDisabled = false;
+                }, 5000)
+            })
         }
 
     }

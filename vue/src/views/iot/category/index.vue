@@ -241,11 +241,14 @@ export default {
         /** 删除按钮操作 */
         handleDelete(row) {
             const categoryIds = row.categoryId || this.ids;
+            let msg="";
             this.$modal.confirm('是否确认删除产品分类编号为"' + categoryIds + '"的数据项？').then(function () {
-                return delCategory(categoryIds);
+                return delCategory(categoryIds).then(response => {
+                    msg=response.msg;
+                });
             }).then(() => {
                 this.getList();
-                this.$modal.msgSuccess("删除成功");
+                this.$modal.msgSuccess(msg);
             }).catch(() => {});
         },
         /** 导出按钮操作 */

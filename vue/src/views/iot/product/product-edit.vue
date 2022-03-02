@@ -62,7 +62,7 @@
 
                 <el-col :span="20">
                     <el-form-item style="text-align: center;margin:40px 0px;">
-                        <el-button type="primary" @click="submitForm()" v-if="form.status==1">提交</el-button>
+                        <el-button type="primary" @click="submitForm()" v-if="form.status!=2">提交</el-button>
                     </el-form-item>
                 </el-col>
             </el-form>
