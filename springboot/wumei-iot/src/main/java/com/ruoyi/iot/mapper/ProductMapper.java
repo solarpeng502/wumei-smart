@@ -84,4 +84,12 @@ public interface ProductMapper
      * @return 结果
      */
     public int deleteProductByProductIds(Long[] productIds);
+
+    /**
+     * 产品下的固件数量
+     *
+     * @param productIds 需要删除的数据主键集合
+     * @return 结果
+     */
+    public int firmwareCountInProducts(Long[] productIds);
 }

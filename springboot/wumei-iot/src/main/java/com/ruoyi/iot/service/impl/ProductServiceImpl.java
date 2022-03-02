@@ -1,5 +1,6 @@
 package com.ruoyi.iot.service.impl;
 
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.redis.RedisCache;
@@ -12,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Random;
 
 import static com.ruoyi.common.utils.SecurityUtils.getLoginUser;
 
@@ -32,6 +32,9 @@ public class ProductServiceImpl implements IProductService
 
     @Autowired
     private RedisCache redisCache;
+
+    @Autowired
+    private ToolServiceImpl toolService;
 
     /**
      * 查询产品
@@ -87,33 +90,14 @@ public class ProductServiceImpl implements IProductService
         }
         // mqtt账号密码
         product.setMqttAccount("wumei-smart");
-        product.setMqttPassword("P"+getStringRandom(15));
-        product.setMqttSecret("K"+getStringRandom(15));
+        product.setMqttPassword("P"+toolService.getStringRandom(15));
+        product.setMqttSecret("K"+toolService.getStringRandom(15));
         product.setStatus(product.getStatus()==null?1:product.getStatus());
         product.setTenantId(user.getUserId());
         product.setTenantName(user.getUserName());
         product.setCreateTime(DateUtils.getNowDate());
         productMapper.insertProduct(product);
         return product;
-    }
-
-    //生成随机数字和字母,
-    private String getStringRandom(int length) {
-        String val = "";
-        Random random = new Random();
-        //参数length，表示生成几位随机数
-        for(int i = 0; i < length; i++) {
-            String charOrNum = random.nextInt(2) % 2 == 0 ? "char" : "num";
-            //输出字母还是数字
-            if( "char".equalsIgnoreCase(charOrNum) ) {
-                //输出是大写字母还是小写字母
-                // int temp = random.nextInt(2) % 2 == 0 ? 65 : 97;
-                val += (char)(random.nextInt(26) + 65);
-            } else if( "num".equalsIgnoreCase(charOrNum) ) {
-                val += String.valueOf(random.nextInt(10));
-            }
-        }
-        return val;
     }
 
     /**
@@ -148,13 +132,20 @@ public class ProductServiceImpl implements IProductService
      * @return 结果
      */
     @Override
-    public int deleteProductByProductIds(Long[] productIds)
+    public AjaxResult deleteProductByProductIds(Long[] productIds)
     {
         // 删除物模型JSON缓存
         for(int i=0;i<productIds.length;i++){
             redisCache.deleteObject(tslPreKey+productIds[i]);
         }
-        return productMapper.deleteProductByProductIds(productIds);
+        int firmwareCount=productMapper.firmwareCountInProducts(productIds);
+        if(firmwareCount>0){
+            return AjaxResult.error("删除失败，请先删除对应产品下的固件");
+        }
+        if(productMapper.deleteProductByProductIds(productIds)>0){
+            return AjaxResult.success("删除成功");
+        }
+        return AjaxResult.error("删除失败");
     }
 
     /**

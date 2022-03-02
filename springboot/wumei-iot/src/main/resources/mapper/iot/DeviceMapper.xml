@@ -286,4 +286,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{deviceId}
         </foreach>
     </delete>
+
+    <select id="getDeviceNumCount" parameterType="String" resultType="int">
+        select count(*) from iot_device where serial_number = #{deviceNum}
+    </select>
+
+    <delete id="deleteDeviceGroupByDeviceIds" parameterType="String">
+        delete from iot_device_group where device_id in
+        <foreach item="deviceId" collection="array" open="(" separator="," close=")">
+            #{deviceId}
+        </foreach>
+    </delete>
 </mapper>

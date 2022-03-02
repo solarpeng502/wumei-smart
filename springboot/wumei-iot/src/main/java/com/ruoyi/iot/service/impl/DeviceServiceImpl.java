@@ -18,6 +18,7 @@ import com.ruoyi.iot.model.ThingsModels.ThingsModelValueItemDto;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesInput;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesOutput;
 import com.ruoyi.iot.service.IDeviceService;
+import com.ruoyi.iot.service.IToolService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -49,6 +50,9 @@ public class DeviceServiceImpl implements IDeviceService {
 
     @Autowired
     private DeviceLogMapper deviceLogMapper;
+
+    @Autowired
+    private IToolService toolService;
 
     /**
      * 查询设备
@@ -393,7 +397,23 @@ public class DeviceServiceImpl implements IDeviceService {
     }
 
     /**
-     * 更新设备状态
+     * 生成设备唯一编号
+     * @return 结果
+     */
+    @Override
+    public String generationDeviceNum() {
+        String number= "D"+toolService.getStringRandom(15);
+        int count= deviceMapper.getDeviceNumCount(number);
+        if(count==0) {
+            return number;
+        }else{
+            generationDeviceNum();
+        }
+        return "";
+    }
+
+    /**
+     *
      * @param deviceNum 设备编号
      * @param status 设备状态（1-未激活，2-禁用，3-在线，4-离线）
      * @return 结果
@@ -434,7 +454,10 @@ public class DeviceServiceImpl implements IDeviceService {
      * @return 结果
      */
     @Override
+    @Transient
     public int deleteDeviceByDeviceIds(Long[] deviceIds) {
+        // 删除设备分组
+        deviceMapper.deleteDeviceGroupByDeviceIds(deviceIds);
         return deviceMapper.deleteDeviceByDeviceIds(deviceIds);
     }
 

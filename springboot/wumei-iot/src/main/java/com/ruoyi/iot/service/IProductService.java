@@ -1,5 +1,6 @@
 package com.ruoyi.iot.service;
 
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.iot.domain.Product;
 import com.ruoyi.iot.model.IdAndName;
 
@@ -66,7 +67,7 @@ public interface IProductService
      * @param productIds 需要删除的产品主键集合
      * @return 结果
      */
-    public int deleteProductByProductIds(Long[] productIds);
+    public AjaxResult deleteProductByProductIds(Long[] productIds);
 
     /**
      * 删除产品信息

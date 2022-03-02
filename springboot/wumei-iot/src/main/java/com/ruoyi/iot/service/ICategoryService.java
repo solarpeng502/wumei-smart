@@ -1,8 +1,10 @@
 package com.ruoyi.iot.service;
 
-import java.util.List;
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.iot.domain.Category;
 import com.ruoyi.iot.model.IdAndName;
+
+import java.util.List;
 
 /**
  * 产品分类Service接口
@@ -57,7 +59,7 @@ public interface ICategoryService
      * @param categoryIds 需要删除的产品分类主键集合
      * @return 结果
      */
-    public int deleteCategoryByCategoryIds(Long[] categoryIds);
+    public AjaxResult deleteCategoryByCategoryIds(Long[] categoryIds);
 
     /**
      * 删除产品分类信息

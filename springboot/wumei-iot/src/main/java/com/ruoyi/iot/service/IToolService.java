@@ -1,10 +1,6 @@
 package com.ruoyi.iot.service;
 
-import com.ruoyi.common.core.domain.model.RegisterBody;
 import com.ruoyi.iot.model.RegisterUserInput;
-
-
-import java.util.List;
 
 /**
  * 
@@ -17,4 +13,9 @@ public interface IToolService
      * 注册
      */
     public String register(RegisterUserInput registerBody);
+
+    /**
+     * 生成随机数字和字母
+     */
+    public String getStringRandom(int length);
 }

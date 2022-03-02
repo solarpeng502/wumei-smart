@@ -101,4 +101,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{categoryId}
         </foreach>
     </delete>
+
+    <select id="productCountInCategorys" parameterType="String" resultType="int">
+        select count(*) from iot_product where category_id in
+        <foreach item="categoryId" collection="array" open="(" separator="," close=")">
+            #{categoryId}
+        </foreach>
+    </select>
 </mapper>

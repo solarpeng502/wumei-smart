@@ -127,6 +127,6 @@ public class ProductController extends BaseController
     @ApiOperation("批量删除产品")
     public AjaxResult remove(@PathVariable Long[] productIds)
     {
-        return toAjax(productService.deleteProductByProductIds(productIds));
+        return productService.deleteProductByProductIds(productIds);
     }
 }

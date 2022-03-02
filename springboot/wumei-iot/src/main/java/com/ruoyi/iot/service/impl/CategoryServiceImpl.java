@@ -1,16 +1,17 @@
 package com.ruoyi.iot.service.impl;
 
-import java.util.List;
-
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.iot.domain.Category;
+import com.ruoyi.iot.mapper.CategoryMapper;
 import com.ruoyi.iot.model.IdAndName;
+import com.ruoyi.iot.service.ICategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.iot.mapper.CategoryMapper;
-import com.ruoyi.iot.domain.Category;
-import com.ruoyi.iot.service.ICategoryService;
+
+import java.util.List;
 
 import static com.ruoyi.common.utils.SecurityUtils.getLoginUser;
 
@@ -103,9 +104,16 @@ public class CategoryServiceImpl implements ICategoryService
      * @return 结果
      */
     @Override
-    public int deleteCategoryByCategoryIds(Long[] categoryIds)
+    public AjaxResult deleteCategoryByCategoryIds(Long[] categoryIds)
     {
-        return categoryMapper.deleteCategoryByCategoryIds(categoryIds);
+        int productCount=categoryMapper.productCountInCategorys(categoryIds);
+        if(productCount>0){
+            return AjaxResult.error("删除失败，请先删除对应分类下的产品");
+        }
+        if(categoryMapper.deleteCategoryByCategoryIds(categoryIds)>0){
+            return AjaxResult.success("删除成功");
+        }
+        return AjaxResult.error("删除失败");
     }
 
     /**

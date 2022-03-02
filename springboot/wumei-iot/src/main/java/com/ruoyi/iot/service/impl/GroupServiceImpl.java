@@ -1,17 +1,17 @@
 package com.ruoyi.iot.service.impl;
 
-import java.beans.Transient;
-import java.util.List;
-
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.iot.domain.Group;
+import com.ruoyi.iot.mapper.GroupMapper;
 import com.ruoyi.iot.model.DeviceGroupInput;
 import com.ruoyi.iot.model.IdOutput;
+import com.ruoyi.iot.service.IGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.iot.mapper.GroupMapper;
-import com.ruoyi.iot.domain.Group;
-import com.ruoyi.iot.service.IGroupService;
+
+import java.beans.Transient;
+import java.util.List;
 
 import static com.ruoyi.common.utils.SecurityUtils.getLoginUser;
 
@@ -136,6 +136,7 @@ public class GroupServiceImpl implements IGroupService
     @Override
     public int deleteGroupByGroupId(Long groupId)
     {
+
         return groupMapper.deleteGroupByGroupId(groupId);
     }
 }

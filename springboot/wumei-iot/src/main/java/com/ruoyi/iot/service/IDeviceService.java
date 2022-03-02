@@ -116,4 +116,10 @@ public interface IDeviceService
      * @return 结果
      */
     public int deleteDeviceByDeviceId(Long deviceId);
+
+    /**
+     * 生成设备唯一编号
+     * @return 结果
+     */
+    public String generationDeviceNum();
 }

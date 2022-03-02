@@ -1,8 +1,9 @@
 package com.ruoyi.iot.mapper;
 
-import java.util.List;
 import com.ruoyi.iot.domain.Category;
 import com.ruoyi.iot.model.IdAndName;
+
+import java.util.List;
 
 /**
  * 产品分类Mapper接口
@@ -66,4 +67,12 @@ public interface CategoryMapper
      * @return 结果
      */
     public int deleteCategoryByCategoryIds(Long[] categoryIds);
+
+    /**
+     * 分类下的产品数量
+     *
+     * @param categoryIds 需要删除的数据主键集合
+     * @return 结果
+     */
+    public int productCountInCategorys(Long[] categoryIds);
 }

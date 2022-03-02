@@ -1,12 +1,12 @@
 package com.ruoyi.iot.mapper;
 
-import java.util.List;
 import com.ruoyi.iot.domain.Device;
 import com.ruoyi.iot.model.DeviceAuthenticateModel;
 import com.ruoyi.iot.model.DeviceShortOutput;
-import com.ruoyi.iot.model.IdAndName;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesInput;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesOutput;
+
+import java.util.List;
 
 /**
  * 设备Mapper接口
@@ -128,4 +128,18 @@ public interface DeviceMapper
      * @return 结果
      */
     public int deleteDeviceByDeviceIds(Long[] deviceIds);
+
+    /**
+     * 查询设备序列号的数量
+     * @param deviceNum
+     * @return
+     */
+    public int getDeviceNumCount(String deviceNum);
+
+    /**
+     * 根据设备IDS删除设备分组
+     * @param deviceIds
+     * @return
+     */
+    public int deleteDeviceGroupByDeviceIds(Long[] deviceIds);
 }

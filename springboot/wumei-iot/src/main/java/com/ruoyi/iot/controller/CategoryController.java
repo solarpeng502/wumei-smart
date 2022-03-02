@@ -122,6 +122,6 @@ public class CategoryController extends BaseController
     @ApiOperation("批量删除分类")
     public AjaxResult remove(@PathVariable Long[] categoryIds)
     {
-        return toAjax(categoryService.deleteCategoryByCategoryIds(categoryIds));
+        return categoryService.deleteCategoryByCategoryIds(categoryIds);
     }
 }

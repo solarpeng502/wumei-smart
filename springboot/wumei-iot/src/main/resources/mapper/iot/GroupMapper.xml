@@ -107,7 +107,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </delete>
 
-    <delete id="deleteDeviceGroupByGroupIds" parameterType="Long">
+    <delete id="deleteDeviceGroupByGroupIds" parameterType="String">
         delete from iot_device_group where group_id in
         <foreach item="groupId" collection="array" open="(" separator="," close=")">
             #{groupId}
