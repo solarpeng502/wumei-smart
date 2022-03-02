@@ -337,7 +337,7 @@ public class DeviceServiceImpl implements IDeviceService {
      */
     @Override
     @Transient
-    public int insertDevice(Device device) {
+    public Device insertDevice(Device device) {
         SysUser sysUser = getLoginUser().getUser();
         //添加设备
         device.setCreateTime(DateUtils.getNowDate());
@@ -357,7 +357,8 @@ public class DeviceServiceImpl implements IDeviceService {
         deviceUser.setTenantId(device.getDeviceId());
         deviceUser.setTenantName(device.getTenantName());
         deviceUser.setIsOwner(1);
-        return deviceUserMapper.insertDeviceUser(deviceUser);
+        deviceUserMapper.insertDeviceUser(deviceUser);
+        return device;
     }
 
     /**

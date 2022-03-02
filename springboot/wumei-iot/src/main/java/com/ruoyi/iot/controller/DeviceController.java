@@ -103,7 +103,7 @@ public class DeviceController extends BaseController
     @ApiOperation("添加设备")
     public AjaxResult add(@RequestBody Device device)
     {
-        return toAjax(deviceService.insertDevice(device));
+        return AjaxResult.success(deviceService.insertDevice(device));
     }
 
     /**

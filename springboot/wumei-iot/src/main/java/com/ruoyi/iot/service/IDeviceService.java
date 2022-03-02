@@ -76,7 +76,7 @@ public interface IDeviceService
      * @param device 设备
      * @return 结果
      */
-    public int insertDevice(Device device);
+    public Device insertDevice(Device device);
 
     /**
      * 修改设备
