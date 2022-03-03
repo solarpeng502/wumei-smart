@@ -47,7 +47,10 @@
                 <el-card :body-style="{ padding: '20px'}" shadow="always">
                     <el-row type="flex" :gutter="10" justify="space-between">
                         <el-col :span="20" style="text-align:left;">
-                            <el-link type="" :underline="false" @click="handleEditDevice(item)" style="font-weight:bold;font-size:16px;line-height:32px;">{{item.deviceName}} <span style="font-size:14px;font-weight:200">Version {{item.firmwareVersion}}</span></el-link>
+                            <el-link type="" :underline="false" @click="handleEditDevice(item)" style="font-weight:bold;font-size:16px;line-height:32px;">
+                                <svg-icon icon-class="device" /> {{item.deviceName}}
+                                <span style="font-size:12px;">Version {{item.firmwareVersion}}</span>
+                            </el-link>
                         </el-col>
                         <el-col :span="4">
                             <div style="font-size:28px;color:#ccc;">
@@ -60,47 +63,51 @@
                         </el-col>
                     </el-row>
                     <el-row :gutter="10">
-                        <el-col :span="14">
-                            <div style="text-align:left;line-height:40px;">
+                        <el-col :span="15">
+                            <div style="text-align:left;line-height:40px;font-size:14px;">
                                 <dict-tag :options="dict.type.iot_device_status" :value="item.status" size="small" style="width:60px;display:inline-block;" />
-                                <el-tooltip effect="light" content="设备影子" placement="right">
-                                    <dict-tag :options="dict.type.iot_is_enable" :value="item.isShadow" size="small" style="width:60px;display:inline-block;" />
-                                </el-tooltip>
+                                <el-tag type="success" size="small" v-if="item.isShadow==1">启用影子</el-tag>
+                                <el-tag type="info" size="small" v-else>禁用影子</el-tag>
                             </div>
-                            <div style="font-size:14px;text-align:left;line-height:26px;">
-                                <div>产品: <el-link type="primary" :underline="false">{{item.productName}}</el-link>
-                                </div>
-                                <div>激活: {{ parseTime(item.activeTime, '{y}-{m}-{d}') }}</div>
-                                <div>编号: {{item.serialNumber}}</div>
-                            </div>
+                            <el-descriptions :column="1" size="mini">
+                                <el-descriptions-item label="产品">
+                                    <el-link type="primary" :underline="false">{{item.productName}}</el-link>
+                                </el-descriptions-item>
+                                <el-descriptions-item label="编号">
+                                    {{item.serialNumber}}
+                                </el-descriptions-item>
+                                <el-descriptions-item label="激活时间">
+                                    {{ parseTime(item.activeTime, '{y}-{m}-{d}') }}
+                                </el-descriptions-item>
+                            </el-descriptions>
                         </el-col>
-                        <el-col :span="10">
+                        <el-col :span="9">
                             <div style="margin-top:10px;">
-                                <el-image style="width:100%;height:100px;" lazy :preview-src-list="[baseUrl+item.imgUrl]" :src="baseUrl+item.imgUrl" fit="cover" v-if="item.imgUrl!=null && item.imgUrl!=''"></el-image>
+                                <el-image style="width:100%;height:100px;border:1px solid #ccc;border-radius:5px;" lazy :preview-src-list="[baseUrl+item.imgUrl]" :src="baseUrl+item.imgUrl" fit="cover" v-if="item.imgUrl!=null && item.imgUrl!=''"></el-image>
                                 <!-- 用于显示本地计算机、手机、树莓派等设备图片-->
-                                <el-image style="width:100%;height:100px;" :preview-src-list="[require('@/assets/images/esp8266.jpg')]" :src="require('@/assets/images/esp8266.jpg')" fit="cover" v-else-if="item.productId==1"></el-image>
-                                <el-image style="width:100%;height:100px;" :preview-src-list="[require('@/assets/images/esp32.jpg')]" :src="require('@/assets/images/esp32.jpg')" fit="cover" v-else-if="item.productId==2"></el-image>
-                                <el-image style="width:100%;height:100px;" :preview-src-list="[require('@/assets/images/raspberry.jpg')]" :src="require('@/assets/images/raspberry.jpg')" fit="cover" v-else-if="item.productId==3"></el-image>
-                                <el-image style="width:100%;height:100px;" :preview-src-list="[require('@/assets/images/telphone.jpg')]" :src="require('@/assets/images/telphone.jpg')" fit="cover" v-else-if="item.productId==4"></el-image>
-                                <el-image style="width:100%;height:100px;" :preview-src-list="[require('@/assets/images/computer.jpg')]" :src="require('@/assets/images/computer.jpg')" fit="cover" v-else-if="item.productId==5"></el-image>
-                                <el-image style="width:100%;height:100px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else></el-image>
+                                <el-image style="width:100%;height:100px;border:1px solid #ccc;border-radius:5px;" :preview-src-list="[require('@/assets/images/esp8266.jpg')]" :src="require('@/assets/images/esp8266.jpg')" fit="cover" v-else-if="item.productId==1"></el-image>
+                                <el-image style="width:100%;height:100px;border:1px solid #ccc;border-radius:5px;" :preview-src-list="[require('@/assets/images/esp32.jpg')]" :src="require('@/assets/images/esp32.jpg')" fit="cover" v-else-if="item.productId==2"></el-image>
+                                <el-image style="width:100%;height:100px;border:1px solid #ccc;border-radius:5px;" :preview-src-list="[require('@/assets/images/raspberry.jpg')]" :src="require('@/assets/images/raspberry.jpg')" fit="cover" v-else-if="item.productId==3"></el-image>
+                                <el-image style="width:100%;height:100px;border:1px solid #ccc;border-radius:5px;" :preview-src-list="[require('@/assets/images/telphone.jpg')]" :src="require('@/assets/images/telphone.jpg')" fit="cover" v-else-if="item.productId==4"></el-image>
+                                <el-image style="width:100%;height:100px;border:1px solid #ccc;border-radius:5px;" :preview-src-list="[require('@/assets/images/computer.jpg')]" :src="require('@/assets/images/computer.jpg')" fit="cover" v-else-if="item.productId==5"></el-image>
+                                <el-image style="width:100%;height:100px;border:1px solid #ccc;border-radius:5px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else></el-image>
                             </div>
                         </el-col>
                     </el-row>
-                    <el-descriptions :column="2" border size="mini" style="height:80px;overflow-y:auto;margin-top:10px;">
-                        <el-descriptions-item v-for="subItem in item.readOnlyList" :key="subItem.id">
+                    <el-descriptions :column="2" border size="mini" style="height:82px;margin-top:10px;overflow:hidden;">
+                        <el-descriptions-item v-for="subItem in item.readOnlyList" :key="subItem.id" :contentStyle="{height:'40px'}">
                             <template slot="label">
-                                <span style="white-space: nowrap;text-overflow: ellipsis;width:40px;overflow:hidden;">{{subItem.name}}</span>
+                                <span style="white-space: nowrap;text-overflow: ellipsis;width:40px;overflow:hidden;height:40px;">{{subItem.name}}</span>
                             </template>
                             <el-link type="primary" :underline="false" style="white-space: nowrap;">{{subItem.value}} {{subItem.unit==null?"":subItem.unit}}</el-link>
                         </el-descriptions-item>
-                        <el-descriptions-item v-for="subItem in item.boolList" :key="subItem.id">
+                        <el-descriptions-item v-for="subItem in item.boolList" :key="subItem.id" :contentStyle="{height:'40px'}">
                             <template slot="label">
                                 <div style="white-space: nowrap;text-overflow:ellipsis;width:40px;overflow:hidden;" :title="subItem.name">{{subItem.name}}</div>
                             </template>
                             <el-switch v-model="subItem.value" active-text="" inactive-text="" :active-value="'1'" :inactive-value="'0'" />
                         </el-descriptions-item>
-                        <el-descriptions-item v-for="subItem in item.enumList" :key="subItem.id">
+                        <el-descriptions-item v-for="subItem in item.enumList" :key="subItem.id" :contentStyle="{height:'40px'}">
                             <template slot="label">
                                 <div style="white-space: nowrap;text-overflow:ellipsis;width:40px;overflow:hidden;" :title="subItem.name">{{subItem.name}}</div>
                             </template>
@@ -108,7 +115,7 @@
                                 <el-option v-for="children in subItem.enumList" :key="children.value" :label="children.text" :value="children.value" />
                             </el-select>
                         </el-descriptions-item>
-                        <el-descriptions-item v-for="subItem in item.decimalList" :key="subItem.id">
+                        <el-descriptions-item v-for="subItem in item.decimalList" :key="subItem.id" :contentStyle="{height:'40px'}">
                             <template slot="label">
                                 <div style="white-space: nowrap;text-overflow:ellipsis;width:40px;overflow:hidden;" :title="subItem.name">{{subItem.name}}</div>
                             </template>
@@ -116,7 +123,7 @@
                                 <el-button slot="append" icon="el-icon-s-promotion" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
                             </el-input>
                         </el-descriptions-item>
-                        <el-descriptions-item v-for="subItem in item.integerList" :key="subItem.id">
+                        <el-descriptions-item v-for="subItem in item.integerList" :key="subItem.id" :contentStyle="{height:'40px'}">
                             <template slot="label">
                                 <div style="white-space: nowrap;text-overflow:ellipsis;width:40px;overflow:hidden;" :title="subItem.name">{{subItem.name}}</div>
                             </template>
@@ -124,7 +131,7 @@
                                 <el-button slot="append" icon="el-icon-s-promotion" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
                             </el-input>
                         </el-descriptions-item>
-                        <el-descriptions-item v-for="subItem in item.arrayList" :key="subItem.id">
+                        <el-descriptions-item v-for="subItem in item.arrayList" :key="subItem.id" :contentStyle="{height:'40px'}">
                             <template slot="label">
                                 <div style="white-space: nowrap;text-overflow:ellipsis;width:40px;overflow:hidden;" :title="subItem.name">{{subItem.name}}</div>
                             </template>
@@ -132,7 +139,7 @@
                                 <el-button slot="append" icon="el-icon-s-promotion" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
                             </el-input>
                         </el-descriptions-item>
-                        <el-descriptions-item v-for="subItem in item.stringList" :key="subItem.id">
+                        <el-descriptions-item v-for="subItem in item.stringList" :key="subItem.id" :contentStyle="{height:'40px'}">
                             <template slot="label">
                                 <div style="white-space: nowrap;text-overflow:ellipsis;width:40px;overflow:hidden;" :title="subItem.name">{{subItem.name}}</div>
                             </template>
@@ -141,10 +148,10 @@
                             </el-input>
                         </el-descriptions-item>
                     </el-descriptions>
-                    <el-button-group style="padding:10px">
-                        <el-button type="success" size="mini" icon="el-icon-odometer" @click="handleMonitor(item)" v-hasPermi="['iot:device:edit']">实时监测</el-button>
+                    <el-button-group style="margin-top:15px;">
+                        <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleEditDevice(item)" v-hasPermi="['iot:device:edit']">详情 </el-button>
                         <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDelete(item)" v-hasPermi="['iot:device:remove']">删除</el-button>
-                        <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleEditDevice(item)" v-hasPermi="['iot:device:edit']">查看详情 </el-button>
+                        <el-button type="success" size="mini" icon="el-icon-odometer" @click="handleMonitor(item)" v-hasPermi="['iot:device:edit']">实时监测</el-button>
                     </el-button-group>
                 </el-card>
             </el-col>

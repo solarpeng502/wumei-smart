@@ -158,7 +158,7 @@
 
     <div style="margin:-21px;margin-top:100px;bottom:0;border:1px solid #ccc;padding:10px;margin-bottom:-21px;">
         <div>
-            <el-link href="https://wumei.live" target="_blank" type="primary" style="margin-left:20px;">开源生活物联网平台 >></el-link>
+            <el-link href="http://wumei.live" target="_blank" type="primary" style="margin-left:20px;">开源生活物联网平台 >></el-link>
             <el-link href="https://github.com/kerwincui/wumei-smart" target="_blank" type="danger" style="margin-left:30px;">Github源码 >></el-link>
             <el-link href="https://gitee.com/kerwincui/wumei-smart" target="_blank" type="success" style="margin-left:30px;">码云源码 >></el-link>
         </div>

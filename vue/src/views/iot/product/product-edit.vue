@@ -24,9 +24,6 @@
                         </el-form-item>
                     </el-col>
                     <el-col :span="7">
-                        <el-form-item label="产品编号" prop="productId">
-                            <el-input v-model="form.productId" placeholder="自动生成" disabled />
-                        </el-form-item>
                         <el-form-item label="设备类型" prop="deviceType">
                             <el-select v-model="form.deviceType" placeholder="请选择设备类型" disabled style="width:100%">
                                 <el-option v-for="dict in dict.type.iot_device_type" :key="dict.value" :label="dict.label" :value="parseInt(dict.value)"></el-option>
@@ -36,6 +33,9 @@
                             <el-select v-model="form.vertificateMethod" placeholder="请选择认证方式" disabled style="width:100%">
                                 <el-option v-for="dict in dict.type.iot_vertificate_method" :key="dict.value" :label="dict.label" :value="parseInt(dict.value)"></el-option>
                             </el-select>
+                        </el-form-item>
+                        <el-form-item label="产品编号" prop="productId">
+                            <el-input v-model="form.productId" placeholder="自动生成" :disabled="!form.mqttAccount" readonly />
                         </el-form-item>
                         <el-form-item label="Mqtt账号" prop="mqttAccount">
                             <el-input v-model="form.mqttAccount" placeholder="自动生成" :disabled="!form.mqttAccount" readonly :type="accountInputType">

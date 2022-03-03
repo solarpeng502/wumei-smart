@@ -13,23 +13,25 @@
                             <template slot="label">
                                 <span style="color:red;">* </span>设备编号
                             </template>
-                            <el-input v-model="form.serialNumber" placeholder="请输入设备编号">
-                                <el-button slot="append" @click="generateNum" :loading="genDisabled">生成</el-button>
+                            <el-input v-model="form.serialNumber" placeholder="请输入设备编号" :disabled="form.status!=1">
+                                <el-button slot="append" @click="generateNum" :loading="genDisabled" :disabled="form.status!=1">生成</el-button>
                             </el-input>
                         </el-form-item>
                         <el-form-item label="" prop="productName">
                             <template slot="label">
                                 <span style="color:red;">* </span>所属产品
                             </template>
-                            <el-input readonly v-model="form.productName" placeholder="请选择产品">
-                                <el-button slot="append" @click="selectProduct()">选择</el-button>
+                            <el-input readonly v-model="form.productName" placeholder="请选择产品" :disabled="form.status!=1">
+                                <el-button slot="append" @click="selectProduct()" :disabled="form.status!=1">选择</el-button>
                             </el-input>
                         </el-form-item>
                         <el-form-item label="固件版本" prop="firmwareVersion">
-                            <el-input v-model="form.firmwareVersion" placeholder="请输入固件版本" type="number"><template slot="prepend">Version</template></el-input>
+                            <el-input v-model="form.firmwareVersion" placeholder="请输入固件版本" type="number" :disabled="form.status!=1">
+                                <template slot="prepend">Version</template>
+                            </el-input>
                         </el-form-item>
                         <el-form-item label="禁用设备" prop="deviceStatus">
-                            <el-switch v-model="deviceStatus" active-text="" inactive-text="" :disabled="form.deviceId==0" :active-value="1" :inactive-value="0" active-color="#F56C6C" @change="statusChange()">
+                            <el-switch v-model="deviceStatus" active-text="" inactive-text="" :disabled="form.status==1" :active-value="1" :inactive-value="0" active-color="#F56C6C">
                             </el-switch>
                         </el-form-item>
                         <el-form-item label="设备影子" prop="isShadow">
@@ -64,19 +66,17 @@
                             <el-input v-model="form.networkAddress" placeholder="请输入设备所在地址" :disabled="form.isCustomerLocation==0" />
                         </el-form-item>
                         <el-form-item label="入网地址" prop="networkIp">
-                            <el-input v-model="form.networkIp" placeholder="请输入设备入网IP" disabled />
+                            <el-input v-model="form.networkIp" placeholder="设备入网IP" disabled />
                         </el-form-item>
                         <el-form-item label="激活时间" prop="activeTime">
-                            <el-date-picker clearable v-model="form.activeTime" type="date" value-format="yyyy-MM-dd" placeholder="选择激活时间" disabled style="width:100%">
+                            <el-date-picker clearable v-model="form.activeTime" type="date" value-format="yyyy-MM-dd" placeholder="设备激活时间" disabled style="width:100%">
                             </el-date-picker>
                         </el-form-item>
                         <el-form-item label="设备信号" prop="rssi">
-                            <el-input v-model="form.rssi" placeholder="请输入wifi信号强度" disabled />
+                            <el-input v-model="form.rssi" placeholder="设备信号强度" disabled />
                         </el-form-item>
                         <el-form-item label="设备状态" prop="status">
-                            <el-select v-model="form.status" disabled style="width:100%">
-                                <el-option v-for="dict in dict.type.iot_device_status" :key="dict.value" :label="dict.label" :value="parseInt(dict.value)"></el-option>
-                            </el-select>
+                            <dict-tag :options="dict.type.iot_device_status" :value="form.status" style="width:60px;display:inline-block;" />
                         </el-form-item>
                     </el-col>
 
@@ -172,12 +172,12 @@ export default {
             activeName: 'basic',
             // 遮罩层
             loading: true,
-            // 设备状态（1-未激活，2-禁用，3-在线，4-离线）
-            deviceStatus: 1,
+            // 设备状态（1=禁用，0=不禁用）
+            deviceStatus: 0,
             // 表单参数
             form: {
                 productId: 0,
-                status:0,
+                status: 1,
             },
             // 图片地址
             imageUrl: require('@/assets/images/product.jpg'),
@@ -218,7 +218,10 @@ export default {
         getDevice(deviceId) {
             getDevice(deviceId).then(response => {
                 this.form = response.data;
-                this.deviceStatus = this.form.status;
+                // 禁用状态
+                if(this.form.status==2){
+                    this.deviceStatus=1;
+                }
                 if (this.form.imgUrl != null && this.form.imgUrl != "") {
                     this.imageUrl = this.form.imgUrl;
                 }
@@ -259,7 +262,7 @@ export default {
                 tenantName: null,
                 serialNumber: null,
                 firmwareVersion: null,
-                status: 0,
+                status: 1,
                 rssi: null,
                 networkAddress: null,
                 networkIp: null,
@@ -273,6 +276,7 @@ export default {
                 remark: null,
                 isCustomerLocation: 0,
             };
+            this.deviceStatus=0;
             this.resetForm("form");
         },
         /** 提交按钮 */
@@ -280,6 +284,9 @@ export default {
             this.$refs["form"].validate(valid => {
                 if (valid) {
                     if (this.form.deviceId != 0) {
+                        // 设置设备状态
+                        this.setDeviceStatus();
+                        console.log(this.form);
                         updateDevice(this.form).then(response => {
                             this.$modal.alertSuccess("修改成功");
                             this.open = false;
@@ -289,8 +296,10 @@ export default {
                         addDevice(this.form).then(response => {
                             this.$modal.alertSuccess("新增成功");
                             this.open = false;
-                            this.form=response.data;
-                            this.deviceStatus = this.form.status;
+                            this.form = response.data;
+                            if(this.form.status==2){
+                                this.deviceStatus=1;
+                            }
                             this.loadMap();
                         });
                     }
@@ -331,12 +340,15 @@ export default {
             this.map.addOverlay(this.mk)
             this.map.panTo(point)
         },
-        // 禁用状态改变事件（1-未激活，2-禁用，3-在线，4-离线）
-        statusChange() {
+        // 设置设备的状态
+        setDeviceStatus() {
             if (this.deviceStatus == 1) {
                 this.form.status = 2;
-            }else{
-                this.form.status=this.deviceStatus;
+            } else {
+                // 禁用状态，启用后状态是离线
+                if (this.form.status == 2) {
+                    this.form.status = 4;
+                }
             }
         },
         // 生成随机字母和数字

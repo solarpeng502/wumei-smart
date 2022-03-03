@@ -147,7 +147,7 @@ export default {
 
                 option = {
                     tooltip: {
-                        formatter: '{a} <br/>{b} : {c}%'
+                        formatter: '{a} <br/>{b} : {c}'+ this.deviceInfo.readOnlyList[i].unit
                     },
                     series: [{
                         name: this.deviceInfo.readOnlyList[i].type,
@@ -159,13 +159,13 @@ export default {
                         },
                         detail: {
                             valueAnimation: true,
-                            formatter: '{value}' + this.deviceInfo.readOnlyList[i].unit,
+                            formatter: '{value}',
                             offsetCenter: [0, "25%"],
                             fontSize: 20,
                         },
                         data: [{
                             value: this.deviceInfo.readOnlyList[i].value,
-                            name: this.deviceInfo.readOnlyList[i].name
+                            name: this.deviceInfo.readOnlyList[i].name+"（"+ this.deviceInfo.readOnlyList[i].unit+"）"
                         }],
                         title: {
                             offsetCenter: [0, "90%"],

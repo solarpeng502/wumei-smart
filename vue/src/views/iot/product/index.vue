@@ -39,53 +39,57 @@
     </el-card>
 
     <el-card style="padding-bottom:100px;">
-        <el-row :gutter="40" v-loading="loading" v-if="viewType=='card'">
-            <el-col :span="6" v-for="(item,index) in productList" :key="index" style="margin-bottom:40px;text-align:center;">
-                <el-card :body-style="{ padding: '0px'}" shadow="always">
-                    <el-image style="width:100%;height:170px;" lazy :preview-src-list="[baseUrl+item.imgUrl]" :src="baseUrl+item.imgUrl" fit="cover" v-if="item.imgUrl!=null && item.imgUrl!=''"></el-image>
-                    <!-- 用于显示本地计算机、手机、树莓派等设备图片-->
-                    <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/esp8266.jpg')]" :src="require('@/assets/images/esp8266.jpg')" fit="cover" v-else-if="item.productId==1"></el-image>
-                    <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/esp32.jpg')]" :src="require('@/assets/images/esp32.jpg')" fit="cover" v-else-if="item.productId==2"></el-image>
-                    <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/raspberry.jpg')]" :src="require('@/assets/images/raspberry.jpg')" fit="cover" v-else-if="item.productId==3"></el-image>
-                    <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/telphone.jpg')]" :src="require('@/assets/images/telphone.jpg')" fit="cover" v-else-if="item.productId==4"></el-image>
-                    <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/computer.jpg')]" :src="require('@/assets/images/computer.jpg')" fit="cover" v-else-if="item.productId==5"></el-image>
-                    <el-image style="width:100%;height:170px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else></el-image>
-                    <el-descriptions :column="2" size="medium" style="padding:10px;">
-                        <template slot="title">
-                            <el-link type="" :underline="false" @click="handleEditProduct(item)" style="font-weight:bold;font-size:16px;">{{item.productName}}</el-link>
-                        </template>
-                        <template slot="extra">
+        <el-row :gutter="30" v-loading="loading" v-if="viewType=='card'">
+            <el-col :span="6" v-for="(item,index) in productList" :key="index" style="margin-bottom:30px;text-align:center;">
+                <el-card :body-style="{ padding: '20px'}" shadow="always">
+                    <el-row type="flex" :gutter="10" justify="space-between">
+                        <el-col :span="20" style="text-align:left;">
+                            <el-link type="" :underline="false" @click="handleEditProduct(item)" style="font-weight:bold;font-size:16px;line-height:32px;">
+                                <svg-icon icon-class="product" /> {{item.productName}}
+                            </el-link>
+                            <el-tag type="info" size="mini" style="margin-left:5px;" v-if="item.isSys==1">系统</el-tag>
+                        </el-col>
+                        <el-col :span="4">
                             <el-button type="success" size="mini" style="padding:5px;" v-if="item.status==2">已发布</el-button>
                             <el-tooltip class="item" effect="dark" content="现在发布" placement="top-start">
-                                <el-button type="" size="mini" style="padding:5px;" v-if="item.status==1" @click="publishProduct(item.productId)">未发布</el-button>
+                                <el-button type="info" size="mini" style="padding:5px;" v-if="item.status==1" @click="publishProduct(item.productId)">未发布</el-button>
                             </el-tooltip>
-                        </template>
-                        <el-descriptions-item label="分类名称">
-                            <el-link type="primary" :underline="false">{{item.categoryName}}</el-link>
-                        </el-descriptions-item>
-                        <el-descriptions-item label="设备类型">
-                            <dict-tag :options="dict.type.iot_device_type" :value="item.deviceType" />
-                        </el-descriptions-item>
-                        <el-descriptions-item label="创建时间">
-                            <span>{{ parseTime(item.createTime, '{y}-{m}-{d}') }}</span>
-                        </el-descriptions-item>
-                        <el-descriptions-item label="联网方式">
-                            <dict-tag :options="dict.type.iot_network_method" :value="item.networkMethod" />
-                        </el-descriptions-item>
-                        <el-descriptions-item label="系统定义">
-                            <dict-tag :options="dict.type.iot_yes_no" :value="item.isSys" />
-                        </el-descriptions-item>
-                        <el-descriptions-item label="认证方式">
-                            <dict-tag :options="dict.type.iot_vertificate_method" :value="item.vertificateMethod" />
-                        </el-descriptions-item>
-                        <el-descriptions-item label="备注">
-                            {{item.remark}}
-                        </el-descriptions-item>
-                    </el-descriptions>
-                    <el-button-group style="padding:0 10px 20px 10px;">
+                        </el-col>
+                    </el-row>
+                    <el-row :gutter="10">
+                        <el-col :span="14">
+                            <el-descriptions :column="1" size="small" style="margin-top:10px;">
+                                <el-descriptions-item label="所属分类">
+                                    <el-link type="primary" :underline="false">{{item.categoryName}}</el-link>
+                                </el-descriptions-item>
+                                <el-descriptions-item label="产品类型">
+                                    <dict-tag :options="dict.type.iot_device_type" :value="item.deviceType" />
+                                </el-descriptions-item>
+                                <el-descriptions-item label="联网方式">
+                                    <dict-tag :options="dict.type.iot_network_method" :value="item.networkMethod" />
+                                </el-descriptions-item>
+                                <el-descriptions-item label="创建时间">
+                                    <span>{{ parseTime(item.createTime, '{y}-{m}-{d}') }}</span>
+                                </el-descriptions-item>
+                            </el-descriptions>
+                        </el-col>
+                        <el-col :span="10">
+                            <div style="margin-top:10px;">
+                                <el-image style="width:100%;height:100px;border:1px solid #ccc;border-radius:5px;" lazy :preview-src-list="[baseUrl+item.imgUrl]" :src="baseUrl+item.imgUrl" fit="cover" v-if="item.imgUrl!=null && item.imgUrl!=''"></el-image>
+                                <!-- 用于显示本地计算机、手机、树莓派等设备图片-->
+                                <el-image style="width:100%;height:100px;border:1px solid #ccc;border-radius:5px;" :preview-src-list="[require('@/assets/images/esp8266.jpg')]" :src="require('@/assets/images/esp8266.jpg')" fit="cover" v-else-if="item.productId==1"></el-image>
+                                <el-image style="width:100%;height:100px;border:1px solid #ccc;border-radius:5px;" :preview-src-list="[require('@/assets/images/esp32.jpg')]" :src="require('@/assets/images/esp32.jpg')" fit="cover" v-else-if="item.productId==2"></el-image>
+                                <el-image style="width:100%;height:100px;border:1px solid #ccc;border-radius:5px;" :preview-src-list="[require('@/assets/images/raspberry.jpg')]" :src="require('@/assets/images/raspberry.jpg')" fit="cover" v-else-if="item.productId==3"></el-image>
+                                <el-image style="width:100%;height:100px;border:1px solid #ccc;border-radius:5px;" :preview-src-list="[require('@/assets/images/telphone.jpg')]" :src="require('@/assets/images/telphone.jpg')" fit="cover" v-else-if="item.productId==4"></el-image>
+                                <el-image style="width:100%;height:100px;border:1px solid #ccc;border-radius:5px;" :preview-src-list="[require('@/assets/images/computer.jpg')]" :src="require('@/assets/images/computer.jpg')" fit="cover" v-else-if="item.productId==5"></el-image>
+                                <el-image style="width:100%;height:100px;border:1px solid #ccc;border-radius:5px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else></el-image>
+                            </div>
+                        </el-col>
+                    </el-row>
+                    <el-button-group style="margin-top:15px;">
                         <el-button size="mini" type="primary" icon="el-icon-edit" @click="handleEditProduct(item)" v-hasPermi="['tool:gen:edit']">详情</el-button>
-                        <el-button size="mini" type="danger" icon="el-icon-delete" @click="handleDelete(item)" v-hasPermi="['iot:product:remove']" v-if="item.status!=2">删除</el-button>
-                        <el-button size="mini" type="info" icon="el-icon-edit" @click="handleGeneratorSDK(item)" v-hasPermi="['iot:product:edit']">下载SDK</el-button>
+                        <el-button size="mini" type="danger" icon="el-icon-delete" @click="handleDelete(item)" v-hasPermi="['iot:product:remove']">删除</el-button>
+                        <el-button size="mini" type="info" icon="el-icon-download" @click="handleGeneratorSDK(item)" v-hasPermi="['iot:product:edit']">下载SDK</el-button>
                     </el-button-group>
                 </el-card>
             </el-col>
@@ -149,8 +153,7 @@
                 <template slot-scope="scope">
                     <div style="text-align:left;margin-left:10px;">
                         <el-button size="small" type="primary" icon="el-icon-edit" @click="handleEditProduct(scope.row)" v-hasPermi="['tool:gen:edit']" style="padding:5px;">详情</el-button>
-                        <el-button size="small" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['iot:product:remove']" style="padding:5px;" :disabled="scope.row.status!=1">删除</el-button><br />
-                        <el-button size="small" type="info" icon="el-icon-edit" @click="handleGeneratorSDK(scope.row)" v-hasPermi="['iot:product:edit']" style="padding:5px;margin-top:8px;">生成设备端SDK</el-button>
+                        <el-button size="small" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['iot:product:remove']" style="padding:5px;">删除</el-button><br />
                     </div>
                 </template>
             </el-table-column>
@@ -299,10 +302,10 @@ export default {
         /** 删除按钮操作 */
         handleDelete(row) {
             const productIds = row.productId || this.ids;
-            let msg="";
+            let msg = "";
             this.$modal.confirm('是否确认删除产品编号为"' + productIds + '"的数据项？').then(function () {
                 return delProduct(productIds).then(response => {
-                    msg=response.msg;
+                    msg = response.msg;
                 });
             }).then(() => {
                 this.getList();
