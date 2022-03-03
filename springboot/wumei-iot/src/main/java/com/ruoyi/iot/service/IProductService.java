@@ -2,6 +2,7 @@ package com.ruoyi.iot.service;
 
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.iot.domain.Product;
+import com.ruoyi.iot.model.ChangeProductStatusModel;
 import com.ruoyi.iot.model.IdAndName;
 
 import java.util.List;
@@ -54,12 +55,12 @@ public interface IProductService
     public int updateProduct(Product product);
 
     /**
-     * 发布产品
+     * 更新产品状态，1-未发布，2-已发布
      *
-     * @param productId 产品
+     * @param model
      * @return 结果
      */
-    public int publishProduct(Long productId);
+    public AjaxResult changeProductStatus(ChangeProductStatusModel model);
 
     /**
      * 批量删除产品

@@ -7,6 +7,7 @@ import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.iot.domain.Product;
 import com.ruoyi.iot.mapper.ProductMapper;
+import com.ruoyi.iot.model.ChangeProductStatusModel;
 import com.ruoyi.iot.model.IdAndName;
 import com.ruoyi.iot.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,15 +115,35 @@ public class ProductServiceImpl implements IProductService
     }
 
     /**
-     * 发布产品
+     * 更新产品状态,1-未发布，2-已发布
      *
-     * @param productId 产品Id
+     * @param model
      * @return 结果
      */
     @Override
-    public int publishProduct(Long productId)
+    public AjaxResult changeProductStatus(ChangeProductStatusModel model)
     {
-        return productMapper.publishProduct(productId);
+        if(model.getStatus()==1){
+            // 产品下不能有设备
+            Long[] productIds = new Long[1];
+            productIds[0]=model.getProductId();
+            int deviceCount=productMapper.deviceCountInProducts(productIds);
+            if(deviceCount>0){
+                return AjaxResult.error("取消发布失败，请先删除产品下的设备");
+            }
+        }else if(model.getStatus()==2){
+            // 产品下必须包含物模型
+            int thingsCount=productMapper.thingsCountInProduct(model.getProductId());
+            if(thingsCount==0){
+                return AjaxResult.error("发布失败，请先添加产品的物模型");
+            }
+        }else{
+            return AjaxResult.error("状态更新失败,状态值有误");
+        }
+        if(productMapper.changeProductStatus(model)>0){
+            return AjaxResult.success("操作成功");
+        }
+        return AjaxResult.error("状态更新失败");
     }
 
     /**
@@ -138,9 +159,15 @@ public class ProductServiceImpl implements IProductService
         for(int i=0;i<productIds.length;i++){
             redisCache.deleteObject(tslPreKey+productIds[i]);
         }
+        // 产品下不能有固件
         int firmwareCount=productMapper.firmwareCountInProducts(productIds);
         if(firmwareCount>0){
             return AjaxResult.error("删除失败，请先删除对应产品下的固件");
+        }
+        // 产品下不能有设备
+        int deviceCount=productMapper.deviceCountInProducts(productIds);
+        if(deviceCount>0){
+            return AjaxResult.error("删除失败，请先删除对应产品下的设备");
         }
         if(productMapper.deleteProductByProductIds(productIds)>0){
             return AjaxResult.success("删除成功");

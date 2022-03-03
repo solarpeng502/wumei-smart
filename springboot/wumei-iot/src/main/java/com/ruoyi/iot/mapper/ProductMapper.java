@@ -1,6 +1,7 @@
 package com.ruoyi.iot.mapper;
 
 import com.ruoyi.iot.domain.Product;
+import com.ruoyi.iot.model.ChangeProductStatusModel;
 import com.ruoyi.iot.model.IdAndName;
 
 import java.util.List;
@@ -54,12 +55,12 @@ public interface ProductMapper
     public int updateProduct(Product product);
 
     /**
-     * 发布产品
+     * 更新产品状态，1-未发布，2-已发布
      *
-     * @param productId 产品ID
+     * @param model
      * @return 结果
      */
-    public int publishProduct(Long productId);
+    public int changeProductStatus(ChangeProductStatusModel model);
 
     /**
      * 修改物模型JSON
@@ -87,9 +88,22 @@ public interface ProductMapper
 
     /**
      * 产品下的固件数量
-     *
      * @param productIds 需要删除的数据主键集合
      * @return 结果
      */
     public int firmwareCountInProducts(Long[] productIds);
+
+    /**
+     * 产品下的设备数量
+     * @param productIds 需要删除的数据主键集合
+     * @return 结果
+     */
+    public int deviceCountInProducts(Long[] productIds);
+
+    /**
+     * 产品下的物模型数量
+     * @param productId 需要删除的数据主键集合
+     * @return 结果
+     */
+    public int thingsCountInProduct(Long productId);
 }

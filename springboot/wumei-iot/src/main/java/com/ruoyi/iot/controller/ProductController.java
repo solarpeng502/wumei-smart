@@ -7,6 +7,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.iot.domain.Product;
+import com.ruoyi.iot.model.ChangeProductStatusModel;
 import com.ruoyi.iot.model.IdAndName;
 import com.ruoyi.iot.service.IProductService;
 import io.swagger.annotations.Api;
@@ -110,12 +111,12 @@ public class ProductController extends BaseController
      * 发布产品
      */
     @PreAuthorize("@ss.hasPermi('iot:product:edit')")
-    @Log(title = "发布产品", businessType = BusinessType.UPDATE)
-    @PutMapping("publish/{productId}")
-    @ApiOperation("发布产品")
-    public AjaxResult publish(@PathVariable Long productId)
+    @Log(title = "更新产品状态", businessType = BusinessType.UPDATE)
+    @PutMapping("/status")
+    @ApiOperation("更新产品状态")
+    public AjaxResult changeProductStatus(@RequestBody ChangeProductStatusModel model)
     {
-        return toAjax(productService.publishProduct(productId));
+        return productService.changeProductStatus(model);
     }
 
     /**

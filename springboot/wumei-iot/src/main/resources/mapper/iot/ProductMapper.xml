@@ -136,8 +136,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where product_id = #{productId}
     </update>
 
-    <update id="publishProduct" parameterType="Long">
-        update iot_product set status=2
+    <update id="changeProductStatus" parameterType="com.ruoyi.iot.model.ChangeProductStatusModel">
+        update iot_product set status=#{status}
         where product_id = #{productId}
     </update>
 
@@ -162,5 +162,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <foreach item="productId" collection="array" open="(" separator="," close=")">
             #{productId}
         </foreach>
+    </select>
+
+    <select id="deviceCountInProducts" parameterType="String" resultType="int">
+        select count(*) from iot_device where product_id in
+        <foreach item="productId" collection="array" open="(" separator="," close=")">
+            #{productId}
+        </foreach>
+    </select>
+
+    <select id="thingsCountInProduct" parameterType="Long" resultType="int">
+        select count(*) from iot_things_model where product_id = #{productId}
     </select>
 </mapper>
