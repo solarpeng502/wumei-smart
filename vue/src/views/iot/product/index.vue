@@ -77,7 +77,7 @@
                         <el-button size="mini" type="primary" icon="el-icon-edit" @click="handleEditProduct(item)" v-hasPermi="['tool:gen:edit']">详情</el-button>
                         <el-button size="mini" type="danger" icon="el-icon-delete" @click="handleDelete(item)" v-hasPermi="['iot:product:remove']" v-if="item.status==1">删除</el-button>
                         <el-button size="mini" type="info" icon="el-icon-download" @click="handleGeneratorSDK(item)" v-hasPermi="['iot:product:edit']" v-if="item.status==2">下载SDK</el-button>
-                        <el-button size="mini" type="warning" icon="el-icon-search" @click="handleEditProduct(item)" v-hasPermi="['tool:gen:edit']">查看设备</el-button>
+                        <el-button size="mini" type="warning" icon="el-icon-search" @click="handleViewDevice(item.productId)" v-hasPermi="['tool:gen:edit']">查看设备</el-button>
                     </el-button-group>
                 </el-card>
             </el-col>
@@ -188,6 +188,16 @@ export default {
                     this.$modal.alertSuccess(response.msg);
                 }).catch(() => {});
             }).catch(() => {});
+        },
+        /** 修改按钮操作 */
+        handleViewDevice(productId) {
+            this.$router.push({
+                path: '/iot/device',
+                query: {
+                    t: Date.now(),
+                    productId: productId,
+                }
+            });
         },
         // 取消按钮
         cancel() {

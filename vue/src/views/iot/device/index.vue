@@ -218,6 +218,7 @@ export default {
         if (time != null && time != this.uniqueId) {
             this.uniqueId = time;
             this.queryParams.pageNum = Number(this.$route.query.pageNum);
+            this.queryParams.productId = Number(this.$route.query.productId);
             this.getList();
         }
     },
@@ -345,6 +346,7 @@ export default {
         /** 重置按钮操作 */
         resetQuery() {
             this.daterangeActiveTime = [];
+            this.queryParams.productId=null;
             this.resetForm("queryForm");
             this.handleQuery();
         },
