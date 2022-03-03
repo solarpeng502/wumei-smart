@@ -1,6 +1,6 @@
 <template>
 <div style="padding:6px;">
-    <el-card v-show="showSearch" style="margin-bottom:6px;">
+    <el-card style="margin-bottom:6px;">
         <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px" style="margin-bottom:-20px;">
             <el-form-item label="产品名称" prop="productName">
                 <el-input v-model="queryParams.productName" placeholder="请输入产品名称" clearable size="small" @keyup.enter.native="handleQuery" />
@@ -17,42 +17,29 @@
                 <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
                 <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
             </el-form-item>
-        </el-form>
-
-        <el-row :gutter="10" class="mb8" style="margin-bottom:-5px;margin-top:10px;">
-            <el-col :span="1.5">
+            <el-form-item style="float:right;">
                 <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleEditProduct(0)" v-hasPermi="['iot:product:add']">新增</el-button>
-            </el-col>
-            <el-col :span="1.5">
-                <el-button type="success" plain icon="el-icon-edit" size="mini" :disabled="single" @click="handleEditProduct" v-hasPermi="['iot:product:edit']">修改</el-button>
-            </el-col>
-            <el-col :span="1.5">
-                <el-button type="danger" plain icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleDelete" v-hasPermi="['iot:product:remove']">删除</el-button>
-            </el-col>
-            <el-col :span="1.5">
-                <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" v-hasPermi="['iot:product:export']">导出</el-button>
-            </el-col>
-            <el-col :span="1.5">
-                <el-button type="info" plain icon="el-icon-document-copy" size="mini" @click="changeViewType" v-hasPermi="['iot:product:list']">切换视图</el-button>
-            </el-col>
-        </el-row>
+            </el-form-item>
+        </el-form>
     </el-card>
 
     <el-card style="padding-bottom:100px;">
-        <el-row :gutter="30" v-loading="loading" v-if="viewType=='card'">
+        <el-row :gutter="30" v-loading="loading" >
             <el-col :span="6" v-for="(item,index) in productList" :key="index" style="margin-bottom:30px;text-align:center;">
                 <el-card :body-style="{ padding: '20px'}" shadow="always">
                     <el-row type="flex" :gutter="10" justify="space-between">
                         <el-col :span="20" style="text-align:left;">
                             <el-link type="" :underline="false" @click="handleEditProduct(item)" style="font-weight:bold;font-size:16px;line-height:32px;">
                                 <svg-icon icon-class="product" /> {{item.productName}}
+                                <el-tag type="info" size="mini" style="margin-left:5px;font-weight:200" v-if="item.isSys==1">系统</el-tag>
                             </el-link>
-                            <el-tag type="info" size="mini" style="margin-left:5px;" v-if="item.isSys==1">系统</el-tag>
                         </el-col>
                         <el-col :span="4">
-                            <el-button type="success" size="mini" style="padding:5px;" v-if="item.status==2">已发布</el-button>
+                            <el-tooltip class="item" effect="dark" content="取消发布" placement="top-start">
+                                <el-button type="success" size="mini" style="padding:5px;" v-if="item.status==2"  @click="changeProductStatus(item.productId,1)">已发布</el-button>
+                            </el-tooltip>
                             <el-tooltip class="item" effect="dark" content="现在发布" placement="top-start">
-                                <el-button type="info" size="mini" style="padding:5px;" v-if="item.status==1" @click="publishProduct(item.productId)">未发布</el-button>
+                                <el-button type="info" size="mini" style="padding:5px;" v-if="item.status==1" @click="changeProductStatus(item.productId,2)">未发布</el-button>
                             </el-tooltip>
                         </el-col>
                     </el-row>
@@ -88,76 +75,13 @@
                     </el-row>
                     <el-button-group style="margin-top:15px;">
                         <el-button size="mini" type="primary" icon="el-icon-edit" @click="handleEditProduct(item)" v-hasPermi="['tool:gen:edit']">详情</el-button>
-                        <el-button size="mini" type="danger" icon="el-icon-delete" @click="handleDelete(item)" v-hasPermi="['iot:product:remove']">删除</el-button>
-                        <el-button size="mini" type="info" icon="el-icon-download" @click="handleGeneratorSDK(item)" v-hasPermi="['iot:product:edit']">下载SDK</el-button>
+                        <el-button size="mini" type="danger" icon="el-icon-delete" @click="handleDelete(item)" v-hasPermi="['iot:product:remove']" v-if="item.status==1">删除</el-button>
+                        <el-button size="mini" type="info" icon="el-icon-download" @click="handleGeneratorSDK(item)" v-hasPermi="['iot:product:edit']" v-if="item.status==2">下载SDK</el-button>
+                        <el-button size="mini" type="warning" icon="el-icon-search" @click="handleEditProduct(item)" v-hasPermi="['tool:gen:edit']">查看设备</el-button>
                     </el-button-group>
                 </el-card>
             </el-col>
         </el-row>
-
-        <el-table v-loading="loading" :data="productList" @selection-change="handleSelectionChange" v-if="viewType=='list'">
-            <input type="hidden" prop="productId" />
-            <el-table-column type="selection" width="55" align="center" />
-            <el-table-column label="图片" align="center" prop="imgUrl">
-                <template slot-scope="scope">
-                    <el-image style="height: 70px" lazy :preview-src-list="[baseUrl+scope.row.imgUrl]" :src="baseUrl+scope.row.imgUrl" fit="contain" v-if="scope.row.imgUrl!=null && scope.row.imgUrl!=''"></el-image>
-                    <el-image style="height:70px;" :preview-src-list="[require('@/assets/images/esp8266.jpg')]" :src="require('@/assets/images/esp8266.jpg')" fit="cover" v-else-if="scope.row.productId==1"></el-image>
-                    <el-image style="height:70px;" :preview-src-list="[require('@/assets/images/esp32.jpg')]" :src="require('@/assets/images/esp32.jpg')" fit="cover" v-else-if="scope.row.productId==2"></el-image>
-                    <el-image style="height:70px;" :preview-src-list="[require('@/assets/images/raspberry.jpg')]" :src="require('@/assets/images/raspberry.jpg')" fit="cover" v-else-if="scope.row.productId==3"></el-image>
-                    <el-image style="height:70px;" :preview-src-list="[require('@/assets/images/telphone.jpg')]" :src="require('@/assets/images/telphone.jpg')" fit="cover" v-else-if="scope.row.productId==4"></el-image>
-                    <el-image style="height:70px;" :preview-src-list="[require('@/assets/images/computer.jpg')]" :src="require('@/assets/images/computer.jpg')" fit="cover" v-else-if="scope.row.productId==5"></el-image>
-                    <el-image style="height:70px;" :preview-src-list="[require('@/assets/images/product.jpg')]" :src="require('@/assets/images/product.jpg')" fit="cover" v-else></el-image>
-                </template>
-            </el-table-column>
-            <el-table-column label="产品名称" align="center" prop="productName">
-                <template slot-scope="scope">
-                    <el-link type="primary" :underline="false" @click="handleEditProduct(scope.row)">{{scope.row.productName}}</el-link>
-                </template>
-            </el-table-column>
-            <el-table-column label="分类名称" align="center" prop="categoryName" />
-            <el-table-column label="状态" align="center" prop="status">
-                <template slot-scope="scope">
-                    <el-button type="success" size="mini" style="padding:5px;" v-if="scope.row.status==2">已发布</el-button>
-                    <el-tooltip class="item" effect="dark" content="现在发布" placement="top-start">
-                        <el-button type="" size="mini" style="padding:5px;" v-if="scope.row.status==1" @click="publishProduct(scope.row.productId)">未发布</el-button>
-                    </el-tooltip>
-                </template>
-            </el-table-column>
-            <el-table-column label="设备类型" align="center" prop="deviceType">
-                <template slot-scope="scope">
-                    <dict-tag :options="dict.type.iot_device_type" :value="scope.row.deviceType" />
-                </template>
-            </el-table-column>
-            <el-table-column label="系统定义" align="center" prop="isSys">
-                <template slot-scope="scope">
-                    <dict-tag :options="dict.type.iot_yes_no" :value="scope.row.isSys" />
-                </template>
-            </el-table-column>
-            <el-table-column label="联网方式" align="center" prop="networkMethod">
-                <template slot-scope="scope">
-                    <dict-tag :options="dict.type.iot_network_method" :value="scope.row.networkMethod" />
-                </template>
-            </el-table-column>
-            <el-table-column label="认证方式" align="center" prop="vertificateMethod">
-                <template slot-scope="scope">
-                    <dict-tag :options="dict.type.iot_vertificate_method" :value="scope.row.vertificateMethod" />
-                </template>
-            </el-table-column>
-            <el-table-column label="创建时间" align="center" prop="createTime" width="150">
-                <template slot-scope="scope">
-                    <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column label="备注" align="left" prop="remark" min-width="150" />
-            <el-table-column label="操作" align="center" class-name="" width="150">
-                <template slot-scope="scope">
-                    <div style="text-align:left;margin-left:10px;">
-                        <el-button size="small" type="primary" icon="el-icon-edit" @click="handleEditProduct(scope.row)" v-hasPermi="['tool:gen:edit']" style="padding:5px;">详情</el-button>
-                        <el-button size="small" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['iot:product:remove']" style="padding:5px;">删除</el-button><br />
-                    </div>
-                </template>
-            </el-table-column>
-        </el-table>
 
         <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
 
@@ -185,7 +109,7 @@
 import {
     listProduct,
     delProduct,
-    publishProduct
+    changeProductStatus
 } from "@/api/iot/product";
 
 export default {
@@ -193,18 +117,8 @@ export default {
     dicts: ['iot_yes_no', 'iot_product_status', 'iot_device_type', 'iot_network_method', 'iot_vertificate_method', 'iot_device_chip'],
     data() {
         return {
-            // 视图类型
-            viewType: "card",
             // 遮罩层
             loading: true,
-            // 选中数组
-            ids: [],
-            // 非单个禁用
-            single: true,
-            // 非多个禁用
-            multiple: true,
-            // 显示搜索条件
-            showSearch: true,
             // 总条数
             total: 0,
             // 产品表格数据
@@ -253,19 +167,26 @@ export default {
                 this.loading = false;
             });
         },
-        /** 发布产品 */
-        publishProduct(productId) {
-            this.$confirm('产品发布后不能再更改产品内容 ！', '提示', {
+        /** 更新产品状态 */
+        changeProductStatus(productId,status) {
+            let message="发生错误了";
+            if(status==2){
+                message="产品发布后不能再更改产品内容和对应物模型 ！";
+            }else if(status==1){
+                message="产品下不能有已经创建的设备，才能取消发布哦 ！"
+            }
+            this.$confirm(message, '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                publishProduct(productId).then(response => {
-                    if (response.code == 200) {
-                        this.getList();
-                        this.$modal.alertSuccess("产品发布成功，可以去添加设备了");
-                    }
-                })
+                let data = {};
+                data.productId = productId;
+                data.status = status;
+                changeProductStatus(data).then(response => {
+                    this.getList();
+                    this.$modal.alertSuccess(response.msg);
+                }).catch(() => {});
             }).catch(() => {});
         },
         // 取消按钮
@@ -283,12 +204,6 @@ export default {
         resetQuery() {
             this.resetForm("queryForm");
             this.handleQuery();
-        },
-        // 多选框选中数据
-        handleSelectionChange(selection) {
-            this.ids = selection.map(item => item.productId)
-            this.single = selection.length !== 1
-            this.multiple = !selection.length
         },
         /** 生成SDK */
         handleGeneratorSDK(row) {
@@ -312,12 +227,6 @@ export default {
                 this.$modal.msgSuccess(msg);
             }).catch(() => {});
         },
-        /** 导出按钮操作 */
-        handleExport() {
-            this.download('iot/product/export', {
-                ...this.queryParams
-            }, `product_${new Date().getTime()}.xlsx`)
-        },
         /** 修改按钮操作 */
         handleEditProduct(row) {
             let productId = 0;
@@ -331,10 +240,6 @@ export default {
                     pageNum: this.queryParams.pageNum
                 }
             });
-        },
-        /**改变视图**/
-        changeViewType() {
-            this.viewType = this.viewType == "card" ? "list" : "card";
         },
     }
 };

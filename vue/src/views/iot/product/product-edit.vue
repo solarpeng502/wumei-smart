@@ -88,10 +88,15 @@
         <el-tab-pane label="" disabled name="product03" />
         <el-tab-pane v-if="form.status==1" name="product04">
             <span slot="label">
-                <el-button type="success" size="mini" @click="publishProduct()">发布产品</el-button>
+                <el-button type="success" size="mini" @click="changeProductStatus(2)">发布产品</el-button>
             </span>
         </el-tab-pane>
-        <el-tab-pane name="product05">
+        <el-tab-pane v-if="form.status==2" name="product05">
+            <span slot="label">
+                <el-button type="danger" size="mini" @click="changeProductStatus(1)">取消发布</el-button>
+            </span>
+        </el-tab-pane>
+        <el-tab-pane name="product06">
             <span slot="label">
                 <el-button type="info" size="mini" @click="goBack()">返回列表</el-button>
             </span>
@@ -113,7 +118,7 @@ import {
     getProduct,
     addProduct,
     updateProduct,
-    publishProduct
+    changeProductStatus
 } from "@/api/iot/product";
 
 export default {
@@ -219,25 +224,38 @@ export default {
                         addProduct(this.form).then(response => {
                             this.$modal.alertSuccess("添加成功,可以开始定义物模型了");
                             this.form = response.data;
+                            this.activeName = "things";
                         });
                     }
                 }
             });
         },
-        /** 发布产品 */
-        publishProduct() {
-            this.$confirm('产品发布后不能再更改产品内容 ！', '提示', {
+        /** 更新产品状态 */
+        changeProductStatus(status) {
+            let message="发生错误了";
+            if(status==2){
+                message="产品发布后不能再更改产品内容和对应物模型 ！";
+            }else if(status==1){
+                message="产品下不能有已经创建的设备，才能取消发布哦 ！"
+            }
+            this.$confirm(message, '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                publishProduct(this.form.productId).then(response => {
-                    if (response.code == 200) {
-                        this.$modal.alertSuccess("产品发布成功，可以去添加设备了");
-                        this.form.status = 2; // 1=未发布，2-已发布
+                let data = {};
+                data.productId = this.form.productId;
+                data.status = status;
+                changeProductStatus(data).then(response => {
+                    this.$modal.alertSuccess(response.msg);
+                    this.goBack();
+                }).catch(()=>{
+                    if(status==2){
+                    this.activeName = "things";
+                    }else{
                         this.goBack();
                     }
-                })
+                });
             }).catch(() => {
                 this.activeName = "basic";
             });

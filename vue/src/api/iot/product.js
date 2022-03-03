@@ -43,11 +43,12 @@ export function updateProduct(data) {
   })
 }
 
-// 发布产品
-export function publishProduct(productId) {
+// 更新产品状态
+export function changeProductStatus(data) {
   return request({
-    url: '/iot/product/publish/'+productId,
-    method: 'put'
+    url: '/iot/product/status/',
+    method: 'put',
+    data:data
   })
 }
 

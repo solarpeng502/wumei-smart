@@ -294,7 +294,7 @@ export default {
                         });
                     } else {
                         addDevice(this.form).then(response => {
-                            this.$modal.alertSuccess("新增成功");
+                            this.$modal.alertSuccess("新增成功,赶快烧录SDK到设备吧");
                             this.open = false;
                             this.form = response.data;
                             if(this.form.status==2){
