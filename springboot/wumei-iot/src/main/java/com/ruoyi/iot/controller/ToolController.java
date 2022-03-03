@@ -153,10 +153,6 @@ public class ToolController extends BaseController {
 
     // 返回认证信息
     private ResponseEntity returnUnauthorized(String clientid,String username,String password,String message) {
-        System.out.println("认证失败："+message
-                +"\nclientid:"+clientid
-                +"\nusername:"+username
-                +"\npassword:"+password);
         log.error("认证失败："+message
                 +"\nclientid:"+clientid
                 +"\nusername:"+username
