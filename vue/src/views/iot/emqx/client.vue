@@ -43,7 +43,9 @@
             <el-table-column label="会话创建时间" align="center" prop="created_at" />
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="150">
                 <template slot-scope="scope">
-                    <el-button size="small" type="danger" v-if="scope.row.connected" style="padding:5px;" icon="el-icon-delete" v-hasPermi="['iot:category:remove']">断开连接</el-button>
+                    <el-button size="small" type="danger" v-if="scope.row.connected" style="padding:5px;" v-hasPermi="['iot:category:remove']">
+                        <svg-icon icon-class="disconnect" /> 断开连接
+                    </el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -71,8 +73,9 @@
 </template>
 
 <script>
-import{listMqttClient} from "@/api/iot/emqx"
-
+import {
+    listMqttClient
+} from "@/api/iot/emqx"
 
 export default {
     name: "Category",
@@ -101,15 +104,15 @@ export default {
     },
     created() {
         this.getList();
-        
+
     },
     methods: {
         /** 查询客户端列表 */
         getList() {
             this.loading = true;
             listMqttClient(this.queryParams).then(response => {
-                this.clientList=response.data.data;
-                this.total=response.data.meta.count;
+                this.clientList = response.data.data;
+                this.total = response.data.meta.count;
                 this.loading = false;
             });
         },
@@ -127,7 +130,7 @@ export default {
         resetQuery() {
             this.resetForm("queryForm");
             this.handleQuery();
-        },        
+        },
     }
 };
 </script>

@@ -14,8 +14,12 @@
             <el-table-column label="描述" align="left" prop="description" />
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="150">
                 <template slot-scope="scope">
-                    <el-button size="small" type="success" style="padding:5px;" icon="el-icon-edit" @click="loadMqttPlugin(scope.row.name)" disabled v-if="!scope.row.active">启动</el-button>
-                    <el-button size="small" type="danger" style="padding:5px;" icon="el-icon-delete" @click="unloadMqttPlugin(scope.row.name)" disabled v-else>停止</el-button>
+                    <el-button size="small" type="success" style="padding:5px;" @click="loadMqttPlugin(scope.row.name)" v-if="!scope.row.active">
+                    <svg-icon icon-class="start" /> 启动
+                    </el-button>
+                    <el-button size="small" type="danger" style="padding:5px;" @click="unloadMqttPlugin(scope.row.name)" v-else>
+                    <svg-icon icon-class="stop" /> 停止
+                    </el-button>
                 </template>
             </el-table-column>
         </el-table>

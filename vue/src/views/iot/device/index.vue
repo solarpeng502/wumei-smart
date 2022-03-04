@@ -55,11 +55,11 @@
                                 <el-tag type="info" size="small" v-else>禁用影子</el-tag>
                             </div>
                             <el-descriptions :column="1" size="mini">
-                                <el-descriptions-item label="产品">
-                                    <el-link type="primary" :underline="false">{{item.productName}}</el-link>
-                                </el-descriptions-item>
                                 <el-descriptions-item label="编号">
                                     {{item.serialNumber}}
+                                </el-descriptions-item>
+                                <el-descriptions-item label="产品">
+                                    <el-link type="primary" :underline="false">{{item.productName}}</el-link>
                                 </el-descriptions-item>
                                 <el-descriptions-item label="激活时间">
                                     {{ parseTime(item.activeTime, '{y}-{m}-{d}') }}
@@ -218,7 +218,11 @@ export default {
         if (time != null && time != this.uniqueId) {
             this.uniqueId = time;
             this.queryParams.pageNum = Number(this.$route.query.pageNum);
-            this.queryParams.productId = Number(this.$route.query.productId);
+            // 产品筛选
+            let productId = this.$route.query.productId
+            if (productId != null) {
+                this.queryParams.productId = Number(productId);
+            }
             this.getList();
         }
     },
@@ -346,7 +350,7 @@ export default {
         /** 重置按钮操作 */
         resetQuery() {
             this.daterangeActiveTime = [];
-            this.queryParams.productId=null;
+            this.queryParams.productId = null;
             this.resetForm("queryForm");
             this.handleQuery();
         },
