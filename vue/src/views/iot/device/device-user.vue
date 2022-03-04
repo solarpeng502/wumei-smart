@@ -70,9 +70,13 @@ export default {
         }
     },
     watch: {
-        // 获取到父组件传递的device
+        // 获取到父组件传递的device后，刷新列表
         device: function (newVal, oldVal) {
             this.deviceInfo = newVal;
+            if (this.deviceInfo && this.deviceInfo.deviceId != 0) {
+                this.queryParams.deviceId = this.deviceInfo.deviceId;
+                this.getList();
+            }
         }
     },
     data() {

@@ -25,11 +25,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectDeviceLogList" parameterType="DeviceLog" resultMap="DeviceLogResult">
         <include refid="selectDeviceLogVo"/>
-        <where>  
+        <where>
+            <if test="1==1"> and device_id = #{deviceId}</if>
             <if test="logName != null  and logName != ''"> and log_name like concat('%', #{logName}, '%')</if>
             <if test="logType != null "> and log_type = #{logType}</if>
             <if test="logValue != null  and logValue != ''"> and log_value = #{logValue}</if>
-            <if test="deviceId != null "> and device_id = #{deviceId}</if>
             <if test="deviceName != null  and deviceName != ''"> and device_name like concat('%', #{deviceName}, '%')</if>
             <if test="identity != null  and identity != ''"> and identity like concat('%', #{identity}, '%')</if>
             <if test="isMonitor != null "> and is_monitor = #{isMonitor}</if>

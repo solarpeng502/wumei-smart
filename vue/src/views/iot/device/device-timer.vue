@@ -274,7 +274,8 @@ export default {
                 cacheJsonThingsModel(this.deviceInfo.productId).then(response => {
                     this.thingsModel = JSON.parse(response.data);
                     // 过滤监测数据，监测数据为只读
-                    // this.thingsModel.properties = this.thingsModel.properties.filter(item => item.isMonitor == 0);
+                    this.thingsModel.properties = this.thingsModel.properties.filter(item => item.isMonitor == 0);
+                    this.queryParams.deviceId= this.deviceInfo.deviceId;
                     this.getList();
                 });
             }
@@ -318,6 +319,7 @@ export default {
             queryParams: {
                 pageNum: 1,
                 pageSize: 10,
+                deviceId:0,
                 jobName: undefined,
                 jobGroup: undefined,
                 status: undefined

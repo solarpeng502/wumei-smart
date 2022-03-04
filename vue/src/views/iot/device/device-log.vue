@@ -52,6 +52,22 @@ import {
 export default {
     name: "DeviceLog",
     dicts: ['iot_device_log_type'],
+    props: {
+        device: {
+            type: Object,
+            default: null
+        }
+    },
+    watch: {
+        // 获取到父组件传递的device后，刷新列表
+        device: function (newVal, oldVal) {
+            this.deviceInfo = newVal;
+            if (this.deviceInfo && this.deviceInfo.deviceId != 0) {
+                this.queryParams.deviceId = this.deviceInfo.deviceId;
+                this.getList();
+            }
+        }
+    },
     data() {
         return {
             // 遮罩层
@@ -76,7 +92,7 @@ export default {
         };
     },
     created() {
-        this.getList();
+        
     },
     methods: {
         /** 查询设备日志列表 */

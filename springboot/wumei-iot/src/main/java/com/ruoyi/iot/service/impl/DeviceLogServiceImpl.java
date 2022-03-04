@@ -1,12 +1,16 @@
 package com.ruoyi.iot.service.impl;
 
-import java.util.List;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.iot.domain.DeviceLog;
+import com.ruoyi.iot.mapper.DeviceLogMapper;
+import com.ruoyi.iot.service.IDeviceLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.iot.mapper.DeviceLogMapper;
-import com.ruoyi.iot.domain.DeviceLog;
-import com.ruoyi.iot.service.IDeviceLogService;
+
+import java.util.List;
+
+import static com.ruoyi.common.utils.SecurityUtils.getLoginUser;
 
 /**
  * 设备日志Service业务层处理
