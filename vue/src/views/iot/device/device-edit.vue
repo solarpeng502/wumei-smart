@@ -103,12 +103,12 @@
             <running-status ref="runningStatus" :device="form" />
         </el-tab-pane>
 
-        <!-- <el-tab-pane name="deviceTimer" :disabled="form.deviceId==0">
+        <el-tab-pane name="deviceTimer" :disabled="form.deviceId==0">
             <span slot="label">设备定时</span>
             <device-timer ref="deviceTimer" :device="form" />
         </el-tab-pane>
 
-        <el-tab-pane name="deviceUser" :disabled="form.deviceId==0">
+         <el-tab-pane name="deviceUser" :disabled="form.deviceId==0">
             <span slot="label">设备用户</span>
             <device-user ref="deviceUser" :device="form" @userEvent="getUserData($event)" />
         </el-tab-pane>
@@ -121,7 +121,7 @@
         <el-tab-pane name="deviceStastic" :disabled="form.deviceId==0">
             <span slot="label">监测统计</span>
             <device-statistic ref="deviceStatistic" :device="form" />
-        </el-tab-pane> -->
+        </el-tab-pane>
 
         <el-tab-pane label="" disabled name="device01" />
         <el-tab-pane label="" disabled name="device02" />
@@ -294,7 +294,7 @@ export default {
                         });
                     } else {
                         addDevice(this.form).then(response => {
-                            this.$modal.alertSuccess("新增成功,赶快烧录SDK到设备吧");
+                            this.$modal.alertSuccess("新增成功, 可以烧录sdk到设备了");
                             this.open = false;
                             this.form = response.data;
                             if(this.form.status==2){

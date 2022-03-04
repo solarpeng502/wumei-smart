@@ -35,11 +35,11 @@
                             </el-link>
                         </el-col>
                         <el-col :span="4">
-                            <el-tooltip class="item" effect="dark" content="取消发布" placement="top-start">
-                                <el-button type="success" size="mini" style="padding:5px;" v-if="item.status==2"  @click="changeProductStatus(item.productId,1)">已发布</el-button>
+                            <el-tooltip class="item" effect="dark" content="取消发布" placement="top-start" v-if="item.status==2">
+                                <el-button type="success" size="mini" style="padding:5px;" @click="changeProductStatus(item.productId,1)">已发布</el-button>
                             </el-tooltip>
-                            <el-tooltip class="item" effect="dark" content="现在发布" placement="top-start">
-                                <el-button type="info" size="mini" style="padding:5px;" v-if="item.status==1" @click="changeProductStatus(item.productId,2)">未发布</el-button>
+                            <el-tooltip class="item" effect="dark" content="现在发布" placement="top-start" v-if="item.status==1">
+                                <el-button type="info" size="mini" style="padding:5px;" @click="changeProductStatus(item.productId,2)">未发布</el-button>
                             </el-tooltip>
                         </el-col>
                     </el-row>
