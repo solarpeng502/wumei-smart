@@ -16,10 +16,10 @@ String userId="1";
 String productId="1"; 
 float rssi=0;
 float firmwareVersion=1.1;
-// wifi
+// Wifi配置
 char *wifiSsid="huawei";
 char *wifiPwd="15208747707";
-// mqtt
+// Mqtt配置
 char *mqttHost="wumei.live";
 int mqttPort=1883;
 char *mqttUserName="wumei-smart";
@@ -28,7 +28,7 @@ char mqttSecret[17]="KHR00FS8T30ISD7S";
 char wumei_iv[17]="wumei-smart-open"; 
 int publishNum=0;
 long publishInterval=600;
-// ntp
+// NTP地址
 String ntpServer="http://wumei.live:8080/iot/tool/ntp?deviceSendTime=";
 
 // 订阅的主题
