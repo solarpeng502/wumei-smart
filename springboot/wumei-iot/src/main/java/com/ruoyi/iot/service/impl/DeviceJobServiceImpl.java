@@ -157,15 +157,15 @@ public class DeviceJobServiceImpl implements IDeviceJobService
     public void deleteJobByDeviceIds(Long[] deviceIds) throws SchedulerException
     {
         // 查出所有job
-//        List<DeviceJob> deviceJobs=jobMapper.selectJobListByDeviceIds(deviceIds);
-//
-//        // 批量删除job
-//        int rows=jobMapper.deleteJobByDeviceIds(deviceIds);
+        List<DeviceJob> deviceJobs=jobMapper.selectShortJobListByDeviceIds(deviceIds);
+
+        // 批量删除job
+        int rows=jobMapper.deleteJobByDeviceIds(deviceIds);
 
         // 批量删除调度器
-//        for(DeviceJob job:deviceJobs){
-//            scheduler.deleteJob(ScheduleUtils.getJobKey(job.getJobId(), job.getJobGroup()));
-//        }
+        for(DeviceJob job:deviceJobs){
+            scheduler.deleteJob(ScheduleUtils.getJobKey(job.getJobId(), job.getJobGroup()));
+        }
 
     }
 

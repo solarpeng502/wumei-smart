@@ -34,6 +34,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		from iot_device_job
     </sql>
 	
+	<select id="selectShortJobListByDeviceIds" parameterType="Long" resultMap="DeviceJobResult">
+		select job_id, job_name, job_group from iot_device_job
+		where device_id in
+		<foreach collection="array" item="deviceId" open="(" separator="," close=")">
+			#{deviceId}
+		</foreach>
+	</select>
+
 	<select id="selectJobList" parameterType="DeviceJob" resultMap="DeviceJobResult">
 		<include refid="selectJobVo"/>
 		<where>
@@ -69,6 +77,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			#{jobId}
         </foreach> 
  	</delete>
+
+	<delete id="deleteJobByDeviceIds" parameterType="Long">
+		delete from iot_device_job where device_id in
+		<foreach collection="array" item="deviceId" open="(" separator="," close=")">
+			#{deviceId}
+		</foreach>
+	</delete>
  	
  	<update id="updateJob" parameterType="DeviceJob">
  		update iot_device_job

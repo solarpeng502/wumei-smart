@@ -6,7 +6,6 @@ import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.iot.domain.Device;
 import com.ruoyi.iot.domain.DeviceLog;
-import com.ruoyi.iot.domain.DeviceUser;
 import com.ruoyi.iot.mapper.DeviceLogMapper;
 import com.ruoyi.iot.mapper.DeviceMapper;
 import com.ruoyi.iot.mapper.DeviceUserMapper;
@@ -352,16 +351,16 @@ public class DeviceServiceImpl implements IDeviceService {
         device.setTenantName(sysUser.getUserName());
         deviceMapper.insertDevice(device);
         // 添加设备用户
-        DeviceUser deviceUser = new DeviceUser();
-        deviceUser.setUserId(sysUser.getUserId());
-        deviceUser.setUserName(sysUser.getUserName());
-        deviceUser.setPhonenumber(sysUser.getPhonenumber());
-        deviceUser.setDeviceId(device.getDeviceId());
-        deviceUser.setDeviceName(device.getDeviceName());
-        deviceUser.setTenantId(device.getDeviceId());
-        deviceUser.setTenantName(device.getTenantName());
-        deviceUser.setIsOwner(1);
-        deviceUserMapper.insertDeviceUser(deviceUser);
+//        DeviceUser deviceUser = new DeviceUser();
+//        deviceUser.setUserId(sysUser.getUserId());
+//        deviceUser.setUserName(sysUser.getUserName());
+//        deviceUser.setPhonenumber(sysUser.getPhonenumber());
+//        deviceUser.setDeviceId(device.getDeviceId());
+//        deviceUser.setDeviceName(device.getDeviceName());
+//        deviceUser.setTenantId(device.getDeviceId());
+//        deviceUser.setTenantName(device.getTenantName());
+//        deviceUser.setIsOwner(1);
+//        deviceUserMapper.insertDeviceUser(deviceUser);
         return device;
     }
 
