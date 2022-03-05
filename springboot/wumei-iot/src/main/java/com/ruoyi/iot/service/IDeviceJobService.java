@@ -62,6 +62,14 @@ public interface IDeviceJobService
     public void deleteJobByIds(Long[] jobIds) throws SchedulerException;
 
     /**
+     * 根据设备Ids批量删除调度信息
+     *
+     * @param deviceIds 需要删除数据的设备Ids
+     * @return 结果
+     */
+    public void deleteJobByDeviceIds(Long[] deviceIds) throws SchedulerException;
+
+    /**
      * 任务调度状态修改
      * 
      * @param job 调度信息

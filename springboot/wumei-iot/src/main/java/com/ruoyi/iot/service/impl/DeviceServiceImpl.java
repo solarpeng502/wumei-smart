@@ -19,6 +19,7 @@ import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesInput;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesOutput;
 import com.ruoyi.iot.service.IDeviceService;
 import com.ruoyi.iot.service.IToolService;
+import org.quartz.SchedulerException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -47,6 +48,9 @@ public class DeviceServiceImpl implements IDeviceService {
 
     @Autowired
     private ThingsModelServiceImpl thingsModelService;
+
+    @Autowired
+    private DeviceJobServiceImpl deviceJobService;
 
     @Autowired
     private DeviceLogMapper deviceLogMapper;
@@ -456,14 +460,13 @@ public class DeviceServiceImpl implements IDeviceService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int deleteDeviceByDeviceIds(Long[] deviceIds) {
+    public int deleteDeviceByDeviceIds(Long[] deviceIds) throws SchedulerException {
         // 删除设备分组
         deviceMapper.deleteDeviceGroupByDeviceIds(deviceIds);
-        // 删除定时任务
-
         // 删除设备日志
-
-
+        deviceLogMapper.deleteDeviceLogByDeviceIds(deviceIds);
+        // 删除定时任务
+        deviceJobService.deleteJobByDeviceIds(deviceIds);
 
         // TODO 删除设备用户
         return deviceMapper.deleteDeviceByDeviceIds(deviceIds);

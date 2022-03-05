@@ -1,7 +1,8 @@
 package com.ruoyi.iot.service;
 
-import java.util.List;
 import com.ruoyi.iot.domain.DeviceLog;
+
+import java.util.List;
 
 /**
  * 设备日志Service接口
@@ -58,4 +59,12 @@ public interface IDeviceLogService
      * @return 结果
      */
     public int deleteDeviceLogByLogId(Long logId);
+
+    /**
+     * 根据设备IDs批量删除设备日志
+     *
+     * @param deviceIds 需要删除的设备日志IDs
+     * @return 结果
+     */
+    public int deleteDeviceLogByDeviceIds(Long[] deviceIds);
 }

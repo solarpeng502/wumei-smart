@@ -4,6 +4,7 @@ import com.ruoyi.iot.domain.Device;
 import com.ruoyi.iot.model.DeviceAuthenticateModel;
 import com.ruoyi.iot.model.DeviceShortOutput;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesInput;
+import org.quartz.SchedulerException;
 
 import java.util.List;
 
@@ -107,7 +108,7 @@ public interface IDeviceService
      * @param deviceIds 需要删除的设备主键集合
      * @return 结果
      */
-    public int deleteDeviceByDeviceIds(Long[] deviceIds);
+    public int deleteDeviceByDeviceIds(Long[] deviceIds) throws SchedulerException;
 
     /**
      * 删除设备信息

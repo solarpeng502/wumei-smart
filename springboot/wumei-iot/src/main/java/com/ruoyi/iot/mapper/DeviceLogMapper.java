@@ -1,7 +1,8 @@
 package com.ruoyi.iot.mapper;
 
-import java.util.List;
 import com.ruoyi.iot.domain.DeviceLog;
+
+import java.util.List;
 
 /**
  * 设备日志Mapper接口
@@ -58,4 +59,12 @@ public interface DeviceLogMapper
      * @return 结果
      */
     public int deleteDeviceLogByLogIds(Long[] logIds);
+
+    /**
+     * 根据设备Ids批量删除设备日志
+     *
+     * @param deviceIds 需要删除的数据设备Ids
+     * @return 结果
+     */
+    public int deleteDeviceLogByDeviceIds(Long[] deviceIds);
 }

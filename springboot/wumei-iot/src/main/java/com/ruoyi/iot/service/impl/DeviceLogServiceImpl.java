@@ -1,6 +1,5 @@
 package com.ruoyi.iot.service.impl;
 
-import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.iot.domain.DeviceLog;
 import com.ruoyi.iot.mapper.DeviceLogMapper;
@@ -9,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
-import static com.ruoyi.common.utils.SecurityUtils.getLoginUser;
 
 /**
  * 设备日志Service业务层处理
@@ -83,6 +80,18 @@ public class DeviceLogServiceImpl implements IDeviceLogService
     public int deleteDeviceLogByLogIds(Long[] logIds)
     {
         return deviceLogMapper.deleteDeviceLogByLogIds(logIds);
+    }
+
+    /**
+     * 根据设备Ids批量删除设备日志
+     *
+     * @param deviceIds 需要删除数据的设备Ids
+     * @return 结果
+     */
+    @Override
+    public int deleteDeviceLogByDeviceIds(Long[] deviceIds)
+    {
+        return deviceLogMapper.deleteDeviceLogByDeviceIds(deviceIds);
     }
 
     /**

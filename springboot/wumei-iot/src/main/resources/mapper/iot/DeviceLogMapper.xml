@@ -11,6 +11,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="logValue"    column="log_value"    />
         <result property="deviceId"    column="device_id"    />
         <result property="deviceName"    column="device_name"    />
+        <result property="serialNumber"    column="serial_number"    />
         <result property="identity"    column="identity"    />
         <result property="datatype"    column="datatype"    />
         <result property="createBy"    column="create_by"    />
@@ -20,7 +21,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectDeviceLogVo">
-        select log_id, log_name, log_type, log_value, device_id, device_name, identity, datatype, create_by, is_monitor, create_time, remark from iot_device_log
+        select log_id, log_name, log_type, log_value, device_id, device_name,serial_number identity, datatype, create_by, is_monitor, create_time, remark from iot_device_log
     </sql>
 
     <select id="selectDeviceLogList" parameterType="DeviceLog" resultMap="DeviceLogResult">
@@ -49,6 +50,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="logValue != null">log_value,</if>
             <if test="deviceId != null">device_id,</if>
             <if test="deviceName != null and deviceName != ''">device_name,</if>
+            <if test="serialNumber != null and serialNumber != ''">serial_number,</if>
             <if test="identity != null">identity,</if>
             <if test="datatype != null">datatype,</if>
             <if test="createBy != null">create_by,</if>
@@ -62,6 +64,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="logValue != null">#{logValue},</if>
             <if test="deviceId != null">#{deviceId},</if>
             <if test="deviceName != null and deviceName != ''">#{deviceName},</if>
+            <if test="serialNumber != null and serialNumber != ''">#{serialNumber},</if>
             <if test="identity != null">#{identity},</if>
             <if test="datatype != null">#{datatype},</if>
             <if test="createBy != null">#{createBy},</if>
@@ -79,6 +82,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="logValue != null">log_value = #{logValue},</if>
             <if test="deviceId != null">device_id = #{deviceId},</if>
             <if test="deviceName != null and deviceName != ''">device_name = #{deviceName},</if>
+            <if test="serialNumber != null and serialNumber != ''">serial_number = #{serialNumber},</if>
             <if test="identity != null">identity = #{identity},</if>
             <if test="datatype != null">datatype = #{datatype},</if>
             <if test="createBy != null">create_by = #{createBy},</if>
@@ -97,6 +101,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         delete from iot_device_log where log_id in 
         <foreach item="logId" collection="array" open="(" separator="," close=")">
             #{logId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteDeviceLogByDeviceIds" parameterType="String">
+        delete from iot_device_log where device_id in
+        <foreach item="logId" collection="array" open="(" separator="," close=")">
+            #{deviceId}
         </foreach>
     </delete>
 </mapper>

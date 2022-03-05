@@ -11,6 +11,7 @@ import com.ruoyi.iot.model.DeviceShortOutput;
 import com.ruoyi.iot.service.IDeviceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -125,8 +126,7 @@ public class DeviceController extends BaseController
     @Log(title = "设备", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{deviceIds}")
     @ApiOperation("批量删除设备")
-    public AjaxResult remove(@PathVariable Long[] deviceIds)
-    {
+    public AjaxResult remove(@PathVariable Long[] deviceIds) throws SchedulerException {
         return toAjax(deviceService.deleteDeviceByDeviceIds(deviceIds));
     }
 

@@ -147,6 +147,29 @@ public class DeviceJobServiceImpl implements IDeviceJobService
     }
 
     /**
+     * 根据设备Ids批量删除调度信息
+     *
+     * @param deviceIds 需要删除数据的设备Ids
+     * @return 结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteJobByDeviceIds(Long[] deviceIds) throws SchedulerException
+    {
+        // 查出所有job
+//        List<DeviceJob> deviceJobs=jobMapper.selectJobListByDeviceIds(deviceIds);
+//
+//        // 批量删除job
+//        int rows=jobMapper.deleteJobByDeviceIds(deviceIds);
+
+        // 批量删除调度器
+//        for(DeviceJob job:deviceJobs){
+//            scheduler.deleteJob(ScheduleUtils.getJobKey(job.getJobId(), job.getJobGroup()));
+//        }
+
+    }
+
+    /**
      * 任务调度状态修改
      * 
      * @param job 调度信息
