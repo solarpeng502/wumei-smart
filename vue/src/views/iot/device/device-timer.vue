@@ -429,6 +429,7 @@ export default {
                 alertId: 0, // 告警ID
                 actions: "",
             };
+            this.submitButtonLoading = false;
             this.timerRepeatValue = 1;
             this.timerWeekValue = [1, 2, 3, 4, 5, 6, 7];
             this.timerTimeValue = "";
@@ -587,6 +588,7 @@ export default {
                     // 设备信息
                     this.form.deviceId = this.deviceInfo.deviceId;
                     this.form.deviceName = this.deviceInfo.deviceName;
+                    this.form.serialNumber = this.deviceInfo.serialNumber;
                     this.form.productId = this.deviceInfo.productId;
                     this.form.productName = this.deviceInfo.productName;
                     // 按钮等待后端加载完
