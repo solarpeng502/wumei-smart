@@ -31,6 +31,10 @@ public class DeviceJob extends BaseEntity
     @Excel(name = "任务名称")
     private String jobName;
 
+    /** 设备编号 */
+    @Excel(name = "设备编号")
+    private String serialNumber;
+
     /** 设备id */
     private Long deviceId;
 
@@ -82,6 +86,18 @@ public class DeviceJob extends BaseEntity
     /** 告警ID */
     @Excel(name = "告警ID")
     private Long alertId;
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public String getSerialNumber() {
+        return serialNumber;
+    }
+
+    public void setSerialNumber(String serialNumber) {
+        this.serialNumber = serialNumber;
+    }
 
     public Integer getIsAdvance() {
         return isAdvance;

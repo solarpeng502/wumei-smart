@@ -1,10 +1,9 @@
 package com.ruoyi.iot.service;
 
-import java.beans.Transient;
-import java.util.List;
 import com.ruoyi.iot.domain.Group;
 import com.ruoyi.iot.model.DeviceGroupInput;
-import com.ruoyi.iot.model.IdOutput;
+
+import java.util.List;
 
 /**
  * 设备分组Service接口
@@ -49,7 +48,6 @@ public interface IGroupService
      * 分组下批量添加设备分组
      * @return
      */
-    @Transient
     public int updateDeviceGroups(DeviceGroupInput input);
 
     /**

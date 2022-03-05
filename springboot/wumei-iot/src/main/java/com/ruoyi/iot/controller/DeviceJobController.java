@@ -1,13 +1,11 @@
 package com.ruoyi.iot.controller;
 
 import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.exception.job.TaskException;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.iot.domain.DeviceJob;
 import com.ruoyi.iot.service.IDeviceJobService;
@@ -95,22 +93,6 @@ public class DeviceJobController extends BaseController
         {
             return error("修改任务'" + job.getJobName() + "'失败，Cron表达式不正确");
         }
-//        else if (StringUtils.containsIgnoreCase(job.getActions(), Constants.LOOKUP_RMI))
-//        {
-//            return error("修改任务'" + job.getJobName() + "'失败，目标字符串不允许'rmi://'调用");
-//        }
-//        else if (StringUtils.containsIgnoreCase(job.getActions(), Constants.LOOKUP_LDAP))
-//        {
-//            return error("修改任务'" + job.getJobName() + "'失败，目标字符串不允许'ldap://'调用");
-//        }
-//        else if (StringUtils.containsAnyIgnoreCase(job.getActions(), new String[] { Constants.HTTP, Constants.HTTPS }))
-//        {
-//            return error("修改任务'" + job.getJobName() + "'失败，目标字符串不允许'http(s)//'调用");
-//        }
-//        else if (StringUtils.containsAnyIgnoreCase(job.getActions(), Constants.JOB_ERROR_STR))
-//        {
-//            return error("修改任务'" + job.getJobName() + "'失败，目标字符串存在违规");
-//        }
         job.setUpdateBy(getUsername());
         return toAjax(jobService.updateJob(job));
     }

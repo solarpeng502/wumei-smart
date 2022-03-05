@@ -18,8 +18,8 @@ import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.beans.Transient;
 import java.util.Random;
 
 /**
@@ -68,7 +68,7 @@ public class ToolServiceImpl implements IToolService
      * 注册
      */
     @Override
-    @Transient
+    @Transactional(rollbackFor = Exception.class)
     public String register(RegisterUserInput registerBody)
     {
         String msg = "";

@@ -1,11 +1,10 @@
 package com.ruoyi.iot.mqtt;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.iot.domain.Device;
 import com.ruoyi.iot.domain.DeviceLog;
 import com.ruoyi.iot.model.NtpModel;
+import com.ruoyi.iot.model.SimpleThingsModel;
 import com.ruoyi.iot.model.ThingsModelItem.ThingsModelValueItemInput;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesInput;
 import com.ruoyi.iot.service.IDeviceLogService;
@@ -18,8 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.beans.Transient;
-import java.text.DateFormat;
 import java.util.List;
 
 @Service
@@ -37,6 +34,7 @@ public class EmqxService {
     private static final String prefix="/+/+/";
     private static final String suffixPost="/post";
     private static final String suffixGet="/get";
+
     private static final String info="info";
     private static final String ntp="ntp";
     private static final String ota="ota";
@@ -134,7 +132,7 @@ public class EmqxService {
      * 上报事件
      * @param message
      */
-    @Transient
+    // @Transactional(rollbackFor = Exception.class)
     private void reportEvent(Long productId,String deviceNum,String message){
         List<ThingsModelValueItemInput> thingsModelValueItemInputs=JSON.parseArray(message,ThingsModelValueItemInput.class);
         Device device =deviceService.selectDeviceBySerialNumber(deviceNum);
@@ -177,21 +175,18 @@ public class EmqxService {
         emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+"/"+status+suffixGet, "{\"status\":"+status+"}");
     }
 
-
-
     /**
      * 发布属性
      */
-    public void publishProperty(){
-
+    public void publishProperty(Long productId,String deviceNum,List<SimpleThingsModel> thingsList){
+        emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+"/"+property+suffixGet, JSON.toJSONString(thingsList));
     }
 
     /**
      * 发布功能
      */
-    public void publishFunction(){
-        // 物模型查询
-
+    public void publishFunction(Long productId,String deviceNum,List<SimpleThingsModel> thingsList){
+        emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+"/"+function+suffixGet, JSON.toJSONString(thingsList));
     }
 
 

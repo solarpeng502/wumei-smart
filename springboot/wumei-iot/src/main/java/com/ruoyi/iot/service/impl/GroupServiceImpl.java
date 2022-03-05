@@ -9,8 +9,8 @@ import com.ruoyi.iot.model.IdOutput;
 import com.ruoyi.iot.service.IGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.beans.Transient;
 import java.util.List;
 
 import static com.ruoyi.common.utils.SecurityUtils.getLoginUser;
@@ -99,7 +99,7 @@ public class GroupServiceImpl implements IGroupService
      * 分组下批量添加设备分组
      * @return
      */
-    @Transient
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public int updateDeviceGroups(DeviceGroupInput input){
         //删除分组下的所有关联设备
@@ -118,7 +118,7 @@ public class GroupServiceImpl implements IGroupService
      * @return 结果
      */
     @Override
-    @Transient
+    @Transactional(rollbackFor = Exception.class)
     public int deleteGroupByGroupIds(Long[] groupIds)
     {
         // 删除设备分组

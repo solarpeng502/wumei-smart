@@ -8,6 +8,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<id     property="jobId"          column="job_id"          />
 		<result property="jobName"        column="job_name"        />
 		<result property="jobGroup"       column="job_group"       />
+		<result property="serialNumber"    column="serial_number"  />
 		<result property="deviceId"       column="device_id"       />
 		<result property="deviceName"       column="device_name"   />
 		<result property="actions"       column="actions"          />
@@ -29,7 +30,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</resultMap>
 	
 	<sql id="selectJobVo">
-        select job_id, job_name, job_group, device_id,device_name,actions,is_advance, cron_expression, misfire_policy, concurrent, status, create_by, create_time, remark, job_type, product_id, product_name, scene_id, alert_id
+        select job_id, job_name, job_group,serial_number, device_id,device_name,actions,is_advance, cron_expression, misfire_policy, concurrent, status, create_by, create_time, remark, job_type, product_id, product_name, scene_id, alert_id
 		from iot_device_job
     </sql>
 	
@@ -76,6 +77,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="jobGroup != null and jobGroup != ''">job_group = #{jobGroup},</if>
  			<if test="deviceId != null and deviceId != ''">device_id = #{deviceId},</if>
 			<if test="deviceName != null and deviceName != ''">device_name = #{deviceName},</if>
+			<if test="serialNumber != null and serialNumber != ''">serial_number = #{serialNumber},</if>
 			<if test="actions != null and actions != ''">actions = #{actions},</if>
 			<if test="isAdvance != null and isAdvance != ''">is_advance = #{isAdvance},</if>
  			<if test="cronExpression != null and cronExpression != ''">cron_expression = #{cronExpression},</if>
@@ -101,6 +103,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="jobGroup != null and jobGroup != ''">job_group,</if>
  			<if test="deviceId != null and deviceId != ''">device_id,</if>
 			<if test="deviceName != null and deviceName != ''">device_name,</if>
+		    <if test="serialNumber != null and serialNumber != ''">serial_number,</if>
 			<if test="actions != null and actions != ''">actions,</if>
  			<if test="cronExpression != null and cronExpression != ''">cron_expression,</if>
  			<if test="misfirePolicy != null and misfirePolicy != ''">misfire_policy,</if>
@@ -121,6 +124,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="jobGroup != null and jobGroup != ''">#{jobGroup},</if>
  			<if test="deviceId != null and deviceId != ''">#{deviceId},</if>
 			<if test="deviceName != null and deviceName != ''">#{deviceName},</if>
+		    <if test="serialNumber != null and serialNumber != ''">#{serialNumber},</if>
 			<if test="actions != null and actions != ''">#{actions},</if>
  			<if test="cronExpression != null and cronExpression != ''">#{cronExpression},</if>
  			<if test="misfirePolicy != null and misfirePolicy != ''">#{misfirePolicy},</if>

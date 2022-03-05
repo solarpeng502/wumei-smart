@@ -1,6 +1,5 @@
 package com.ruoyi.iot.service.impl;
 
-import java.beans.Transient;
 import java.util.ArrayList;
 import java.util.List;
 

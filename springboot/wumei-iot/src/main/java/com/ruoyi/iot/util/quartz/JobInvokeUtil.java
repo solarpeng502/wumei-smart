@@ -1,19 +1,19 @@
 package com.ruoyi.iot.util.quartz;
 
-import com.ruoyi.common.utils.StringUtils;
+import com.alibaba.fastjson.JSON;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.iot.domain.DeviceJob;
-import com.ruoyi.quartz.domain.SysJob;
+import com.ruoyi.iot.model.Action;
+import com.ruoyi.iot.model.SimpleThingsModel;
+import com.ruoyi.iot.mqtt.EmqxService;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 任务执行工具
  *
- * @author ruoyi
+ * @author kerwincui
  */
 public class JobInvokeUtil
 {
@@ -24,19 +24,39 @@ public class JobInvokeUtil
      */
     public static void invokeMethod(DeviceJob deviceJob) throws Exception
     {
-        String actions = deviceJob.getActions();
         if(deviceJob.getJobType()==1){
-            // 定时
+            System.out.println("------------------------执行定时任务-----------------------------");
+            List<Action> actions= JSON.parseArray(deviceJob.getActions(),Action.class);
+            List<SimpleThingsModel> propertys=new ArrayList<>();
+            List<SimpleThingsModel> functions=new ArrayList<>();
+            for(int i=0;i<actions.size();i++){
+                SimpleThingsModel model=new SimpleThingsModel();
+                model.setId(actions.get(i).getId());
+                model.setValue(actions.get(i).getValue());
+                if(actions.get(i).getType()==1){
+                    propertys.add(model);
+                }else if(actions.get(i).getType()==2){
+                    functions.add(model);
+                }
+            }
+            EmqxService emqxService=SpringUtils.getBean(EmqxService.class);
+            // 发布属性
+            if(propertys.size()>0){
+                emqxService.publishProperty(deviceJob.getProductId(),deviceJob.getSerialNumber(),propertys);
+            }
+            // 发布功能
+            if(functions.size()>0){
+                emqxService.publishFunction(deviceJob.getProductId(),deviceJob.getSerialNumber(),functions);
+            }
 
-            System.out.println("------------------------执行了一次定时任务-----------------------------");
         }else if(deviceJob.getJobType()==2){
             // 告警
 
-            System.out.println("------------------------执行了一次告警-----------------------------");
+            System.out.println("------------------------执行告警-----------------------------");
         }else if(deviceJob.getJobType()==3){
             // 场景联动
 
-            System.out.println("------------------------执行了一次场景联动-----------------------------");
+            System.out.println("------------------------执行场景联动-----------------------------");
         }
     }
 

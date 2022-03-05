@@ -23,8 +23,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.beans.Transient;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -115,7 +115,7 @@ public class DeviceServiceImpl implements IDeviceService {
      * @return 设备
      */
     @Override
-    @Transient
+    @Transactional(rollbackFor = Exception.class)
     public int reportDeviceThingsModelValue(ThingsModelValuesInput input, int type) {
         // 查询物模型
         String thingsModels = thingsModelService.getCacheThingsModelByProductId(input.getProductId());
@@ -336,7 +336,7 @@ public class DeviceServiceImpl implements IDeviceService {
      * @return 结果
      */
     @Override
-    @Transient
+    @Transactional(rollbackFor = Exception.class)
     public Device insertDevice(Device device) {
         SysUser sysUser = getLoginUser().getUser();
         //添加设备
@@ -455,10 +455,17 @@ public class DeviceServiceImpl implements IDeviceService {
      * @return 结果
      */
     @Override
-    @Transient
+    @Transactional(rollbackFor = Exception.class)
     public int deleteDeviceByDeviceIds(Long[] deviceIds) {
         // 删除设备分组
         deviceMapper.deleteDeviceGroupByDeviceIds(deviceIds);
+        // 删除定时任务
+
+        // 删除设备日志
+
+
+
+        // TODO 删除设备用户
         return deviceMapper.deleteDeviceByDeviceIds(deviceIds);
     }
 

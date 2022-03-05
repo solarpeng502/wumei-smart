@@ -129,30 +129,56 @@ public class ToolController extends BaseController {
                     return returnUnauthorized(clientid,username,password,ex.getMessage());
                 }
             } else {
-                // 设备认证
+                // 设备
+                if(clientid.indexOf("&")==0){return returnUnauthorized(clientid,username,password,"认证信息有误");}
+                String deviceNum=clientid.substring(0,clientid.lastIndexOf("&"));
+                Long productId=Long.valueOf(clientid.substring(clientid.lastIndexOf("&")));
                 DeviceAuthenticateModel model = deviceService.selectDeviceAuthenticateBySerialNumber(clientid);
-                // 格式 password-expireTime
-                String decryptPassword = AESUtils.decrypt(password, model.getMqttSecret());
-                Long expireTime = Long.valueOf(decryptPassword.substring(decryptPassword.lastIndexOf("&") + 1));
-                String mqttPassword = decryptPassword.substring(0, decryptPassword.lastIndexOf("&"));
-                // 账号密码匹配，未过期、设备状态不是禁用(设备状态（1-未激活，2-禁用，3-在线，4-离线）)
-                if (mqttPassword.equals(model.getMqttPassword())
-                        && username.equals(model.getMqttAccount())
-                        && expireTime > System.currentTimeMillis()
-                        && model.getStatus() != 2) {
-                    System.out.println("-----------认证成功,clientId:"+clientid+"---------------");
-                    return ResponseEntity.ok().body("ok");
+                if(model==null){return returnUnauthorized(clientid,username,password,"认证信息有误");}
+                if(model.getDeviceId()!=null || model.getDeviceId()!=0){
+                    // 认证，密码加密格式 password & expireTime
+                    String decryptPassword = AESUtils.decrypt(password, model.getMqttSecret());
+                    Long expireTime = Long.valueOf(decryptPassword.substring(decryptPassword.lastIndexOf("&") + 1));
+                    String mqttPassword = decryptPassword.substring(0, decryptPassword.lastIndexOf("&"));
+                    // 账号密码匹配，未过期、设备状态不是禁用(设备状态（1-未激活，2-禁用，3-在线，4-离线）)
+                    if (mqttPassword.equals(model.getMqttPassword())
+                            && username.equals(model.getMqttAccount())
+                            && expireTime > System.currentTimeMillis()
+                            && model.getStatus() != 2) {
+                        System.out.println("-----------认证成功,clientId:"+clientid+"---------------");
+                        return ResponseEntity.ok().body("ok");
+                    }
+
+                }else{
+                    // 自动添加设备
+                    Device device=new Device();
+                    int random=(int)(Math.random()*(9000))+1000;
+                    device.setDeviceName("设备"+random);
+                    device.setSerialNumber(deviceService.generationDeviceNum());
+
+                    // 需要重新写一个方法
+                    //deviceService.insertDevice(device);
+
                 }
+
+
+
+
+
             }
         } catch (Exception ex) {
             // ex.printStackTrace();
             return returnUnauthorized(clientid,username,password,ex.getMessage());
         }
-        return returnUnauthorized(clientid,username,password,"");
+        return returnUnauthorized(clientid,username,password,"认证信息有误");
     }
 
     // 返回认证信息
     private ResponseEntity returnUnauthorized(String clientid,String username,String password,String message) {
+        System.out.println("认证失败："+message
+                +"\nclientid:"+clientid
+                +"\nusername:"+username
+                +"\npassword:"+password);
         log.error("认证失败："+message
                 +"\nclientid:"+clientid
                 +"\nusername:"+username
