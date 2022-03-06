@@ -229,6 +229,7 @@ export default {
     },
     created() {
         this.deviceList = [{
+                id:21,
                 name: '海门',
                 value: 9,
                 long: 121.15,
@@ -239,6 +240,7 @@ export default {
                 status: 1,
             },
             {
+                id:21,
                 name: '鄂尔多斯',
                 value: 12,
                 long: 109.781327,
@@ -249,6 +251,7 @@ export default {
                 status: 2
             },
             {
+                id:21,
                 name: '招远',
                 value: 12,
                 long: 120.38,
@@ -259,6 +262,7 @@ export default {
                 status: 3
             },
             {
+                id:21,
                 name: '海口',
                 value: 12,
                 long: 110.38,
@@ -336,14 +340,14 @@ export default {
                 tooltip: {
                     trigger: 'item',
                     formatter: function (params) {
-                        var htmlStr = '<div>';
-                        htmlStr += "名称: " + params.data.value + "<br />";
-                        htmlStr += "状态: " + params.data.value + "<br />";
-                        htmlStr += "影子: " + params.data.value + "<br />";
-                        htmlStr += "产品: " + params.data.value + "<br />";
-                        htmlStr += "版本: " + params.data.value + "<br />";
-                        htmlStr += "地址: " + params.data.value + "<br />";
-                        htmlStr += "激活时间: " + params.data.value + "<br />";
+                        var htmlStr = '<div style="padding:5px;line-height:28px;">';
+                        htmlStr += "设备名称： " + params.data.value + "<br />";
+                        htmlStr += "设备状态： " + "<span style='color:green'>在线</span>" + "<br />";
+                        htmlStr += "设备影子： " + "<span style='color:green'>启用</span>" + "<br />";
+                        htmlStr += "产品名称： " + params.data.value + "<br />";
+                        htmlStr += "固件版本： " + params.data.value + "<br />";
+                        htmlStr += "所在地址： " + params.data.value + "<br />";
+                        htmlStr += "激活时间： " + params.data.value + "<br />";
                         htmlStr += '</div>';
                         return htmlStr;
                     }

@@ -1,127 +1,133 @@
 <template>
 <div style="padding-left:20px;">
-    <el-row :gutter="10">
-        <el-col :span="24" id="parent">
-            <div id="monitor" ref="monitor" style="height:600px;width:1500px;"></div>
-        </el-col>
-        <el-col :span="24"></el-col>
-    </el-row>
+
+    <div v-for="(item,index) in dataList" :key="index" style="margin-bottom:50px;width:1200px;">
+        <el-card shadow="hover" :body-style="{ padding: '0px' }">
+            <div ref="statisticMap" style="height:300px;width:1200px;padding-bottom:20px;"></div>
+        </el-card>
+    </div>
+
 </div>
 </template>
 
 <script>
 import * as echarts from 'echarts';
-require('echarts/theme/macarons') // echarts theme
 export default {
     name: "device-statistic",
     data() {
         return {
-
+            dataList: []
         };
     },
     created() {
+        this.dataList = [{
+            id: "1",
+            name: "温度",
+            unit: "℃",
+            data: [21, 22, 23, 25, 26, 27, 21, 31],
+            date: ['2021-02-01', '2021-02-02', '2021-02-03', '2021-02-04', '2021-02-05', '2021-02-06', '2021-02-07', '2021-02-08']
+        }, {
+            id: "1",
+            name: "湿度",
+            unit: '%',
+            data: [30, 32, 23, 35, 40, 57, 21, 31],
+            date: ['2021-02-01', '2021-02-02', '2021-02-03', '2021-02-04', '2021-02-05', '2021-02-06', '2021-02-07', '2021-02-08']
+        }]
         this.$nextTick(function () {
-            this.getMonitor();
+            this.getStatistic();
         });
     },
     methods: {
-        /**监测数据 */
-        getMonitor() {
-            var myChart = echarts.init(this.$refs.monitor,"macarons");
-            var option;
+        /**监测统计数据 */
+        getStatistic() {
+            console.log(this.dataList);
+            for (let i = 0; i < this.dataList.length; i++) {
+                var myChart = echarts.init(this.$refs.statisticMap[i]);
+                var option;
 
-            let base = +new Date(2010, 9, 3);
-            let oneDay = 24 * 3600 * 100;
-            let date = [];
-            let data = [Math.random() * -10];
-            for (let i = 1; i < 20000; i++) {
-                var now = new Date((base += oneDay));
-                date.push([now.getFullYear(), now.getMonth() + 1, now.getDate(), now.getHours(), now.getMinutes()].join('/'));
-                data.push(Math.round((Math.random() - 0.5) * 2 + data[i - 1]));
-            }
-            option = {
-                tooltip: {
-                    trigger: 'axis',
-                    position: function (pt) {
-                        return [pt[0], '10%'];
-                    }
-                },
-                title: {
-                    left: 'center',
-                    text: '历史数据'
-                },
-                grid: {
-                    top: '50px',
-                    left: '30px',
-                    right: '50px',
-                    bottom: '50px',
-                    containLabel: true
-                },
-                toolbox: {
-                    feature: {
-                        dataZoom: {
-                            yAxisIndex: 'none'
-                        },
-                        restore: {},
-                        saveAsImage: {}
-                    }
-                },
-                xAxis: {
-                    type: 'category',
-                    boundaryGap: false,
-                    name: "时间", //坐标名字
-                    nameLocation: "end", //坐标位置，支持start,end，middle
-                    nameTextStyle: { //字体样式            
-                        fontSize: 16, //字体大小            
-                        padding: 2 //距离坐标位置的距离    
+                option = {
+                    tooltip: {
+                        trigger: 'axis',
+                        position: function (pt) {
+                            return [pt[0], '30%'];
+                        }
                     },
-                    data: date
-                },
-                yAxis: {
-                    type: 'value',
-                    boundaryGap: [0, '100%'],
-                    name: "温度", //坐标名字
-                    nameLocation: "end", //坐标位置，支持start,end，middle
-                    nameTextStyle: { //字体样式            
-                        fontSize: 16, //字体大小            
-                        padding: 2 //距离坐标位置的距离    
+                    title: {
+                        left: 'center',
+                        text: this.dataList[i].name+'统计 （单位 '+this.dataList[i].unit+"）",
                     },
-                },
-                dataZoom: [{
-                        type: 'inside',
-                        start: 0,
-                        end: 20
+                    grid: {
+                        top: '80px',
+                        left: '40px',
+                        right: '100px',
+                        bottom: '60px',
+                        containLabel: true
                     },
-                    {
-                        start: 0,
-                        end: 10
-                    }
-                ],
-                series: [{
-                    name: '温度',
-                    type: 'line',
-                    symbol: 'none',
-                    sampling: 'lttb',
-                    itemStyle: {
-                        color: 'rgb(64, 158, 255)'
-                    },
-                    areaStyle: {
-                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                                offset: 0,
-                                color: 'rgb(220, 220, 220)'
+                    toolbox: {
+                        feature: {
+                            dataZoom: {
+                                yAxisIndex: 'none'
                             },
-                            {
-                                offset: 1,
-                                color: 'rgb(64, 158, 255)'
-                            }
-                        ])
+                            restore: {},
+                            saveAsImage: {}
+                        }
                     },
-                    data: data
-                }]
-            };
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        name: "时间", //坐标名字
+                        nameLocation: "end", //坐标位置，支持start,end，middle
+                        nameTextStyle: { //字体样式            
+                            fontSize: 16, //字体大小            
+                            padding: 10 //距离坐标位置的距离    
+                        },
+                        data: this.dataList[i].date
+                    },
+                    yAxis: {
+                        type: 'value',
+                        boundaryGap: [0, '100%'],
+                        name: this.dataList[i].name, //坐标名字
+                        nameLocation: "end", //坐标位置，支持start,end，middle
+                        nameTextStyle: { //字体样式            
+                            fontSize: 16, //字体大小            
+                            padding: 10 //距离坐标位置的距离    
+                        },
+                    },
+                    dataZoom: [{
+                            type: 'inside',
+                            start: 0,
+                            end: 100
+                        },
+                        {
+                            start: 0,
+                            end: 100
+                        }
+                    ],
+                    series: [{
+                        name: '温度',
+                        type: 'line',
+                        symbol: 'none',
+                        sampling: 'lttb',
+                        itemStyle: {
+                            color: 'rgb(64, 158, 255)'
+                        },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                    offset: 0,
+                                    color: 'rgb(64, 158, 255)'
+                                },
+                                {
+                                    offset: 1,
+                                    color: 'rgb(255, 255, 255)'
+                                }
+                            ])
+                        },
+                        data: this.dataList[i].data
+                    }]
+                };
 
-            option && myChart.setOption(option);
-
+                option && myChart.setOption(option);
+            }
         },
     }
 };
