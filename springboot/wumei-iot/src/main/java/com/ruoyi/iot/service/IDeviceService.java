@@ -80,6 +80,14 @@ public interface IDeviceService
     public Device insertDevice(Device device);
 
     /**
+     * 设备认证后自动添加设备
+     *
+     * @param device 设备
+     * @return 结果
+     */
+    public Device insertDeviceAuto(Device device);
+
+    /**
      * 修改设备
      * 
      * @param device 设备
@@ -93,7 +101,7 @@ public interface IDeviceService
      * @param status 设备状态（1-未激活，2-禁用，3-在线，4-离线）
      * @return 结果
      */
-    public int updateDeviceStatus(String deviceNUm,int status);
+    public int updateDeviceStatusAndLocation(String deviceNUm,int status,String ipAddress);
 
     /**
      * 上报设备信息

@@ -12,7 +12,7 @@
             <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                 <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" style="z-index:1000">
                     <h3 class="title">账号登录</h3>
-                    <p style="text-align:center">项目开发中，请不要删除数据</p>
+                    <el-link type="danger" style="margin-bottom:10px;font-weight:bolder;font-size:16px;" :underline="false" target="_blank" href="http://wumei.live">项目马上发布，暂不提供演示。返回官网 >></el-link></el-link></el-link>
                     <el-form-item prop="username">
                         <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
                             <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
@@ -39,7 +39,7 @@
                         </el-button>
                         <div style="float: right;margin-top:10px;" v-if="register">
                             <a style="margin-right:20px;" target="_blank" href="http://wumei.live">返回官网</a>
-                            <router-link style="color:#fff;font-size:16px;" :to="'/register'">立即注册 >></router-link>
+                            <router-link style="color:#fff;font-size:16px;display:none;" :to="'/register'" >立即注册 >></router-link>
                         </div>
                     </el-form-item>
 
@@ -70,8 +70,8 @@ export default {
         return {
             codeUrl: "",
             loginForm: {
-                username: "admin",
-                password: "admin123",
+                username: "",
+                password: "",
                 rememberMe: false,
                 code: "",
                 uuid: ""

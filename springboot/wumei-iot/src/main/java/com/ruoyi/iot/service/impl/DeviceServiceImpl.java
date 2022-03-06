@@ -2,8 +2,12 @@ package com.ruoyi.iot.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.http.HttpUtils;
+import com.ruoyi.common.utils.ip.IpUtils;
 import com.ruoyi.iot.domain.Device;
 import com.ruoyi.iot.domain.DeviceLog;
 import com.ruoyi.iot.mapper.DeviceLogMapper;
@@ -19,6 +23,8 @@ import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesOutput;
 import com.ruoyi.iot.service.IDeviceService;
 import com.ruoyi.iot.service.IToolService;
 import org.quartz.SchedulerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -39,6 +45,8 @@ import static com.ruoyi.common.utils.SecurityUtils.getLoginUser;
  */
 @Service
 public class DeviceServiceImpl implements IDeviceService {
+    private static final Logger log = LoggerFactory.getLogger(DeviceServiceImpl.class);
+
     @Autowired
     private DeviceMapper deviceMapper;
 
@@ -365,6 +373,20 @@ public class DeviceServiceImpl implements IDeviceService {
     }
 
     /**
+     * 设备认证后自动添加设备
+     *
+     * @param device 设备
+     * @return 结果
+     */
+    @Override
+    public Device insertDeviceAuto(Device device) {
+        device.setCreateTime(DateUtils.getNowDate());
+        device.setThingsModelValue(JSONObject.toJSONString(getThingsModelDefaultValue(device.getProductId())));
+        deviceMapper.insertDevice(device);
+        return device;
+    }
+
+    /**
      * 获取物模型值
      * @param productId
      * @return
@@ -423,11 +445,66 @@ public class DeviceServiceImpl implements IDeviceService {
      * @return 结果
      */
     @Override
-    public int updateDeviceStatus(String deviceNum,int status) {
+    public int updateDeviceStatusAndLocation(String deviceNum,int status,String ipAddress) {
         Device device=new Device();
         device.setStatus(status);
         device.setSerialNumber(deviceNum);
+        // 设置定位
+        if(ipAddress!="") {
+            Device deviceEntity = deviceMapper.selectDeviceBySerialNumber(deviceNum);
+            if (deviceEntity.getIsCustomerLocation() == 1) {
+                device.setNetworkIp(ipAddress);
+                setLocation(ipAddress, device);
+            }
+        }
         return deviceMapper.updateDeviceStatus(device);
+    }
+
+    /**
+     * 根据IP获取地址
+     * @param ip
+     * @return
+     */
+    private void setLocation(String ip,Device device){
+        String IP_URL = "http://whois.pconline.com.cn/ipJson.jsp";
+        String address = "未知地址";
+        // 内网不查询
+        if (IpUtils.internalIp(ip))
+        {
+            device.setNetworkAddress( "内网IP");
+        }
+        try
+        {
+            String rspStr = HttpUtils.sendGet(IP_URL, "ip=" + ip + "&json=true", Constants.GBK);
+            if (!StringUtils.isEmpty(rspStr))
+            {
+                JSONObject obj = JSONObject.parseObject(rspStr);
+                device.setNetworkAddress(obj.getString("addr"));
+                System.out.println(device.getSerialNumber()+"- 设置地址："+obj.getString("addr"));
+                // 查询经纬度
+                setLatitudeAndLongitude(obj.getString("city"),device);
+            }
+
+        }
+        catch (Exception e){
+            log.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 设置经纬度
+     * @param city
+     */
+    private void setLatitudeAndLongitude(String city,Device device){
+        String BAIDU_URL="https://api.map.baidu.com/geocoder";
+        String baiduResponse = HttpUtils.sendGet(BAIDU_URL,"address="+city  + "&output=json", Constants.GBK);
+        if(StringUtils.isEmpty(baiduResponse)){
+            JSONObject baiduObject = JSONObject.parseObject(baiduResponse);
+            JSONObject location=baiduObject.getJSONObject("result").getJSONObject("location");
+            device.setLongitude(location.getBigDecimal("lng"));
+            device.setLatitude(location.getBigDecimal("lat"));
+            System.out.println(device.getSerialNumber()+"- 设置经度："+location.getBigDecimal("lng")+"，设置纬度："+location.getBigDecimal("lat"));
+        }
     }
 
     /**

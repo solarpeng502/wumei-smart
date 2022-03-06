@@ -6,6 +6,7 @@ import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.exception.file.FileNameLengthLimitExceededException;
@@ -15,6 +16,7 @@ import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.common.utils.file.MimeTypeUtils;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.iot.domain.Device;
+import com.ruoyi.iot.domain.Product;
 import com.ruoyi.iot.model.DeviceAuthenticateModel;
 import com.ruoyi.iot.model.MqttClientConnectModel;
 import com.ruoyi.iot.model.RegisterUserInput;
@@ -22,10 +24,12 @@ import com.ruoyi.iot.mqtt.EmqxService;
 import com.ruoyi.iot.mqtt.MqttConfig;
 import com.ruoyi.iot.service.ICategoryService;
 import com.ruoyi.iot.service.IDeviceService;
+import com.ruoyi.iot.service.IProductService;
 import com.ruoyi.iot.service.IToolService;
 import com.ruoyi.iot.util.AESUtils;
 import com.ruoyi.iot.util.VelocityInitializer;
 import com.ruoyi.iot.util.VelocityUtils;
+import com.ruoyi.system.service.ISysUserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.swagger.annotations.Api;
@@ -77,6 +81,12 @@ public class ToolController extends BaseController {
     private IDeviceService deviceService;
 
     @Autowired
+    private IProductService productService;
+
+    @Autowired
+    private ISysUserService userService;
+
+    @Autowired
     private TokenService tokenService;
 
     @Autowired
@@ -112,7 +122,7 @@ public class ToolController extends BaseController {
             if (clientid.startsWith("server") || clientid.startsWith("test")) {
                 // 服务端配置账号认证
                 if (mqttConfig.getusername().equals(username) && mqttConfig.getpassword().equals(password)) {
-                    System.out.println("-----------认证成功,clientId:"+clientid+"---------------");
+                    System.out.println("-----------认证成功,clientId:" + clientid + "---------------");
                     return ResponseEntity.ok().body("ok");
                 }
             } else if (clientid.startsWith("web") || clientid.startsWith("phone")) {
@@ -123,66 +133,73 @@ public class ToolController extends BaseController {
                 }
                 try {
                     Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
-                    System.out.println("-----------认证成功,clientId:"+clientid+"---------------");
+                    System.out.println("-----------认证成功,clientId:" + clientid + "---------------");
                     return ResponseEntity.ok().body("ok");
                 } catch (Exception ex) {
-                    return returnUnauthorized(clientid,username,password,ex.getMessage());
+                    return returnUnauthorized(clientid, username, password, ex.getMessage());
                 }
             } else {
-                // 设备
-                if(clientid.indexOf("&")==0){return returnUnauthorized(clientid,username,password,"认证信息有误");}
-                String deviceNum=clientid.substring(0,clientid.lastIndexOf("&"));
-                Long productId=Long.valueOf(clientid.substring(clientid.lastIndexOf("&")));
+                // 设备认证
                 DeviceAuthenticateModel model = deviceService.selectDeviceAuthenticateBySerialNumber(clientid);
-                if(model==null){return returnUnauthorized(clientid,username,password,"认证信息有误");}
-                if(model.getDeviceId()!=null || model.getDeviceId()!=0){
-                    // 认证，密码加密格式 password & expireTime
-                    String decryptPassword = AESUtils.decrypt(password, model.getMqttSecret());
-                    Long expireTime = Long.valueOf(decryptPassword.substring(decryptPassword.lastIndexOf("&") + 1));
-                    String mqttPassword = decryptPassword.substring(0, decryptPassword.lastIndexOf("&"));
+                if (model == null) {
+                    return returnUnauthorized(clientid, username, password, "认证信息有误");
+                }
+                // 密码解密，密码加密格式 password & productId & userId & expireTime
+                String decryptPassword = AESUtils.decrypt(password, model.getMqttSecret());
+                if (decryptPassword == null || decryptPassword == "") {
+                    return returnUnauthorized(clientid, username, password, "认证信息有误");
+                }
+                String[] infos = decryptPassword.split("&");
+                if (infos.length != 4) {
+                    return returnUnauthorized(clientid, username, password, "认证信息有误");
+                }
+                String mqttPassword = infos[0];
+                Long productId = Long.valueOf(infos[1]);
+                Long userId = Long.valueOf(infos[2]);
+                Long expireTime = Long.valueOf(infos[3]);
+                if (model.getDeviceId() != null || model.getDeviceId() != 0) {
                     // 账号密码匹配，未过期、设备状态不是禁用(设备状态（1-未激活，2-禁用，3-在线，4-离线）)
                     if (mqttPassword.equals(model.getMqttPassword())
                             && username.equals(model.getMqttAccount())
                             && expireTime > System.currentTimeMillis()
                             && model.getStatus() != 2) {
-                        System.out.println("-----------认证成功,clientId:"+clientid+"---------------");
+                        System.out.println("-----------认证成功,clientId:" + clientid + "---------------");
                         return ResponseEntity.ok().body("ok");
                     }
-
-                }else{
+                } else {
                     // 自动添加设备
-                    Device device=new Device();
-                    int random=(int)(Math.random()*(9000))+1000;
-                    device.setDeviceName("设备"+random);
-                    device.setSerialNumber(deviceService.generationDeviceNum());
-
-                    // 需要重新写一个方法
-                    //deviceService.insertDevice(device);
-
+                    Device device = new Device();
+                    int random = (int) (Math.random() * (9000)) + 1000;
+                    device.setDeviceName("设备" + random);
+                    device.setSerialNumber(clientid);
+                    SysUser user=userService.selectUserById(userId);
+                    device.setUserId(userId);
+                    device.setUserName(user.getUserName());
+                    Product product=productService.selectProductByProductId(productId);
+                    device.setProductId(productId);
+                    device.setProductName(product.getProductName());
+                    deviceService.insertDeviceAuto(device);
                 }
-
-
-
-
-
             }
         } catch (Exception ex) {
             // ex.printStackTrace();
-            return returnUnauthorized(clientid,username,password,ex.getMessage());
+            return returnUnauthorized(clientid, username, password, ex.getMessage());
         }
-        return returnUnauthorized(clientid,username,password,"认证信息有误");
+        return returnUnauthorized(clientid, username, password, "认证信息有误");
     }
 
-    // 返回认证信息
-    private ResponseEntity returnUnauthorized(String clientid,String username,String password,String message) {
-        System.out.println("认证失败："+message
-                +"\nclientid:"+clientid
-                +"\nusername:"+username
-                +"\npassword:"+password);
-        log.error("认证失败："+message
-                +"\nclientid:"+clientid
-                +"\nusername:"+username
-                +"\npassword:"+password);
+    /**
+     * 返回认证信息
+     */
+    private ResponseEntity returnUnauthorized(String clientid, String username, String password, String message) {
+        System.out.println("认证失败：" + message
+                + "\nclientid:" + clientid
+                + "\nusername:" + username
+                + "\npassword:" + password);
+        log.error("认证失败：" + message
+                + "\nclientid:" + clientid
+                + "\nusername:" + username
+                + "\npassword:" + password);
         return ResponseEntity.status(401).body("Unauthorized");
     }
 
@@ -201,25 +218,23 @@ public class ToolController extends BaseController {
             // 设备状态（1-未激活，2-禁用，3-在线，4-离线）
             if (model.getAction().equals("client_disconnected")) {
                 String ip = model.getIpaddress();
-                deviceService.updateDeviceStatus(device.getSerialNumber(), 4);
+                deviceService.updateDeviceStatusAndLocation(device.getSerialNumber(), 4, "");
                 emqxService.publishStatus(device.getProductId(), device.getSerialNumber(), 4);
             } else if (model.getAction().equals("client_connected")) {
-                // TODO 更新设备的地址
-
-                deviceService.updateDeviceStatus(device.getSerialNumber(), 3);
+                deviceService.updateDeviceStatusAndLocation(device.getSerialNumber(), 3, model.getIpaddress());
                 emqxService.publishStatus(device.getProductId(), device.getSerialNumber(), 3);
             }
-        }catch(Exception ex){
+        } catch (Exception ex) {
             // ex.printStackTrace();
-            System.out.println("发生错误："+ex.getMessage());
-            log.error("发生错误："+ex.getMessage());
+            System.out.println("发生错误：" + ex.getMessage());
+            log.error("发生错误：" + ex.getMessage());
         }
         return AjaxResult.success();
     }
 
     @ApiOperation("获取NTP时间")
     @GetMapping("/ntp")
-    public JSONObject ntp(@RequestParam Long deviceSendTime){
+    public JSONObject ntp(@RequestParam Long deviceSendTime) {
         JSONObject ntpJson = new JSONObject();
         ntpJson.put("deviceSendTime", deviceSendTime);
         ntpJson.put("serverRecvTime", System.currentTimeMillis());
@@ -246,7 +261,8 @@ public class ToolController extends BaseController {
             // 获取文件名和文件类型
             String fileName = file.getOriginalFilename();
             String extension = getExtension(file);
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MMdd-HHmmss");//设置日期格式
+            //设置日期格式
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MMdd-HHmmss");
             fileName = "/iot/" + getLoginUser().getUserId().toString() + "/" + df.format(new Date()) + "." + extension;
             //创建目录
             File desc = new File(filePath + File.separator + fileName);
