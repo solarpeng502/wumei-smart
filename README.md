@@ -37,6 +37,7 @@
 - 视频流处理（进度0%）
 - 桌面端模拟器/监控（进度0%）
 - 安卓端模拟器/监控（进度0%）
+- App和小程序（正在开发中...）
 
 
 
@@ -96,13 +97,5 @@ download ------------------------------------------------------- 工具下载<br
 ![图片一](https://raw.githubusercontent.com/kerwincui/wumei-smart/master/document/08.png)
 ![图片一](https://raw.githubusercontent.com/kerwincui/wumei-smart/master/document/09.png)
 
-
-* 手机端（开发中）
-
-
-* 电脑端监控/模拟器（开发中）
-
-
-* 安卓端监控/模拟器（开发中）
 
 
