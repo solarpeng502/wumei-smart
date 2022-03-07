@@ -1,6 +1,7 @@
 package com.ruoyi.iot.mapper;
 
 import com.ruoyi.iot.domain.Device;
+import com.ruoyi.iot.model.AuthenticateInputModel;
 import com.ruoyi.iot.model.DeviceAllShortOutput;
 import com.ruoyi.iot.model.DeviceAuthenticateModel;
 import com.ruoyi.iot.model.DeviceShortOutput;
@@ -36,10 +37,10 @@ public interface DeviceMapper
     /**
      * 根据设备编号查询设备认证信息
      *
-     * @param serialNumber 设备主键
+     * @param model 设备编号和产品ID
      * @return 设备
      */
-    public DeviceAuthenticateModel selectDeviceAuthenticateBySerialNumber(String serialNumber);
+    public DeviceAuthenticateModel selectDeviceAuthenticate(AuthenticateInputModel model);
 
     /**
      * 查询设备和运行状态

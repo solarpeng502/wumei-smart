@@ -13,6 +13,7 @@ import com.ruoyi.iot.domain.DeviceLog;
 import com.ruoyi.iot.mapper.DeviceLogMapper;
 import com.ruoyi.iot.mapper.DeviceMapper;
 import com.ruoyi.iot.mapper.DeviceUserMapper;
+import com.ruoyi.iot.model.AuthenticateInputModel;
 import com.ruoyi.iot.model.DeviceAllShortOutput;
 import com.ruoyi.iot.model.DeviceAuthenticateModel;
 import com.ruoyi.iot.model.DeviceShortOutput;
@@ -91,12 +92,12 @@ public class DeviceServiceImpl implements IDeviceService {
     /**
      * 根据设备编号查询设备认证信息
      *
-     * @param serialNumber 设备主键
+     * @param model 设备编号和产品ID
      * @return 设备
      */
     @Override
-    public DeviceAuthenticateModel selectDeviceAuthenticateBySerialNumber(String serialNumber) {
-        return deviceMapper.selectDeviceAuthenticateBySerialNumber(serialNumber);
+    public DeviceAuthenticateModel selectDeviceAuthenticate(AuthenticateInputModel model) {
+        return deviceMapper.selectDeviceAuthenticate(model);
     }
 
     /**

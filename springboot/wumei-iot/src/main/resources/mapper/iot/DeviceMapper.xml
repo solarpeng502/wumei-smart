@@ -150,11 +150,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where device_id = #{deviceId}
     </select>
 
-    <select id="selectDeviceAuthenticateBySerialNumber" parameterType="String" resultMap="DeviceAuthenticateResult">
-        select d.device_id, d.device_name,d.status, d.product_id, d.product_name, d.serial_number ,p.mqtt_password,p.mqtt_account,p.mqtt_secret
-        from iot_device d
-        left join iot_product p on d.product_id=p.product_id
-        where serial_number = #{serialNumber}
+    <select id="selectDeviceAuthenticate" parameterType="com.ruoyi.iot.model.AuthenticateInputModel" resultMap="DeviceAuthenticateResult">
+        SELECT p.mqtt_password,p.mqtt_account, p.mqtt_secret,d.device_id,d.device_name,d.STATUS,d.product_id,d.product_name,d.serial_number
+        FROM iot_product p
+                LEFT JOIN ( SELECT device_id, device_name, STATUS, product_id, product_name, serial_number
+                FROM iot_device
+                WHERE serial_number = #{serialNumber} ) AS d ON d.product_id = p.product_id
+        WHERE
+            p.product_id = #{productId}
     </select>
 
     <select id="selectDeviceBySerialNumber" parameterType="String" resultMap="DeviceResult">

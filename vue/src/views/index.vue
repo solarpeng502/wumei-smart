@@ -337,7 +337,7 @@ export default {
             };
             option = {
                 title: {
-                    text: '设备分布（数量 '+this.deviceCount+'）',
+                    text: '设备分布和状态（数量 '+this.deviceCount+'）',
                     subtext: 'wumei-smart open source living iot platform',
                     sublink: 'https://iot.wumei.live',
                     target: "_blank",

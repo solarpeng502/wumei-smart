@@ -17,6 +17,7 @@ import com.ruoyi.common.utils.file.MimeTypeUtils;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.iot.domain.Device;
 import com.ruoyi.iot.domain.Product;
+import com.ruoyi.iot.model.AuthenticateInputModel;
 import com.ruoyi.iot.model.DeviceAuthenticateModel;
 import com.ruoyi.iot.model.MqttClientConnectModel;
 import com.ruoyi.iot.model.RegisterUserInput;
@@ -140,7 +141,14 @@ public class ToolController extends BaseController {
                 }
             } else {
                 // 设备认证
-                DeviceAuthenticateModel model = deviceService.selectDeviceAuthenticateBySerialNumber(clientid);
+                String[] clientInfo=clientid.split("&");
+                if (clientInfo.length != 2) {
+                    return returnUnauthorized(clientid, username, password, "认证信息有误");
+                }
+                String deviceNum=clientInfo[0];
+                Long productId=Long.valueOf(clientInfo[1]);
+                AuthenticateInputModel authenticateInputModel=new AuthenticateInputModel(deviceNum,productId);
+                DeviceAuthenticateModel model = deviceService.selectDeviceAuthenticate(authenticateInputModel);
                 if (model == null) {
                     return returnUnauthorized(clientid, username, password, "认证信息有误");
                 }
@@ -150,13 +158,12 @@ public class ToolController extends BaseController {
                     return returnUnauthorized(clientid, username, password, "认证信息有误");
                 }
                 String[] infos = decryptPassword.split("&");
-                if (infos.length != 4) {
+                if (infos.length != 3) {
                     return returnUnauthorized(clientid, username, password, "认证信息有误");
                 }
                 String mqttPassword = infos[0];
-                Long productId = Long.valueOf(infos[1]);
-                Long userId = Long.valueOf(infos[2]);
-                Long expireTime = Long.valueOf(infos[3]);
+                Long userId = Long.valueOf(infos[1]);
+                Long expireTime = Long.valueOf(infos[2]);
                 if (model.getDeviceId() != null || model.getDeviceId() != 0) {
                     // 账号密码匹配，未过期、设备状态不是禁用(设备状态（1-未激活，2-禁用，3-在线，4-离线）)
                     if (mqttPassword.equals(model.getMqttPassword())
