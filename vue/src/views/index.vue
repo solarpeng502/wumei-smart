@@ -186,6 +186,8 @@ export default {
         return {
             // 设备列表
             deviceList: [],
+            // 设备总数
+            deviceCount:0,
             // emqx状态数据
             stats: {},
             // emqx统计信息
@@ -274,7 +276,7 @@ export default {
         getAllDevice() {
             listAllDeviceShort().then(response => {
                 this.deviceList = response.rows;
-                console.log(this.deviceList);
+                this.deviceCount=response.total;
                 this.$nextTick(() => {
                     loadBMap().then(() => {
                         this.getmap();
@@ -331,12 +333,11 @@ export default {
                         });
                     }
                 }
-                console.log(res);
                 return res;
             };
             option = {
                 title: {
-                    text: '设备分布（数量 5）',
+                    text: '设备分布（数量 '+this.deviceCount+'）',
                     subtext: 'wumei-smart open source living iot platform',
                     sublink: 'https://iot.wumei.live',
                     target: "_blank",
@@ -344,7 +345,6 @@ export default {
                         color: '#333',
                         textBorderColor: '#fff',
                         textBorderWidth: 10,
-                        fontSize: 20
                     },
                     top: 10,
                     left: 'center'

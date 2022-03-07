@@ -1,12 +1,13 @@
 package com.ruoyi.iot.domain;
 
-import java.math.BigDecimal;
-import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 设备对象 iot_device
@@ -96,17 +97,17 @@ public class Device extends BaseEntity
     private String imgUrl;
 
     /** 是否自定义位置 **/
-    private Integer isCustomerLocation;
+    private Integer isCustomLocation;
 
     /** 删除标志（0代表存在 2代表删除） */
     private String delFlag;
 
-    public Integer getIsCustomerLocation() {
-        return isCustomerLocation;
+    public Integer getIsCustomLocation() {
+        return isCustomLocation;
     }
 
-    public void setIsCustomerLocation(Integer isCustomerLocation) {
-        this.isCustomerLocation = isCustomerLocation;
+    public void setIsCustomLocation(Integer isCustomLocation) {
+        this.isCustomLocation = isCustomLocation;
     }
 
     public String getImgUrl() {

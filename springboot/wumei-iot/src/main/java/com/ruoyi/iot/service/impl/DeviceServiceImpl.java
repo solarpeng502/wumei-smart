@@ -463,7 +463,7 @@ public class DeviceServiceImpl implements IDeviceService {
         // 设置定位
         if(ipAddress!="") {
             Device deviceEntity = deviceMapper.selectDeviceBySerialNumber(deviceNum);
-            if (deviceEntity.getIsCustomerLocation() == 1) {
+            if (deviceEntity.getIsCustomLocation() == 1) {
                 device.setNetworkIp(ipAddress);
                 setLocation(ipAddress, device);
             }
