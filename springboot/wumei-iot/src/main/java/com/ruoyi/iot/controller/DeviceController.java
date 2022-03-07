@@ -7,6 +7,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.iot.domain.Device;
+import com.ruoyi.iot.model.DeviceAllShortOutput;
 import com.ruoyi.iot.model.DeviceShortOutput;
 import com.ruoyi.iot.service.IDeviceService;
 import io.swagger.annotations.Api;
@@ -56,6 +57,18 @@ public class DeviceController extends BaseController
     {
         startPage();
         List<DeviceShortOutput> list = deviceService.selectDeviceShortList(device);
+        return getDataTable(list);
+    }
+
+    /**
+     * 查询所有设备简短列表
+     */
+    @PreAuthorize("@ss.hasPermi('iot:device:list')")
+    @GetMapping("/all")
+    @ApiOperation("查询所有设备简短列表")
+    public TableDataInfo allShortList()
+    {
+        List<DeviceAllShortOutput> list = deviceService.selectAllDeviceShortList();
         return getDataTable(list);
     }
 

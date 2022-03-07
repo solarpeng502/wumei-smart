@@ -1,6 +1,7 @@
 package com.ruoyi.iot.service;
 
 import com.ruoyi.iot.domain.Device;
+import com.ruoyi.iot.model.DeviceAllShortOutput;
 import com.ruoyi.iot.model.DeviceAuthenticateModel;
 import com.ruoyi.iot.model.DeviceShortOutput;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesInput;
@@ -62,6 +63,13 @@ public interface IDeviceService
      * @return 设备集合
      */
     public List<Device> selectDeviceList(Device device);
+
+    /**
+     * 查询所有设备简短列表
+     *
+     * @return 设备
+     */
+    public List<DeviceAllShortOutput> selectAllDeviceShortList();
 
     /**
      * 查询设备简短列表

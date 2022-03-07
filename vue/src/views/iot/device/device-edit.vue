@@ -48,22 +48,22 @@
                             <el-image style="height:225px;border:1px solid #dee4ed;border-radius:5px;padding:5px;" :src="imageUrl" :preview-src-list="[imageUrl]" fit="cover"></el-image>
                         </el-form-item>
                         -->
-                        <el-form-item label="自定义位置" prop="isCustomerLocation">
-                            <el-switch v-model="form.isCustomerLocation" active-text="" inactive-text="" :active-value="1" :inactive-value="0">
+                        <el-form-item label="自定义位置" prop="isCustomLocation">
+                            <el-switch v-model="form.isCustomLocation" active-text="" inactive-text="" :active-value="1" :inactive-value="0">
                             </el-switch>
                         </el-form-item>
                         <el-form-item label="设备经度" prop="longitude">
-                            <el-input v-model="form.longitude" placeholder="请输入设备经度" type="number" :disabled="form.isCustomerLocation==0">
+                            <el-input v-model="form.longitude" placeholder="请输入设备经度" type="number" :disabled="form.isCustomLocation==0">
                                 <el-link slot="append" :underline="false" href="https://api.map.baidu.com/lbsapi/getpoint/index.html" target="_blank">坐标拾取</el-link>
                             </el-input>
                         </el-form-item>
                         <el-form-item label="设备纬度" prop="latitude">
-                            <el-input v-model="form.latitude" placeholder="请输入设备纬度" type="number" :disabled="form.isCustomerLocation==0">
+                            <el-input v-model="form.latitude" placeholder="请输入设备纬度" type="number" :disabled="form.isCustomLocation==0">
                                 <el-link slot="append" :underline="false" href="https://api.map.baidu.com/lbsapi/getpoint/index.html" target="_blank">坐标拾取</el-link>
                             </el-input>
                         </el-form-item>
                         <el-form-item label="所在地址" prop="networkAddress">
-                            <el-input v-model="form.networkAddress" placeholder="请输入设备所在地址" :disabled="form.isCustomerLocation==0" />
+                            <el-input v-model="form.networkAddress" placeholder="请输入设备所在地址" :disabled="form.isCustomLocation==0" />
                         </el-form-item>
                         <el-form-item label="入网地址" prop="networkIp">
                             <el-input v-model="form.networkIp" placeholder="设备入网IP" disabled />
@@ -276,7 +276,7 @@ export default {
                 updateBy: null,
                 updateTime: null,
                 remark: null,
-                isCustomerLocation: 0,
+                isCustomLocation: 0,
             };
             this.deviceStatus=0;
             this.resetForm("form");

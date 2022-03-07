@@ -87,6 +87,9 @@ public class DeviceShortOutput
     @Excel(name = "激活时间", width = 30, dateFormat = "yyyy-MM-dd")
     private Date activeTime;
 
+    /** 是否自定义位置 **/
+    private Integer isCustomLocation;
+
     /** 图片地址 */
     private String imgUrl;
 
@@ -97,6 +100,14 @@ public class DeviceShortOutput
     private List<ArrayModelOutput> arrayList;
     private List<BoolModelOutput> boolList;
     private List<ReadOnlyModelOutput> readOnlyList;
+
+    public Integer getIsCustomLocation() {
+        return isCustomLocation;
+    }
+
+    public void setIsCustomLocation(Integer isCustomLocation) {
+        this.isCustomLocation = isCustomLocation;
+    }
 
     public String getImgUrl() {
         return imgUrl;

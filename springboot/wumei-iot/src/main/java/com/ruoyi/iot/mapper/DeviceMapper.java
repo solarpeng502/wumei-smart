@@ -1,6 +1,7 @@
 package com.ruoyi.iot.mapper;
 
 import com.ruoyi.iot.domain.Device;
+import com.ruoyi.iot.model.DeviceAllShortOutput;
 import com.ruoyi.iot.model.DeviceAuthenticateModel;
 import com.ruoyi.iot.model.DeviceShortOutput;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesInput;
@@ -80,6 +81,13 @@ public interface DeviceMapper
      * @return 设备集合
      */
     public List<DeviceShortOutput> selectDeviceShortList(Device device);
+
+    /**
+     * 查询所有设备简短列表
+     *
+     * @return 设备集合
+     */
+    public List<DeviceAllShortOutput> selectAllDeviceShortList();
 
     /**
      * 新增设备

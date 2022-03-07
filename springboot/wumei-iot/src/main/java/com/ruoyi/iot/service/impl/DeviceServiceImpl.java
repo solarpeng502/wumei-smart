@@ -13,6 +13,7 @@ import com.ruoyi.iot.domain.DeviceLog;
 import com.ruoyi.iot.mapper.DeviceLogMapper;
 import com.ruoyi.iot.mapper.DeviceMapper;
 import com.ruoyi.iot.mapper.DeviceUserMapper;
+import com.ruoyi.iot.model.DeviceAllShortOutput;
 import com.ruoyi.iot.model.DeviceAuthenticateModel;
 import com.ruoyi.iot.model.DeviceShortOutput;
 import com.ruoyi.iot.model.ThingsModelItem.*;
@@ -203,6 +204,17 @@ public class DeviceServiceImpl implements IDeviceService {
     }
 
     /**
+     * 查询所有设备简短列表
+     *
+     * @return 设备
+     */
+    @Override
+    public List<DeviceAllShortOutput> selectAllDeviceShortList() {
+        // TODO redis缓存
+        return deviceMapper.selectAllDeviceShortList();
+    }
+
+    /**
      * 查询设备简短列表
      *
      * @param device 设备
@@ -211,7 +223,6 @@ public class DeviceServiceImpl implements IDeviceService {
     @Override
     public List<DeviceShortOutput> selectDeviceShortList(Device device) {
         // TODO 关联设备用户表
-
         List<DeviceShortOutput> deviceList = deviceMapper.selectDeviceShortList(device);
         for (int i = 0; i < deviceList.size(); i++) {
             JSONObject thingsModelObject = JSONObject.parseObject(thingsModelService.getCacheThingsModelByProductId(deviceList.get(i).getProductId()));

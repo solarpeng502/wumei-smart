@@ -2,7 +2,7 @@
 <div class="app-container home">
     <el-row :gutter="40">
         <el-col :span="14">
-            <el-card style="margin:-10px;" shadow="hover">
+            <el-card style="margin:-10px;" shadow="hover" body-style="background-color:#F8F8F8;">
                 <div ref="map" style="height:650px;margin:-10px;margin-top:-5px;"></div>
             </el-card>
         </el-col>
@@ -173,6 +173,9 @@ import {
     getMqttStats,
     statisticMqtt
 } from "@/api/iot/emqx";
+import {
+    listAllDeviceShort,
+} from "@/api/iot/device";
 
 export default {
     name: "Index",
@@ -215,66 +218,73 @@ export default {
         };
     },
     created() {
-        this.deviceList = [{
-                id: 21,
-                name: '海门',
-                value: 9,
-                long: 121.15,
-                lat: 31.89,
-                address: "海门",
-                product: "测试产品",
-                version: 1.0,
-                status: 1,
-            },
-            {
-                id: 21,
-                name: '鄂尔多斯',
-                value: 12,
-                long: 109.781327,
-                lat: 39.608266,
-                address: "海门",
-                product: "测试产品",
-                version: 2.0,
-                status: 2
-            },
-            {
-                id: 21,
-                name: '招远',
-                value: 12,
-                long: 120.38,
-                lat: 37.35,
-                address: "海门",
-                product: "测试产品",
-                version: 1.0,
-                status: 3
-            },
-            {
-                id: 21,
-                name: '海口',
-                value: 12,
-                long: 110.38,
-                lat: 20.35,
-                address: "测试",
-                product: "测试产品",
-                version: 1.0,
-                status: 4
-            }
-        ];
+        // this.deviceList = [{
+        //         id: 21,
+        //         name: '海门',
+        //         value: 9,
+        //         long: 121.15,
+        //         lat: 31.89,
+        //         address: "海门",
+        //         product: "测试产品",
+        //         version: 1.0,
+        //         status: 1,
+        //     },
+        //     {
+        //         id: 21,
+        //         name: '鄂尔多斯',
+        //         value: 12,
+        //         long: 109.781327,
+        //         lat: 39.608266,
+        //         address: "海门",
+        //         product: "测试产品",
+        //         version: 2.0,
+        //         status: 2
+        //     },
+        //     {
+        //         id: 21,
+        //         name: '招远',
+        //         value: 12,
+        //         long: 120.38,
+        //         lat: 37.35,
+        //         address: "海门",
+        //         product: "测试产品",
+        //         version: 1.0,
+        //         status: 3
+        //     },
+        //     {
+        //         id: 21,
+        //         name: '海口',
+        //         value: 12,
+        //         long: 110.38,
+        //         lat: 20.35,
+        //         address: "测试",
+        //         product: "测试产品",
+        //         version: 1.0,
+        //         status: 4
+        //     }
+        // ];
+        this.getAllDevice();
         this.getServer();
         this.getMqttStats();
         this.statisticMqtt();
-        this.$nextTick(() => {
-            loadBMap().then(() => {
-                this.getmap();
-            });
-        })
 
     },
     methods: {
+        /**查询所有设备 */
+        getAllDevice() {
+            listAllDeviceShort().then(response => {
+                this.deviceList = response.rows;
+                console.log(this.deviceList);
+                this.$nextTick(() => {
+                    loadBMap().then(() => {
+                        this.getmap();
+                    });
+                })
+            })
+        },
         /** 查询emqx统计*/
         statisticMqtt() {
             statisticMqtt().then(response => {
-                console.log(response);
                 this.static = response.data.data[0].metrics;
             })
         },
@@ -306,35 +316,63 @@ export default {
             let convertData = function (data, status) {
                 var res = [];
                 for (var i = 0; i < data.length; i++) {
-                    var geoCoord = [data[i].long, data[i].lat];
+                    var geoCoord = [data[i].longitude, data[i].latitude];
                     if (geoCoord && data[i].status == status) {
                         res.push({
-                            name: data[i].name,
+                            name: data[i].deviceName,
                             value: geoCoord,
-                            test: "测试金风科技收到了"
+                            serialNumber: data[i].serialNumber,
+                            status: data[i].status,
+                            isShadow: data[i].isShadow,
+                            firmwareVersion: data[i].firmwareVersion,
+                            networkAddress: data[i].networkAddress,
+                            productName: data[i].productName,
+                            activeTime: data[i].activeTime,
                         });
                     }
                 }
+                console.log(res);
                 return res;
             };
             option = {
                 title: {
-                    text: '终端设备分布和状态',
+                    text: '设备分布（数量 5）',
                     subtext: 'wumei-smart open source living iot platform',
-                    sublink: 'http://www.wumei.live',
+                    sublink: 'https://iot.wumei.live',
+                    target: "_blank",
+                    textStyle: {
+                        color: '#333',
+                        textBorderColor: '#fff',
+                        textBorderWidth: 10,
+                        fontSize: 20
+                    },
+                    top: 10,
                     left: 'center'
                 },
                 tooltip: {
                     trigger: 'item',
                     formatter: function (params) {
                         var htmlStr = '<div style="padding:5px;line-height:28px;">';
-                        htmlStr += "设备名称： " + params.data.value + "<br />";
-                        htmlStr += "设备状态： " + "<span style='color:green'>在线</span>" + "<br />";
-                        htmlStr += "设备影子： " + "<span style='color:green'>启用</span>" + "<br />";
-                        htmlStr += "产品名称： " + params.data.value + "<br />";
-                        htmlStr += "固件版本： " + params.data.value + "<br />";
-                        htmlStr += "所在地址： " + params.data.value + "<br />";
-                        htmlStr += "激活时间： " + params.data.value + "<br />";
+                        htmlStr += "设备名称： <span style='color:#409EFF'>" + params.data.name + "</span><br />";
+                        htmlStr += "设备状态： ";
+                        if (params.data.status == 1) {
+                            htmlStr += "<span style='color:#E6A23C'>未激活</span>" + "<br />";
+                        } else if (params.data.status == 2) {
+                            htmlStr += "<span style='color:#F56C6C'>禁用</span>" + "<br />";
+                        } else if (params.data.status == 3) {
+                            htmlStr += "<span style='color:#67C23A'>在线</span>" + "<br />";
+                        } else if (params.data.status == 4) {
+                            htmlStr += "<span style='color:#909399'>离线</span>" + "<br />";
+                        }
+                        if (params.data.isShadow == 1) {
+                            htmlStr += "设备影子： " + "<span style='color:#67C23A'>启用</span>" + "<br />";
+                        } else {
+                            htmlStr += "设备影子： " + "<span style='color:#909399'>未启用</span>" + "<br />";
+                        }
+                        htmlStr += "产品名称： " + params.data.productName + "<br />";
+                        htmlStr += "固件版本： Version " + params.data.firmwareVersion + "<br />";
+                        htmlStr += "激活时间： " + params.data.activeTime + "<br />";
+                        htmlStr += "所在地址： " + params.data.networkAddress + "<br />";
                         htmlStr += '</div>';
                         return htmlStr;
                     }
@@ -712,6 +750,7 @@ export default {
     .card-panel-col {
         margin-bottom: 10px;
     }
+
     .card-panel {
         height: 68px;
         cursor: pointer;
@@ -724,42 +763,51 @@ export default {
             .card-panel-icon-wrapper {
                 color: #fff;
             }
+
             .icon-message {
                 background: #36a3f7;
             }
+
             .icon-shopping {
                 background: #34bfa3
             }
         }
+
         .icon-message {
             color: #36a3f7;
         }
+
         .icon-shopping {
             color: #34bfa3
         }
+
         .card-panel-icon-wrapper {
             float: left;
-            margin:10px;
+            margin: 10px;
             padding: 10px;
             transition: all 0.38s ease-out;
             border-radius: 6px;
         }
+
         .card-panel-icon {
             float: left;
             font-size: 32px;
         }
+
         .card-panel-description {
             float: right;
             font-weight: bold;
             margin: 15px;
             margin-left: 0px;
-            .card-panel-text {  
+
+            .card-panel-text {
                 line-height: 14px;
                 color: rgba(0, 0, 0, 0.45);
                 font-size: 14px;
                 margin-bottom: 12px;
-                text-align:right;
+                text-align: right;
             }
+
             .card-panel-num {
                 font-size: 18px;
             }
