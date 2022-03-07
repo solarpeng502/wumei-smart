@@ -9,101 +9,90 @@
 
         <el-col :span="10">
             <el-card style="margin:-10px;" shadow="hover">
-                <div style="height:270px;">
-                    <h3 style="font-weight:bold">Mqtt 统计指标</h3>
-                    <el-descriptions :column="3" border>
-                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
-                            <template slot="label">
-                                <i class="el-icon-s-data"></i>
-                                发送字节
-                            </template>
-                            <el-link type="success" :underline="false">{{this.static["bytes.sent"]}}</el-link>
-                        </el-descriptions-item>
-                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;" contentStyle="">
-                            <template slot="label">
-                                <i class="el-icon-s-data"></i>
-                                接收字节
-                            </template>
-                            <el-link type="primary" :underline="false">{{this.static["bytes.received"]}}</el-link>
-                        </el-descriptions-item>
-                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
-                            <template slot="label">
-                                <i class="el-icon-s-data"></i>
-                                认证次数
-                            </template>
-                            <el-link type="danger" :underline="false">{{this.static["client.authenticate"]}}</el-link>
-                        </el-descriptions-item>
-
-                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
-                            <template slot="label">
-                                <i class="el-icon-s-data"></i>
-                                发送报文数
-                            </template>
-                            <el-link type="success" :underline="false">{{this.static["packets.sent"]}}</el-link>
-                        </el-descriptions-item>
-                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
-                            <template slot="label">
-                                <i class="el-icon-s-data"></i>
-                                接收报文数
-                            </template>
-                            <el-link type="primary" :underline="false">{{this.static["packets.received"]}}</el-link>
-                        </el-descriptions-item>
-                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
-                            <template slot="label">
-                                <i class="el-icon-s-data"></i>
-                                连接次数
-                            </template>
-                            <el-link type="danger" :underline="false">{{this.static["client.connected"]}}</el-link>
-                        </el-descriptions-item>
-
-                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
-                            <template slot="label">
-                                <i class="el-icon-s-data"></i>
-                                发送消息
-                            </template>
-                            <el-link type="success" :underline="false">{{this.static["messages.sent"]}}</el-link>
-                        </el-descriptions-item>
-                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
-                            <template slot="label">
-                                <i class="el-icon-s-data"></i>
-                                接收消息
-                            </template>
-                            <el-link type="primary" :underline="false">{{this.static["messages.received"]}}</el-link>
-                        </el-descriptions-item>
-                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
-                            <template slot="label">
-                                <i class="el-icon-s-data"></i>
-                                丢弃消息
-                            </template>
-                            <el-link type="danger" :underline="false">{{this.static["delivery.dropped"]}}</el-link>
-                        </el-descriptions-item>
-
-                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
-                            <template slot="label">
-                                <i class="el-icon-s-data"></i>
-                                创建会话数
-                            </template>
-                            <el-link type="success" :underline="false">{{this.static["session.created"]}}</el-link>
-                        </el-descriptions-item>
-                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
-                            <template slot="label">
-                                <i class="el-icon-s-data"></i>
-                                终结会话数
-                            </template>
-                            <el-link type="primary" :underline="false">{{this.static["session.terminated"]}}</el-link>
-                        </el-descriptions-item>
-                        <el-descriptions-item labelStyle="line-height:34px;font-weight:bold;">
-                            <template slot="label">
-                                <i class="el-icon-s-data"></i>
-                                订阅次数
-                            </template>
-                            <el-link type="danger" :underline="false">{{this.static["client.subscribe"]}}</el-link>
-                        </el-descriptions-item>
-                    </el-descriptions>
-                </div>
+                <h3 style="font-weight:bold">Mqtt 统计指标</h3>
+                <el-row :gutter="40" class="panel-group">
+                    <el-col :span="12" class="card-panel-col">
+                        <div class="card-panel">
+                            <div class="card-panel-icon-wrapper icon-message">
+                                <svg-icon icon-class="guide" class-name="card-panel-icon" />
+                            </div>
+                            <div class="card-panel-description">
+                                <div class="card-panel-text">
+                                    发送字节
+                                </div>
+                                <count-to :start-val="0" :end-val="this.static['bytes.sent']" :duration="3000" class="card-panel-num" />
+                            </div>
+                        </div>
+                    </el-col>
+                    <el-col :span="12" class="card-panel-col">
+                        <div class="card-panel">
+                            <div class="card-panel-icon-wrapper icon-shopping">
+                                <svg-icon icon-class="receiver" class-name="card-panel-icon" />
+                            </div>
+                            <div class="card-panel-description">
+                                <div class="card-panel-text">
+                                    接收字节
+                                </div>
+                                <count-to :start-val="0" :end-val="this.static['bytes.received']" :duration="3000" class="card-panel-num" />
+                            </div>
+                        </div>
+                    </el-col>
+                    <el-col :span="12" class="card-panel-col">
+                        <div class="card-panel">
+                            <div class="card-panel-icon-wrapper icon-message">
+                                <svg-icon icon-class="authenticate" class-name="card-panel-icon" />
+                            </div>
+                            <div class="card-panel-description">
+                                <div class="card-panel-text">
+                                    认证次数
+                                </div>
+                                <count-to :start-val="0" :end-val="this.static['client.authenticate']" :duration="1000" class="card-panel-num" />
+                            </div>
+                        </div>
+                    </el-col>
+                    <el-col :span="12" class="card-panel-col">
+                        <div class="card-panel">
+                            <div class="card-panel-icon-wrapper icon-shopping">
+                                <svg-icon icon-class="connect" class-name="card-panel-icon" />
+                            </div>
+                            <div class="card-panel-description">
+                                <div class="card-panel-text">
+                                    连接次数
+                                </div>
+                                <count-to :start-val="0" :end-val="this.static['client.connected']" :duration="1000" class="card-panel-num" />
+                            </div>
+                        </div>
+                    </el-col>
+                    <el-col :span="12" class="card-panel-col">
+                        <div class="card-panel">
+                            <div class="card-panel-icon-wrapper icon-message">
+                                <svg-icon icon-class="subscribe1" class-name="card-panel-icon" />
+                            </div>
+                            <div class="card-panel-description">
+                                <div class="card-panel-text">
+                                    订阅次数
+                                </div>
+                                <count-to :start-val="0" :end-val="this.static['client.subscribe']" :duration="2000" class="card-panel-num" />
+                            </div>
+                        </div>
+                    </el-col>
+                    <el-col :span="12" class="card-panel-col">
+                        <div class="card-panel">
+                            <div class="card-panel-icon-wrapper icon-shopping">
+                                <svg-icon icon-class="message" class-name="card-panel-icon" />
+                            </div>
+                            <div class="card-panel-description">
+                                <div class="card-panel-text">
+                                    接收消息
+                                </div>
+                                <count-to :start-val="0" :end-val="this.static['messages.received']" :duration="2000" class="card-panel-num" />
+                            </div>
+                        </div>
+                    </el-col>
+                </el-row>
             </el-card>
             <el-card style="margin:-10px;margin-top:20px;" shadow="hover">
-                <div ref="statsChart" style="height:298px;"></div>
+                <div ref="statsChart" style="height:296px;"></div>
             </el-card>
         </el-col>
 
@@ -167,13 +156,8 @@
 </div>
 </template>
 
-<style scoped>
-.margin-top .el-descriptions-item__label {
-    font-weight: bold;
-}
-</style>
-
 <script>
+import CountTo from 'vue-count-to'
 import * as echarts from 'echarts';
 require('echarts/theme/macarons') // echarts theme
 import {
@@ -192,6 +176,9 @@ import {
 
 export default {
     name: "Index",
+    components: {
+        CountTo
+    },
     data() {
         return {
             // 设备列表
@@ -229,7 +216,7 @@ export default {
     },
     created() {
         this.deviceList = [{
-                id:21,
+                id: 21,
                 name: '海门',
                 value: 9,
                 long: 121.15,
@@ -240,7 +227,7 @@ export default {
                 status: 1,
             },
             {
-                id:21,
+                id: 21,
                 name: '鄂尔多斯',
                 value: 12,
                 long: 109.781327,
@@ -251,7 +238,7 @@ export default {
                 status: 2
             },
             {
-                id:21,
+                id: 21,
                 name: '招远',
                 value: 12,
                 long: 120.38,
@@ -262,7 +249,7 @@ export default {
                 status: 3
             },
             {
-                id:21,
+                id: 21,
                 name: '海口',
                 value: 12,
                 long: 110.38,
@@ -719,3 +706,64 @@ export default {
     },
 };
 </script>
+
+<style lang="scss" scoped>
+.panel-group {
+    .card-panel-col {
+        margin-bottom: 10px;
+    }
+    .card-panel {
+        height: 68px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        color: #666;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, .1);
+
+        &:hover {
+            .card-panel-icon-wrapper {
+                color: #fff;
+            }
+            .icon-message {
+                background: #36a3f7;
+            }
+            .icon-shopping {
+                background: #34bfa3
+            }
+        }
+        .icon-message {
+            color: #36a3f7;
+        }
+        .icon-shopping {
+            color: #34bfa3
+        }
+        .card-panel-icon-wrapper {
+            float: left;
+            margin:10px;
+            padding: 10px;
+            transition: all 0.38s ease-out;
+            border-radius: 6px;
+        }
+        .card-panel-icon {
+            float: left;
+            font-size: 32px;
+        }
+        .card-panel-description {
+            float: right;
+            font-weight: bold;
+            margin: 15px;
+            margin-left: 0px;
+            .card-panel-text {  
+                line-height: 14px;
+                color: rgba(0, 0, 0, 0.45);
+                font-size: 14px;
+                margin-bottom: 12px;
+                text-align:right;
+            }
+            .card-panel-num {
+                font-size: 18px;
+            }
+        }
+    }
+}
+</style>
