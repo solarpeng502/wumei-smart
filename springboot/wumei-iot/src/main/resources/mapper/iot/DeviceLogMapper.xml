@@ -4,6 +4,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.iot.mapper.DeviceLogMapper">
     
+    <resultMap type="com.ruoyi.iot.model.MonitorModel" id="MonitorResult">
+        <result property="value"    column="log_value"    />
+        <result property="time"    column="create_time"    />
+    </resultMap>
+
     <resultMap type="DeviceLog" id="DeviceLogResult">
         <result property="logId"    column="log_id"    />
         <result property="logName"    column="log_name"    />
@@ -23,6 +28,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <sql id="selectDeviceLogVo">
         select log_id, log_name, log_type, log_value, device_id, device_name,serial_number identity, datatype, create_by, is_monitor, create_time, remark from iot_device_log
     </sql>
+
+    <select id="selectMonitorList" parameterType="DeviceLog" resultMap="MonitorResult">
+        select log_value, create_time from iot_device_log
+        where device_id = #{deviceId} and identity = #{identity} and is_monitor=1
+    </select>
 
     <select id="selectDeviceLogList" parameterType="DeviceLog" resultMap="DeviceLogResult">
         <include refid="selectDeviceLogVo"/>

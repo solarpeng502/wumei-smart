@@ -370,6 +370,32 @@ export default {
             this.getCacheThingsModdel(item.productId);
             this.$nextTick(function () {
                 this.getMonitor();
+
+                // 测试数据
+                this.chart[0].setOption({
+                    // xAxis: {
+                    //     data: ['2021-09-09', '2021-09-10', '2021-09-11', '2021-09-12', ]
+                    // },
+                    series: [{
+                        data: [
+                            ['2021-08-01 08:23', 30],
+                            ['2021-08-05 10:20', 60],
+                            ['2021-08-09 10:20', 60],
+                            ['2021-09-01 10:20', 60],
+                            ['2021-09-02 10:20', 60],
+                            ['2021-09-03 10:20', 60],
+                            ['2021-09-04 10:20', 60],
+                            ['2021-09-05 10:20', 60],
+                            ['2021-09-06 10:20', 60],
+                            ['2021-09-07 10:20', 60],
+                            ['2021-09-08 10:20', 60],
+                            ['2021-09-09 10:20', 60],
+                            ['2021-09-10 10:20', 60],
+                            ['2021-09-11 10:20', 60],
+                            ['2021-09-12 10:20', 60],
+                        ]
+                    }]
+                });
             });
 
         },
@@ -413,29 +439,30 @@ export default {
                 this.chart[i] = echarts.init(this.$refs.monitor[i]);
                 var option;
 
-                function randomData() {
-                    now = new Date(+now + oneDay);
-                    value = value + Math.random() * 21 - 10;
-                    return {
-                        name: now.toString(),
-                        value: [
-                            [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
-                            Math.round(value)
-                        ]
-                    };
-                }
-                let data = [];
-                let now = new Date(1997, 9, 3);
-                let oneDay = 24 * 3600 * 1000;
-                let value = Math.random() * 1000;
-                for (var j = 0; j < 1000; j++) {
-                    data.push(randomData());
-                }
-                
+                // function randomData() {
+                //     now = new Date(+now + oneDay);
+                //     value = value + Math.random() * 21 - 10;
+                //     return {
+                //         name: now.toString(),
+                //         value: [
+                //             [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
+                //             Math.round(value)
+                //         ]
+                //     };
+                // }
+                // let data = [];
+                // let now = new Date(1997, 9, 3);
+                // let oneDay = 24 * 3600 * 1000;
+                // let value = Math.random() * 1000;
+                // for (var j = 0; j < 1000; j++) {
+                //     data.push(randomData());
+                // }
+                // console.log(randomData())
+
                 option = {
                     title: {
                         left: 'center',
-                        text: '温度'
+                        text: this.monitorThings[i].name + ' 单位 ' + (this.monitorThings[i].datatype.unit != undefined ? this.monitorThings[i].datatype.unit : "无") + "）"
                     },
                     grid: {
                         top: '50px',
@@ -444,23 +471,33 @@ export default {
                         bottom: '20px',
                         containLabel: true
                     },
+                    // 初始化动画
+                    animationDuration: function (idx) {
+                        // 越往后的数据时长越大
+                        return 5000;
+                    },
+                    // 数据更新动画
+                    animationDurationUpdate: function (idx) {
+                        // 越往后的数据时长越大
+                        return  1000;
+                    },
                     tooltip: {
                         trigger: 'axis',
-                        formatter: function (params) {
-                            params = params[0];
-                            var date = new Date(params.name);
-                            return (
-                                date.getDate() +
-                                '/' +
-                                (date.getMonth() + 1) +
-                                '/' +
-                                date.getFullYear() +
-                                ' : ' +
-                                params.value[1]
-                            );
-                        },
+                        // formatter: function (params) {
+                        //     params = params[0];
+                        //     var date = new Date(params.name);
+                        //     return (
+                        //         date.getDate() +
+                        //         '/' +
+                        //         (date.getMonth() + 1) +
+                        //         '/' +
+                        //         date.getFullYear() +
+                        //         ' : ' +
+                        //         params.value[1]
+                        //     );
+                        // },
                         axisPointer: {
-                            animation: false
+                            animation: true
                         }
                     },
                     xAxis: {
@@ -477,23 +514,23 @@ export default {
                         }
                     },
                     series: [{
-                        name: 'Fake Data',
+                        name: this.monitorThings[i].name,
                         type: 'line',
                         showSymbol: false,
-                        data: data
+                        data: []
                     }]
                 };
-                setInterval(function () {
-                    for (var i = 0; i < 5; i++) {
-                        data.shift();
-                        data.push(randomData());
-                    }
-                    this.chart[i].setOption({
-                        series: [{
-                            data: data
-                        }]
-                    });
-                }, 1000);
+                // setInterval(function () {
+                //     for (var i = 0; i < 5; i++) {
+                //         data.shift();
+                //         data.push(randomData());
+                //     }
+                //     this.chart[i].setOption({
+                //         series: [{
+                //             data: data
+                //         }]
+                //     });
+                // }, 1000);
 
                 option && this.chart[i].setOption(option);
             }

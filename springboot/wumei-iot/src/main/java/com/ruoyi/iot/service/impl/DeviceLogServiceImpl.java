@@ -3,6 +3,7 @@ package com.ruoyi.iot.service.impl;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.iot.domain.DeviceLog;
 import com.ruoyi.iot.mapper.DeviceLogMapper;
+import com.ruoyi.iot.model.MonitorModel;
 import com.ruoyi.iot.service.IDeviceLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,18 @@ public class DeviceLogServiceImpl implements IDeviceLogService
     public List<DeviceLog> selectDeviceLogList(DeviceLog deviceLog)
     {
         return deviceLogMapper.selectDeviceLogList(deviceLog);
+    }
+
+    /**
+     * 查询设备监测数据
+     *
+     * @param deviceLog 设备日志
+     * @return 设备日志
+     */
+    @Override
+    public List<MonitorModel> selectMonitorList(DeviceLog deviceLog)
+    {
+        return deviceLogMapper.selectMonitorList(deviceLog);
     }
 
     /**

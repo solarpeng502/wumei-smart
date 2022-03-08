@@ -1,6 +1,7 @@
 package com.ruoyi.iot.mapper;
 
 import com.ruoyi.iot.domain.DeviceLog;
+import com.ruoyi.iot.model.MonitorModel;
 
 import java.util.List;
 
@@ -27,6 +28,14 @@ public interface DeviceLogMapper
      * @return 设备日志集合
      */
     public List<DeviceLog> selectDeviceLogList(DeviceLog deviceLog);
+
+    /**
+     * 查询设备监测数据
+     *
+     * @param deviceLog 设备日志
+     * @return 设备日志集合
+     */
+    public List<MonitorModel> selectMonitorList(DeviceLog deviceLog);
 
     /**
      * 新增设备日志

@@ -4,7 +4,7 @@
         <el-col :span="24">
             <div v-for="(item,index) in monitorThings" :key="index" style="margin-bottom:50px;">
                 <el-card shadow="hover" :body-style="{ padding: '10px 0px',overflow:'auto' }">
-                    <div ref="statisticMap" style="height:280px;width:1470px;"></div>
+                    <div ref="statisticMap" style="height:250px;width:1470px;"></div>
                 </el-card>
             </div>
         </el-col>
@@ -19,7 +19,7 @@ import {
     cacheJsonThingsModel
 } from "@/api/iot/model";
 import {
-    listDeviceLog
+    listMonitor
 } from "@/api/iot/deviceLog";
 
 export default {
@@ -43,8 +43,6 @@ export default {
         return {
             // 设备信息
             deviceInfo: {},
-            // 监测数据
-            // dataList: [],
             // 监测物模型
             monitorThings: [],
             // 图表集合
@@ -52,41 +50,7 @@ export default {
         };
     },
     mounted() {
-
-        // this.dataList = [{
-        //     id: "1",
-        //     name: "温度",
-        //     unit: "℃",
-        //     dat: [{
-        //         time: "2021-09-09",
-        //         value: "21"
-        //     }],
-        //     data: [],
-        //     date: [],
-        // }, {
-        //     id: "1",
-        //     name: "湿度",
-        //     unit: '%',
-        //     data: [30, 32, 23, 35, 40, 57, 21, 31],
-        //     date: ['2021-02-01', '2021-02-02', '2021-02-03', '2021-02-04', '2021-02-05', '2021-02-06', '2021-02-07', '2021-02-08']
-        // }]
-        // this.$nextTick(function () {
-        //     this.getStatistic();
-
-        //     this.dataList[0].data = ['21', '22', '23', '25', '26', '27', '21', '31'];
-        //     this.dataList[0].date = ['2021-02-01', '2021-02-02', '2021-02-03', '2021-02-04', '2021-02-05', '2021-02-06', '2021-02-07', '2021-02-08'];
-        //     this.chart[0].setOption({
-        //         xAxis: {
-        //             data: this.dataList[0].date
-        //         },
-        //         series: [{
-        //             data: this.dataList[0].data
-        //         }]
-        //     });
-
-        //     // this.dataList[0].data= ['21', '22', '23', '25', '26', '27', '21', '31'];
-        //     // this.dataList[0].date=['2021-02-01', '2021-02-02', '2021-02-03', '2021-02-04', '2021-02-05', '2021-02-06', '2021-02-07', '2021-02-08'];
-        // });
+        
     },
     methods: {
         /** 获取物模型*/
@@ -96,30 +60,11 @@ export default {
                 let thingsModel = JSON.parse(response.data);
                 // 筛选监测数据
                 this.monitorThings = thingsModel.properties.filter(item => item.isMonitor == 1);
-                console.log(this.monitorThings);
                 // 加载图表
                 this.$nextTick(function () {
                     this.getStatistic();
-
                     // 获取统计数据
                     this.getStatisticData(this.monitorThings);
-
-                    // 测试数据
-                    this.chart[0].setOption({
-                        // xAxis: {
-                        //     data: ['2021-09-09', '2021-09-10', '2021-09-11', '2021-09-12', ]
-                        // },
-                        series: [{
-                            data: [{
-                                time: '2021-09-01',
-                                value: 30
-                            }, {
-                                time: '2021-09-09',
-                                value: 60
-                            }]
-                        }]
-                    });
-
                 });
 
             });
@@ -130,10 +75,21 @@ export default {
                 let queryParams = {};
                 queryParams.deviceId = this.deviceInfo.deviceId;
                 queryParams.identity = monitorThingsModel[i].id;
-                console.log(queryParams)
-                listDeviceLog(queryParams).then(response => {
+                listMonitor(queryParams).then(response => {
                     let data = response.rows;
-                    console.log(data)
+                    // 对象转数组
+                    let dataList=[];
+                    for(let j=0; j<data.length; j++) {
+                        let item=[];
+                        item[0]=data[j].time;
+                        item[1]=data[j].value;
+                        dataList.push(item);
+                    }
+                    this.chart[i].setOption({
+                        series: [{
+                            data:dataList
+                        }]
+                    });
                 });
             }
         },
@@ -144,11 +100,9 @@ export default {
                 var option;
 
                 option = {
+                    animationDurationUpdate:3000,
                     tooltip: {
                         trigger: 'axis',
-                        position: function (pt) {
-                            return [pt[0], '30%'];
-                        }
                     },
                     title: {
                         left: 'center',
@@ -157,7 +111,7 @@ export default {
                     grid: {
                         top: '80px',
                         left: '40px',
-                        right: '100px',
+                        right: '80px',
                         bottom: '60px',
                         containLabel: true
                     },
@@ -171,15 +125,14 @@ export default {
                         }
                     },
                     xAxis: {
-                        type: 'category',
+                        type: 'time',
                         boundaryGap: false,
                         name: "时间", //坐标名字
                         nameLocation: "end", //坐标位置，支持start,end，middle
                         nameTextStyle: { //字体样式            
                             fontSize: 16, //字体大小            
-                            padding: 30 //距离坐标位置的距离    
+                            padding: 20 //距离坐标位置的距离    
                         },
-                        // data: this.monitorThings[i].dataList.time
                     },
                     yAxis: {
                         type: 'value',
@@ -220,10 +173,9 @@ export default {
                                 }
                             ])
                         },
-                        // data: this.monitorThings[i].dataList.data
+                        data: []
                     }]
                 };
-
                 option && this.chart[i].setOption(option);
             }
         },

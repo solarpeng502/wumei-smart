@@ -1,7 +1,8 @@
 package com.ruoyi.iot.service;
 
-import java.util.List;
 import com.ruoyi.iot.domain.AlertLog;
+
+import java.util.List;
 
 /**
  * 设备告警Service接口
