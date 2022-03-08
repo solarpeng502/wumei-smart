@@ -21,27 +21,26 @@
     <el-table v-loading="loading" :data="deviceLogList" size="mini">
         <el-table-column label="名称" align="center" prop="logName" />
         <el-table-column label="动作" align="center" prop="logValue">
-             <template slot-scope="scope">
-                    <div v-html="formatValueDisplay(scope.row)"></div>
-                </template>
+            <template slot-scope="scope">
+                <div v-html="formatValueDisplay(scope.row)"></div>
+            </template>
         </el-table-column>
         <el-table-column label="标识符" align="center" prop="identity" />
-        <el-table-column label="类型" align="center" prop="logType" width="100">
+        <el-table-column label="类型" align="center" prop="logType" width="120">
             <template slot-scope="scope">
                 <dict-tag :options="dict.type.iot_device_log_type" :value="scope.row.logType" />
             </template>
         </el-table-column>
-        <el-table-column label="数据类型" align="center" prop="datatype" width="80">
+        <el-table-column label="数据类型" align="center" prop="datatype" width="100">
             <template slot-scope="scope">
                 <dict-tag :options="dict.type.iot_data_type" :value="scope.row.datatype" />
             </template>
         </el-table-column>
-        <el-table-column label="监测数据" align="center" prop="isMonitor" width="80">
+        <el-table-column label="监测数据" align="center" prop="isMonitor" width="100">
             <template slot-scope="scope">
                 <dict-tag :options="dict.type.iot_yes_no" :value="scope.row.isMonitor" />
             </template>
         </el-table-column>
-        <el-table-column label="设备编号" align="center" prop="serialNumber" />
         <el-table-column label="备注" align="center" prop="remark" />
         <el-table-column label="创建时间" align="center" prop="createTime" width="180">
             <template slot-scope="scope">
@@ -87,7 +86,7 @@ export default {
     data() {
         return {
             // 物模型
-            thingsModel:{},
+            thingsModel: {},
             // 遮罩层
             loading: true,
             // 显示搜索条件
@@ -110,7 +109,7 @@ export default {
         };
     },
     created() {
-        
+
     },
     methods: {
         /** 查询设备日志列表 */
@@ -147,7 +146,46 @@ export default {
         },
         /** 格式化显示数据定义 */
         formatValueDisplay(row) {
-
+            // 类型（1=属性上报，2=事件上报，3=调用功能，4=设备升级，5=设备上线，6=设备离线）
+            if (row.logType == 1) {
+                let propertyItem = this.getThingsModelItem(1, row.identity);
+                if (propertyItem != "") {
+                    return '监测值：<span style="color:#ff0000;">' + row.logValue + (propertyItem.datatype.unit != undefined ? propertyItem.datatype.unit : '') + '</span>';
+                }
+            } else if (row.logType == 2) {
+                let eventItem = this.getThingsModelItem(2, row.identity);
+                if (eventItem != "") {
+                    return '事件：<span style="color:#FF0000">' + row.logValue + '</span>';
+                }
+            } else if (row.logType == 3) {
+                let functionItem = this.getThingsModelItem(2, row.identity);
+                if (functionItem != "") {
+                    return '功能：<span style="color:#FF0000">' + row.logValue + '</span>';
+                }
+            } else if (row.logType == 4) {
+                return '<span style="color:#0000FF">OTA</span>';
+            } else if (row.logType == 5) {
+                return '<span style="color:#00FF00">上线</span>';
+            } else if (row.logType == 6) {
+                return '<span style="color:#FF0000">离线</span>';
+            }
+            return "";
+        },
+        getThingsModelItem(type, identity) {
+            if (type == 1) {
+                for (let i = 0; i < this.thingsModel.properties.length; i++) {
+                    if (this.thingsModel.properties[i].id == identity) {
+                        return this.thingsModel.properties[i];
+                    }
+                }
+            } else if (type == 2) {
+                for (let i = 0; i < this.thingsModel.functions.length; i++) {
+                    if (this.thingsModel.functions[i].id == identity) {
+                        return this.thingsModel.functions[i];
+                    }
+                }
+            }
+            return "";
         }
     }
 };
