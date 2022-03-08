@@ -166,6 +166,16 @@ export default {
         productList,
         deviceTimer,
     },
+    watch: {
+        activeName(val) {
+            if (val == "deviceStastic") {
+                this.$nextTick(() => {
+                    // TODO 重置统计表格的尺寸
+                    
+                })
+            }
+        }
+    },
     data() {
         return {
             // 生成设备编码是否禁用
@@ -221,8 +231,8 @@ export default {
             getDevice(deviceId).then(response => {
                 this.form = response.data;
                 // 禁用状态
-                if(this.form.status==2){
-                    this.deviceStatus=1;
+                if (this.form.status == 2) {
+                    this.deviceStatus = 1;
                 }
                 if (this.form.imgUrl != null && this.form.imgUrl != "") {
                     this.imageUrl = this.form.imgUrl;
@@ -278,7 +288,7 @@ export default {
                 remark: null,
                 isCustomLocation: 0,
             };
-            this.deviceStatus=0;
+            this.deviceStatus = 0;
             this.resetForm("form");
         },
         /** 提交按钮 */
@@ -299,8 +309,8 @@ export default {
                             this.$modal.alertSuccess("新增成功, 可以烧录sdk到设备了");
                             this.open = false;
                             this.form = response.data;
-                            if(this.form.status==2){
-                                this.deviceStatus=1;
+                            if (this.form.status == 2) {
+                                this.deviceStatus = 1;
                             }
                             this.loadMap();
                         });

@@ -146,11 +146,14 @@
 
         <!-- 查看监测数据 -->
         <el-dialog title="实时监测" :visible.sync="open" width="800px">
-            <div style="margin-top:-50px;">
-                <el-divider></el-divider>
-            </div>
-            <div ref="monitor" style="width:100%;height:250px;"></div>
-            <div ref="monitor1" style="width:100%;height:250px;"></div>
+            <el-row :gutter="20">
+                <el-col :span="12" v-for="(item,index) in monitorThings" :key="index" style="margin-bottom:20px;">
+                    <el-card shadow="hover" :body-style="{ padding: '10px 0px' }">
+                        <div ref="monitor" style="height:250px;"></div>
+                    </el-card>
+                </el-col>
+            </el-row>
+
             <div slot="footer" class="dialog-footer">
                 <el-button @click="cancel">关 闭</el-button>
             </div>
@@ -170,12 +173,19 @@ import {
     listDeviceShort,
     delDevice,
 } from "@/api/iot/device";
+import {
+    cacheJsonThingsModel
+} from "@/api/iot/model";
 
 export default {
     name: "Device",
     dicts: ['iot_device_status', 'iot_is_enable'],
     data() {
         return {
+            // 图表集合
+            chart: [],
+            // 监测物模型
+            monitorThings: [],
             // mqtt客户端
             client: {},
             // 遮罩层
@@ -355,13 +365,23 @@ export default {
             this.handleQuery();
         },
         /** 查看监测数据 */
-        handleMonitor() {
+        handleMonitor(item) {
             this.open = true;
+            this.getCacheThingsModdel(item.productId);
             this.$nextTick(function () {
                 this.getMonitor();
-                this.getMonitor1();
             });
 
+        },
+        /** 获取物模型*/
+        getCacheThingsModdel(productId) {
+            // 获取缓存的Json物模型
+            cacheJsonThingsModel(productId).then(response => {
+                let thingsModel = JSON.parse(response.data);
+                // 筛选监测数据
+                this.monitorThings = thingsModel.properties.filter(item => item.isMonitor == 1);
+                console.log(this.monitorThings);
+            });
         },
         /** 修改按钮操作 */
         handleEditDevice(row) {
@@ -389,167 +409,96 @@ export default {
         },
         /**监测数据 */
         getMonitor() {
-            var myChart = echarts.init(this.$refs.monitor);
-            var option;
+            for (let i = 0; i < this.monitorThings.length; i++) {
+                this.chart[i] = echarts.init(this.$refs.monitor[i]);
+                var option;
 
-            function randomData() {
-                now = new Date(+now + oneDay);
-                value = value + Math.random() * 21 - 10;
-                return {
-                    name: now.toString(),
-                    value: [
-                        [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
-                        Math.round(value)
-                    ]
-                };
-            }
-            let data = [];
-            let now = new Date(1997, 9, 3);
-            let oneDay = 24 * 3600 * 1000;
-            let value = Math.random() * 1000;
-            for (var i = 0; i < 1000; i++) {
-                data.push(randomData());
-            }
-            option = {
-                title: {
-                    text: '温度'
-                },
-                tooltip: {
-                    trigger: 'axis',
-                    formatter: function (params) {
-                        params = params[0];
-                        var date = new Date(params.name);
-                        return (
-                            date.getDate() +
-                            '/' +
-                            (date.getMonth() + 1) +
-                            '/' +
-                            date.getFullYear() +
-                            ' : ' +
-                            params.value[1]
-                        );
-                    },
-                    axisPointer: {
-                        animation: false
-                    }
-                },
-                xAxis: {
-                    type: 'time',
-                    splitLine: {
-                        show: false
-                    }
-                },
-                yAxis: {
-                    type: 'value',
-                    boundaryGap: [0, '100%'],
-                    splitLine: {
-                        show: false
-                    }
-                },
-                series: [{
-                    name: 'Fake Data',
-                    type: 'line',
-                    showSymbol: false,
-                    data: data
-                }]
-            };
-            setInterval(function () {
-                for (var i = 0; i < 5; i++) {
-                    data.shift();
+                function randomData() {
+                    now = new Date(+now + oneDay);
+                    value = value + Math.random() * 21 - 10;
+                    return {
+                        name: now.toString(),
+                        value: [
+                            [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
+                            Math.round(value)
+                        ]
+                    };
+                }
+                let data = [];
+                let now = new Date(1997, 9, 3);
+                let oneDay = 24 * 3600 * 1000;
+                let value = Math.random() * 1000;
+                for (var j = 0; j < 1000; j++) {
                     data.push(randomData());
                 }
-                myChart.setOption({
+                
+                option = {
+                    title: {
+                        left: 'center',
+                        text: '温度'
+                    },
+                    grid: {
+                        top: '50px',
+                        left: '20px',
+                        right: '20px',
+                        bottom: '20px',
+                        containLabel: true
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        formatter: function (params) {
+                            params = params[0];
+                            var date = new Date(params.name);
+                            return (
+                                date.getDate() +
+                                '/' +
+                                (date.getMonth() + 1) +
+                                '/' +
+                                date.getFullYear() +
+                                ' : ' +
+                                params.value[1]
+                            );
+                        },
+                        axisPointer: {
+                            animation: false
+                        }
+                    },
+                    xAxis: {
+                        type: 'time',
+                        splitLine: {
+                            show: false
+                        }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        boundaryGap: [0, '100%'],
+                        splitLine: {
+                            show: false
+                        }
+                    },
                     series: [{
+                        name: 'Fake Data',
+                        type: 'line',
+                        showSymbol: false,
                         data: data
                     }]
-                });
-            }, 1000);
+                };
+                setInterval(function () {
+                    for (var i = 0; i < 5; i++) {
+                        data.shift();
+                        data.push(randomData());
+                    }
+                    this.chart[i].setOption({
+                        series: [{
+                            data: data
+                        }]
+                    });
+                }, 1000);
 
-            option && myChart.setOption(option);
-
+                option && this.chart[i].setOption(option);
+            }
         },
 
-        /**监测数据 */
-        getMonitor1() {
-            var myChart = echarts.init(this.$refs.monitor1);
-            var option;
-
-            function randomData() {
-                now = new Date(+now + oneDay);
-                value = value + Math.random() * 21 - 10;
-                return {
-                    name: now.toString(),
-                    value: [
-                        [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
-                        Math.round(value)
-                    ]
-                };
-            }
-            let data = [];
-            let now = new Date(1997, 9, 3);
-            let oneDay = 24 * 3600 * 1000;
-            let value = Math.random() * 1000;
-            for (var i = 0; i < 1000; i++) {
-                data.push(randomData());
-            }
-            option = {
-                title: {
-                    text: '湿度'
-                },
-                tooltip: {
-                    trigger: 'axis',
-                    formatter: function (params) {
-                        params = params[0];
-                        var date = new Date(params.name);
-                        return (
-                            date.getDate() +
-                            '/' +
-                            (date.getMonth() + 1) +
-                            '/' +
-                            date.getFullYear() +
-                            ' : ' +
-                            params.value[1]
-                        );
-                    },
-                    axisPointer: {
-                        animation: false
-                    }
-                },
-                xAxis: {
-                    type: 'time',
-                    splitLine: {
-                        show: false
-                    }
-                },
-                yAxis: {
-                    type: 'value',
-                    boundaryGap: [0, '100%'],
-                    splitLine: {
-                        show: false
-                    }
-                },
-                series: [{
-                    name: 'Fake Data',
-                    type: 'line',
-                    showSymbol: false,
-                    data: data
-                }]
-            };
-            setInterval(function () {
-                for (var i = 0; i < 5; i++) {
-                    data.shift();
-                    data.push(randomData());
-                }
-                myChart.setOption({
-                    series: [{
-                        data: data
-                    }]
-                });
-            }, 1000);
-
-            option && myChart.setOption(option);
-
-        }
     }
 };
 </script>

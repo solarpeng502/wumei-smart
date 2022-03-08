@@ -501,7 +501,7 @@ export default {
                         type: 'scatter',
                         coordinateSystem: 'bmap',
                         data: convertData(this.deviceList, 1),
-                        symbolSize: 20,
+                        symbolSize: 15,
                         itemStyle: {
                             color: '#E6A23C'
                         }
@@ -510,7 +510,7 @@ export default {
                         type: 'scatter',
                         coordinateSystem: 'bmap',
                         data: convertData(this.deviceList, 2),
-                        symbolSize: 20,
+                        symbolSize: 15,
                         itemStyle: {
                             color: '#F56C6C'
                         }
@@ -518,7 +518,7 @@ export default {
                         type: 'scatter',
                         coordinateSystem: 'bmap',
                         data: convertData(this.deviceList, 4),
-                        symbolSize: 20,
+                        symbolSize: 15,
                         itemStyle: {
                             color: '#909399'
                         }
@@ -526,7 +526,7 @@ export default {
                         type: 'effectScatter',
                         coordinateSystem: 'bmap',
                         data: convertData(this.deviceList, 3),
-                        symbolSize: 20,
+                        symbolSize: 15,
                         showEffectOn: 'render',
                         rippleEffect: {
                             brushType: 'stroke',

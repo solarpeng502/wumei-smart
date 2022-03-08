@@ -267,7 +267,6 @@ export default {
     watch: {
         // 获取到父组件传递的device后
         device: function (newVal, oldVal) {
-            console.log(newVal);
             this.deviceInfo = newVal;
             if (this.deviceInfo && this.deviceInfo.deviceId != 0) {
                 // 获取缓存的Json物模型
