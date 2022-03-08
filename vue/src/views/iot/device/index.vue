@@ -184,6 +184,11 @@ export default {
         return {
             // 图表集合
             chart: [],
+            // 图标数据集合
+            dataList: [],
+            // 计时器
+            interval: null,
+            now: new Date(2021, 9, 3),
             // 监测物模型
             monitorThings: [],
             // mqtt客户端
@@ -364,51 +369,6 @@ export default {
             this.resetForm("queryForm");
             this.handleQuery();
         },
-        /** 查看监测数据 */
-        handleMonitor(item) {
-            this.open = true;
-            this.getCacheThingsModdel(item.productId);
-            this.$nextTick(function () {
-                this.getMonitor();
-
-                // 测试数据
-                this.chart[0].setOption({
-                    // xAxis: {
-                    //     data: ['2021-09-09', '2021-09-10', '2021-09-11', '2021-09-12', ]
-                    // },
-                    series: [{
-                        data: [
-                            ['2021-08-01 08:23', 30],
-                            ['2021-08-05 10:20', 60],
-                            ['2021-08-09 10:20', 60],
-                            ['2021-09-01 10:20', 60],
-                            ['2021-09-02 10:20', 60],
-                            ['2021-09-03 10:20', 60],
-                            ['2021-09-04 10:20', 60],
-                            ['2021-09-05 10:20', 60],
-                            ['2021-09-06 10:20', 60],
-                            ['2021-09-07 10:20', 60],
-                            ['2021-09-08 10:20', 60],
-                            ['2021-09-09 10:20', 60],
-                            ['2021-09-10 10:20', 60],
-                            ['2021-09-11 10:20', 60],
-                            ['2021-09-12 10:20', 60],
-                        ]
-                    }]
-                });
-            });
-
-        },
-        /** 获取物模型*/
-        getCacheThingsModdel(productId) {
-            // 获取缓存的Json物模型
-            cacheJsonThingsModel(productId).then(response => {
-                let thingsModel = JSON.parse(response.data);
-                // 筛选监测数据
-                this.monitorThings = thingsModel.properties.filter(item => item.isMonitor == 1);
-                console.log(this.monitorThings);
-            });
-        },
         /** 修改按钮操作 */
         handleEditDevice(row) {
             let deviceId = 0;
@@ -433,32 +393,74 @@ export default {
                 this.$modal.msgSuccess("删除成功");
             }).catch(() => {});
         },
+        /** 查看监测数据 */
+        handleMonitor(item) {
+            this.open = true;
+            // 获取物模型
+            this.getCacheThingsModdel(item.productId);
+            // Mqtt发布消息获取Mqtt数据
+
+        },
+        /** 获取物模型*/
+        getCacheThingsModdel(productId) {
+            // 获取缓存的Json物模型
+            cacheJsonThingsModel(productId).then(response => {
+                let thingsModel = JSON.parse(response.data);
+                // 筛选监测数据
+                this.monitorThings = thingsModel.properties.filter(item => item.isMonitor == 1);
+                // 绘制监测图表
+                this.$nextTick(function () {
+                    this.getMonitorChart();
+                    this.randomMqttData();
+                });
+            });
+        },
+        // 模拟Mqtt数据
+        randomMqttData() {
+            let self = this;
+            self.dataList = [];
+            if (self.interval != null) { //判断计时器是否为空
+                clearInterval(self.interval);
+                self.interval = null;
+            }
+            self.interval = setInterval(function () {
+                let seconds = 1000;
+                self.now = new Date(+self.now + seconds);
+                for (let i = 0; i < self.monitorThings.length; i++) {
+                    let date = [
+                        self.now.getFullYear(),
+                        self.now.getMonth(),
+                        self.now.getDate(),
+                    ].join('/');
+                    let time = [
+                        self.now.getHours(),
+                        self.now.getMinutes(),
+                        self.now.getSeconds()
+                    ].join(':');
+                    let value = Math.floor(Math.random() * (40.3 - 20.46)) + 10.46;
+                    if (self.dataList[i] == undefined) {
+                        self.dataList[i] = [];
+                    }
+                    if (self.dataList[i].length > 60) {
+                        self.dataList[i].shift();
+                    }
+                    self.dataList[i].push([date + ' ' + time, value]);
+
+                    // 更新图表
+                    self.chart[i].setOption({
+                        series: [{
+                            data: self.dataList[i]
+                        }]
+                    });
+                }
+
+            }, 1000);
+        },
         /**监测数据 */
-        getMonitor() {
+        getMonitorChart() {
             for (let i = 0; i < this.monitorThings.length; i++) {
                 this.chart[i] = echarts.init(this.$refs.monitor[i]);
                 var option;
-
-                // function randomData() {
-                //     now = new Date(+now + oneDay);
-                //     value = value + Math.random() * 21 - 10;
-                //     return {
-                //         name: now.toString(),
-                //         value: [
-                //             [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
-                //             Math.round(value)
-                //         ]
-                //     };
-                // }
-                // let data = [];
-                // let now = new Date(1997, 9, 3);
-                // let oneDay = 24 * 3600 * 1000;
-                // let value = Math.random() * 1000;
-                // for (var j = 0; j < 1000; j++) {
-                //     data.push(randomData());
-                // }
-                // console.log(randomData())
-
                 option = {
                     title: {
                         left: 'center',
@@ -471,37 +473,15 @@ export default {
                         bottom: '20px',
                         containLabel: true
                     },
-                    // 初始化动画
-                    animationDuration: function (idx) {
-                        // 越往后的数据时长越大
-                        return 5000;
-                    },
-                    // 数据更新动画
-                    animationDurationUpdate: function (idx) {
-                        // 越往后的数据时长越大
-                        return  1000;
-                    },
                     tooltip: {
                         trigger: 'axis',
-                        // formatter: function (params) {
-                        //     params = params[0];
-                        //     var date = new Date(params.name);
-                        //     return (
-                        //         date.getDate() +
-                        //         '/' +
-                        //         (date.getMonth() + 1) +
-                        //         '/' +
-                        //         date.getFullYear() +
-                        //         ' : ' +
-                        //         params.value[1]
-                        //     );
-                        // },
                         axisPointer: {
                             animation: true
                         }
                     },
                     xAxis: {
                         type: 'time',
+                        show: false,
                         splitLine: {
                             show: false
                         }
@@ -510,7 +490,7 @@ export default {
                         type: 'value',
                         boundaryGap: [0, '100%'],
                         splitLine: {
-                            show: false
+                            show: true
                         }
                     },
                     series: [{
@@ -520,18 +500,6 @@ export default {
                         data: []
                     }]
                 };
-                // setInterval(function () {
-                //     for (var i = 0; i < 5; i++) {
-                //         data.shift();
-                //         data.push(randomData());
-                //     }
-                //     this.chart[i].setOption({
-                //         series: [{
-                //             data: data
-                //         }]
-                //     });
-                // }, 1000);
-
                 option && this.chart[i].setOption(option);
             }
         },
