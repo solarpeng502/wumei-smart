@@ -2,6 +2,7 @@ package com.ruoyi.iot.mapper;
 
 import com.ruoyi.iot.domain.DeviceLog;
 import com.ruoyi.iot.model.MonitorModel;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -11,7 +12,8 @@ import java.util.List;
  * @author kerwincui
  * @date 2022-01-13
  */
-public interface DeviceLogMapper 
+@Repository
+public interface DeviceLogMapper
 {
     /**
      * 查询设备日志

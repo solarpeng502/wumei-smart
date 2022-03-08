@@ -2,6 +2,7 @@ package com.ruoyi.iot.mapper;
 
 import java.util.List;
 import com.ruoyi.iot.domain.OauthClientDetails;
+import org.springframework.stereotype.Repository;
 
 /**
  * 云云对接Mapper接口
@@ -9,6 +10,7 @@ import com.ruoyi.iot.domain.OauthClientDetails;
  * @author kerwincui
  * @date 2022-02-07
  */
+@Repository
 public interface OauthClientDetailsMapper 
 {
     /**

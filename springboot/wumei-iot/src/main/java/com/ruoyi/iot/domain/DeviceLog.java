@@ -38,6 +38,10 @@ public class DeviceLog extends BaseEntity
     @Excel(name = "设备名称")
     private String deviceName;
 
+    /** 设备编号 */
+    @Excel(name = "设备编号")
+    private String serialNumber;
+
     /** 标识符 */
     @Excel(name = "标识符")
     private String identity;
@@ -50,7 +54,15 @@ public class DeviceLog extends BaseEntity
     @Excel(name = "是否监测数据", readConverterExp = "1==是，0=否")
     private Integer isMonitor;
 
-    public void setLogId(Long logId) 
+    public String getSerialNumber() {
+        return serialNumber;
+    }
+
+    public void setSerialNumber(String serialNumber) {
+        this.serialNumber = serialNumber;
+    }
+
+    public void setLogId(Long logId)
     {
         this.logId = logId;
     }

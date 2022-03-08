@@ -4,6 +4,7 @@ import java.util.List;
 import com.ruoyi.iot.domain.Group;
 import com.ruoyi.iot.model.DeviceGroupInput;
 import com.ruoyi.iot.model.IdOutput;
+import org.springframework.stereotype.Repository;
 
 /**
  * 设备分组Mapper接口
@@ -11,6 +12,7 @@ import com.ruoyi.iot.model.IdOutput;
  * @author kerwincui
  * @date 2021-12-16
  */
+@Repository
 public interface GroupMapper 
 {
     /**

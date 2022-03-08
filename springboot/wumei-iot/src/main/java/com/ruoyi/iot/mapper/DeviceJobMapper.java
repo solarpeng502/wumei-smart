@@ -1,6 +1,7 @@
 package com.ruoyi.iot.mapper;
 
 import com.ruoyi.iot.domain.DeviceJob;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -9,6 +10,7 @@ import java.util.List;
  * 
  * @author kerwincui
  */
+@Repository
 public interface DeviceJobMapper
 {
     /**

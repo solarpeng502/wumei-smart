@@ -2,6 +2,7 @@ package com.ruoyi.iot.mapper;
 
 import java.util.List;
 import com.ruoyi.iot.domain.Firmware;
+import org.springframework.stereotype.Repository;
 
 /**
  * 产品固件Mapper接口
@@ -9,6 +10,7 @@ import com.ruoyi.iot.domain.Firmware;
  * @author kerwincui
  * @date 2021-12-16
  */
+@Repository
 public interface FirmwareMapper 
 {
     /**

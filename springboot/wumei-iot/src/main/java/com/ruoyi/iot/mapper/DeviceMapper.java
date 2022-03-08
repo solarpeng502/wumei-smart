@@ -7,6 +7,7 @@ import com.ruoyi.iot.model.DeviceAuthenticateModel;
 import com.ruoyi.iot.model.DeviceShortOutput;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesInput;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesOutput;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ import java.util.List;
  * @author kerwincui
  * @date 2021-12-16
  */
+@Repository
 public interface DeviceMapper 
 {
     /**

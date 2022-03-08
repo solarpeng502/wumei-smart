@@ -4,7 +4,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.iot.mapper.AlertLogMapper">
     
-    <resultMap type="AlertLog" id="AlertLogResult">
+    <resultMap type="com.ruoyi.iot.domain.AlertLog" id="AlertLogResult">
         <result property="alertLogId"    column="alert_log__id"    />
         <result property="alertName"    column="alert_name"    />
         <result property="alertLevel"    column="alert_level"    />
@@ -24,7 +24,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select alert_log__id, alert_name, alert_level, status, product_id, product_name, device_id, device_name, create_by, create_time, update_by, update_time, remark from iot_alert_log
     </sql>
 
-    <select id="selectAlertLogList" parameterType="AlertLog" resultMap="AlertLogResult">
+    <select id="selectAlertLogList" parameterType="com.ruoyi.iot.domain.AlertLog" resultMap="AlertLogResult">
         <include refid="selectAlertLogVo"/>
         <where>  
             <if test="alertName != null  and alertName != ''"> and alert_name like concat('%', #{alertName}, '%')</if>
@@ -42,7 +42,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where alert_log__id = #{alertLogId}
     </select>
         
-    <insert id="insertAlertLog" parameterType="AlertLog" useGeneratedKeys="true" keyProperty="alertLogId">
+    <insert id="insertAlertLog" parameterType="com.ruoyi.iot.domain.AlertLog" useGeneratedKeys="true" keyProperty="alertLogId">
         insert into iot_alert_log
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="alertName != null and alertName != ''">alert_name,</if>
@@ -74,7 +74,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
     </insert>
 
-    <update id="updateAlertLog" parameterType="AlertLog">
+    <update id="updateAlertLog" parameterType="com.ruoyi.iot.domain.AlertLog">
         update iot_alert_log
         <trim prefix="SET" suffixOverrides=",">
             <if test="alertName != null and alertName != ''">alert_name = #{alertName},</if>

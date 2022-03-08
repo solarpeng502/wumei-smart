@@ -3,6 +3,7 @@ package com.ruoyi.iot.mapper;
 import com.ruoyi.iot.domain.Product;
 import com.ruoyi.iot.model.ChangeProductStatusModel;
 import com.ruoyi.iot.model.IdAndName;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  * @author kerwincui
  * @date 2021-12-16
  */
+@Repository
 public interface ProductMapper 
 {
     /**

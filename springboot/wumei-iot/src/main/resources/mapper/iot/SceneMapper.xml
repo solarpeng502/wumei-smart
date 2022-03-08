@@ -4,7 +4,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.iot.mapper.SceneMapper">
     
-    <resultMap type="Scene" id="SceneResult">
+    <resultMap type="com.ruoyi.iot.domain.Scene" id="SceneResult">
         <result property="sceneId"    column="scene_id"    />
         <result property="sceneName"    column="scene_name"    />
         <result property="userId"    column="user_id"    />
@@ -22,7 +22,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select scene_id, scene_name, user_id, user_name, triggers, actions, create_by, create_time, update_by, update_time, remark from iot_scene
     </sql>
 
-    <select id="selectSceneList" parameterType="Scene" resultMap="SceneResult">
+    <select id="selectSceneList" parameterType="com.ruoyi.iot.domain.Scene" resultMap="SceneResult">
         <include refid="selectSceneVo"/>
         <where>  
             <if test="sceneName != null  and sceneName != ''"> and scene_name like concat('%', #{sceneName}, '%')</if>
@@ -36,7 +36,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where scene_id = #{sceneId}
     </select>
         
-    <insert id="insertScene" parameterType="Scene" useGeneratedKeys="true" keyProperty="sceneId">
+    <insert id="insertScene" parameterType="com.ruoyi.iot.domain.Scene" useGeneratedKeys="true" keyProperty="sceneId">
         insert into iot_scene
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="sceneName != null and sceneName != ''">scene_name,</if>
@@ -64,7 +64,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
     </insert>
 
-    <update id="updateScene" parameterType="Scene">
+    <update id="updateScene" parameterType="com.ruoyi.iot.domain.Scene">
         update iot_scene
         <trim prefix="SET" suffixOverrides=",">
             <if test="sceneName != null and sceneName != ''">scene_name = #{sceneName},</if>

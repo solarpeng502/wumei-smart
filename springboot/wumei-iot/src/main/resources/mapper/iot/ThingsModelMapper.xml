@@ -4,7 +4,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.iot.mapper.ThingsModelMapper">
     
-    <resultMap type="ThingsModel" id="ThingsModelResult">
+    <resultMap type="com.ruoyi.iot.domain.ThingsModel" id="ThingsModelResult">
         <result property="modelId"    column="model_id"    />
         <result property="modelName"    column="model_name"    />
         <result property="productId"    column="product_id"    />
@@ -23,7 +23,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select model_id, model_name, product_id, product_name, tenant_id, tenant_name, identifier, type, datatype, specs, is_Top, is_Monitor from iot_things_model
     </sql>
 
-    <select id="selectThingsModelList" parameterType="ThingsModel" resultMap="ThingsModelResult">
+    <select id="selectThingsModelList" parameterType="com.ruoyi.iot.domain.ThingsModel" resultMap="ThingsModelResult">
         <include refid="selectThingsModelVo"/>
         <where>
             and product_id = #{productId}
@@ -47,7 +47,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where model_id = #{modelId}
     </select>
         
-    <insert id="insertThingsModel" parameterType="ThingsModel" useGeneratedKeys="true" keyProperty="modelId">
+    <insert id="insertThingsModel" parameterType="com.ruoyi.iot.domain.ThingsModel" useGeneratedKeys="true" keyProperty="modelId">
         insert into iot_things_model
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="modelName != null and modelName != ''">model_name,</if>
@@ -87,7 +87,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
     </insert>
 
-    <insert id="insertBatchThingsModel" parameterType="ThingsModel" useGeneratedKeys="true" keyProperty="modelId">
+    <insert id="insertBatchThingsModel" parameterType="com.ruoyi.iot.domain.ThingsModel" useGeneratedKeys="true" keyProperty="modelId">
         insert into iot_things_model (model_name,product_id,product_name,tenant_id,tenant_name,identifier,type,datatype,specs,is_Top,is_Monitor,create_by,create_time)
         values
         <foreach item="model" collection="list" separator=",">
@@ -97,7 +97,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </insert>
 
-    <update id="updateThingsModel" parameterType="ThingsModel">
+    <update id="updateThingsModel" parameterType="com.ruoyi.iot.domain.ThingsModel">
         update iot_things_model
         <trim prefix="SET" suffixOverrides=",">
             <if test="modelName != null and modelName != ''">model_name = #{modelName},</if>

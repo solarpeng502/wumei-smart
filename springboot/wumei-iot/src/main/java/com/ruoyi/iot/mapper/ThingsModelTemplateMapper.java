@@ -1,7 +1,9 @@
 package com.ruoyi.iot.mapper;
 
-import java.util.List;
 import com.ruoyi.iot.domain.ThingsModelTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * 通用物模型Mapper接口
@@ -9,6 +11,7 @@ import com.ruoyi.iot.domain.ThingsModelTemplate;
  * @author kerwincui
  * @date 2021-12-16
  */
+@Repository
 public interface ThingsModelTemplateMapper 
 {
     /**

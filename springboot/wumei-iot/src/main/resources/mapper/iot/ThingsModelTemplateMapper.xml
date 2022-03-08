@@ -4,7 +4,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.iot.mapper.ThingsModelTemplateMapper">
     
-    <resultMap type="ThingsModelTemplate" id="ThingsModelTemplateResult">
+    <resultMap type="com.ruoyi.iot.domain.ThingsModelTemplate" id="ThingsModelTemplateResult">
         <result property="templateId"    column="template_id"    />
         <result property="templateName"    column="template_name"    />
         <result property="tenantId"    column="tenant_id"    />
@@ -25,7 +25,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select template_id, template_name, tenant_id, tenant_name, identifier, type, datatype, specs, is_sys, is_Top, is_Monitor, create_time, update_time, remark from iot_things_model_template
     </sql>
 
-    <select id="selectThingsModelTemplateList" parameterType="ThingsModelTemplate" resultMap="ThingsModelTemplateResult">
+    <select id="selectThingsModelTemplateList" parameterType="com.ruoyi.iot.domain.ThingsModelTemplate" resultMap="ThingsModelTemplateResult">
         <include refid="selectThingsModelTemplateVo"/>
         <where>  
             <if test="templateName != null  and templateName != ''"> and template_name like concat('%', #{templateName}, '%')</if>
@@ -47,7 +47,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </select>
         
-    <insert id="insertThingsModelTemplate" parameterType="ThingsModelTemplate" useGeneratedKeys="true" keyProperty="templateId">
+    <insert id="insertThingsModelTemplate" parameterType="com.ruoyi.iot.domain.ThingsModelTemplate" useGeneratedKeys="true" keyProperty="templateId">
         insert into iot_things_model_template
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="templateName != null and templateName != ''">template_name,</if>
@@ -87,7 +87,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
     </insert>
 
-    <update id="updateThingsModelTemplate" parameterType="ThingsModelTemplate">
+    <update id="updateThingsModelTemplate" parameterType="com.ruoyi.iot.domain.ThingsModelTemplate">
         update iot_things_model_template
         <trim prefix="SET" suffixOverrides=",">
             <if test="templateName != null and templateName != ''">template_name = #{templateName},</if>

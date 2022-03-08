@@ -9,7 +9,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="time"    column="create_time"    />
     </resultMap>
 
-    <resultMap type="DeviceLog" id="DeviceLogResult">
+    <resultMap type="com.ruoyi.iot.domain.DeviceLog" id="DeviceLogResult">
         <result property="logId"    column="log_id"    />
         <result property="logName"    column="log_name"    />
         <result property="logType"    column="log_type"    />
@@ -26,15 +26,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectDeviceLogVo">
-        select log_id, log_name, log_type, log_value, device_id, device_name,serial_number identity, datatype, create_by, is_monitor, create_time, remark from iot_device_log
+        select log_id, log_name, log_type, log_value, device_id, device_name,serial_number, identity, datatype, create_by, is_monitor, create_time, remark from iot_device_log
     </sql>
 
-    <select id="selectMonitorList" parameterType="DeviceLog" resultMap="MonitorResult">
+    <select id="selectMonitorList" parameterType="com.ruoyi.iot.domain.DeviceLog" resultMap="MonitorResult">
         select log_value, create_time from iot_device_log
         where device_id = #{deviceId} and identity = #{identity} and is_monitor=1
     </select>
 
-    <select id="selectDeviceLogList" parameterType="DeviceLog" resultMap="DeviceLogResult">
+    <select id="selectDeviceLogList" parameterType="com.ruoyi.iot.domain.DeviceLog" resultMap="DeviceLogResult">
         <include refid="selectDeviceLogVo"/>
         <where>
             <if test="1==1"> and device_id = #{deviceId}</if>
@@ -52,7 +52,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where log_id = #{logId}
     </select>
         
-    <insert id="insertDeviceLog" parameterType="DeviceLog" useGeneratedKeys="true" keyProperty="logId">
+    <insert id="insertDeviceLog" parameterType="com.ruoyi.iot.domain.DeviceLog" useGeneratedKeys="true" keyProperty="logId">
         insert into iot_device_log
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="logName != null and logName != ''">log_name,</if>
@@ -84,7 +84,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
     </insert>
 
-    <update id="updateDeviceLog" parameterType="DeviceLog">
+    <update id="updateDeviceLog" parameterType="com.ruoyi.iot.domain.DeviceLog">
         update iot_device_log
         <trim prefix="SET" suffixOverrides=",">
             <if test="logName != null and logName != ''">log_name = #{logName},</if>

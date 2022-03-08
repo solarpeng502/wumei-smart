@@ -19,19 +19,30 @@
     </el-form>
 
     <el-table v-loading="loading" :data="deviceLogList" size="mini">
-        <el-table-column label="设备日志ID" align="center" prop="logId" />
-        <el-table-column label="日志名称" align="center" prop="logName" />
-        <el-table-column label="类型" align="center" prop="logType">
+        <el-table-column label="名称" align="center" prop="logName" />
+        <el-table-column label="动作" align="center" prop="logValue">
+             <template slot-scope="scope">
+                    <div v-html="formatValueDisplay(scope.row)"></div>
+                </template>
+        </el-table-column>
+        <el-table-column label="标识符" align="center" prop="identity" />
+        <el-table-column label="类型" align="center" prop="logType" width="100">
             <template slot-scope="scope">
                 <dict-tag :options="dict.type.iot_device_log_type" :value="scope.row.logType" />
             </template>
         </el-table-column>
-        <el-table-column label="日志值" align="center" prop="logValue" />
-        <el-table-column label="设备ID" align="center" prop="deviceId" />
-        <el-table-column label="设备名称" align="center" prop="deviceName" />
-        <el-table-column label="标识符" align="center" prop="identity" />
-        <el-table-column label="数据类型" align="center" prop="datatype" />
-        <el-table-column label="是否监测数据" align="center" prop="isMonitor" />
+        <el-table-column label="数据类型" align="center" prop="datatype" width="80">
+            <template slot-scope="scope">
+                <dict-tag :options="dict.type.iot_data_type" :value="scope.row.datatype" />
+            </template>
+        </el-table-column>
+        <el-table-column label="监测数据" align="center" prop="isMonitor" width="80">
+            <template slot-scope="scope">
+                <dict-tag :options="dict.type.iot_yes_no" :value="scope.row.isMonitor" />
+            </template>
+        </el-table-column>
+        <el-table-column label="设备编号" align="center" prop="serialNumber" />
+        <el-table-column label="备注" align="center" prop="remark" />
         <el-table-column label="创建时间" align="center" prop="createTime" width="180">
             <template slot-scope="scope">
                 <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
@@ -48,10 +59,13 @@
 import {
     listDeviceLog
 } from "@/api/iot/deviceLog";
+import {
+    cacheJsonThingsModel
+} from "@/api/iot/model";
 
 export default {
     name: "DeviceLog",
-    dicts: ['iot_device_log_type'],
+    dicts: ['iot_device_log_type', "iot_data_type", "iot_yes_no"],
     props: {
         device: {
             type: Object,
@@ -65,11 +79,15 @@ export default {
             if (this.deviceInfo && this.deviceInfo.deviceId != 0) {
                 this.queryParams.deviceId = this.deviceInfo.deviceId;
                 this.getList();
+                // 获取物模型
+                this.getCacheThingsModdel(this.deviceInfo.productId);
             }
         }
     },
     data() {
         return {
+            // 物模型
+            thingsModel:{},
             // 遮罩层
             loading: true,
             // 显示搜索条件
@@ -119,6 +137,17 @@ export default {
             this.download('iot/deviceLog/export', {
                 ...this.queryParams
             }, `deviceLog_${new Date().getTime()}.xlsx`)
+        },
+        /** 获取物模型*/
+        getCacheThingsModdel(productId) {
+            // 获取缓存的Json物模型
+            cacheJsonThingsModel(productId).then(response => {
+                this.thingsModel = JSON.parse(response.data);
+            });
+        },
+        /** 格式化显示数据定义 */
+        formatValueDisplay(row) {
+
         }
     }
 };

@@ -4,7 +4,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.iot.mapper.ProductMapper">
     
-    <resultMap type="Product" id="ProductResult">
+    <resultMap type="com.ruoyi.iot.domain.Product" id="ProductResult">
         <result property="productId"    column="product_id"    />
         <result property="productName"    column="product_name"    />
         <result property="categoryId"    column="category_id"    />
@@ -34,7 +34,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select product_id, product_name, category_id, category_name, tenant_id, tenant_name, is_sys,mqtt_account,mqtt_password,mqtt_secret ,status, device_type, network_method, vertificate_method, create_time, update_time, img_url,remark from iot_product
     </sql>
 
-    <select id="selectProductList" parameterType="Product" resultMap="ProductResult">
+    <select id="selectProductList" parameterType="com.ruoyi.iot.domain.Product" resultMap="ProductResult">
         <include refid="selectProductVo"/>
         <where>  
             <if test="productName != null  and productName != ''"> and product_name like concat('%', #{productName}, '%')</if>
@@ -61,7 +61,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where product_id = #{productId}
     </select>
         
-    <insert id="insertProduct" parameterType="Product" useGeneratedKeys="true" keyProperty="productId">
+    <insert id="insertProduct" parameterType="com.ruoyi.iot.domain.Product" useGeneratedKeys="true" keyProperty="productId">
         insert into iot_product
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="productName != null and productName != ''">product_name,</if>
@@ -109,7 +109,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
     </insert>
 
-    <update id="updateProduct" parameterType="Product">
+    <update id="updateProduct" parameterType="com.ruoyi.iot.domain.Product">
         update iot_product
         <trim prefix="SET" suffixOverrides=",">
             <if test="productName != null and productName != ''">product_name = #{productName},</if>
@@ -141,7 +141,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where product_id = #{productId}
     </update>
 
-    <update id="updateThingsModelJson" parameterType="Product">
+    <update id="updateThingsModelJson" parameterType="com.ruoyi.iot.domain.Product">
         update iot_product set things_models_json=#{thingsModelsJson}
         where product_id = #{productId}
     </update>

@@ -2,6 +2,7 @@ package com.ruoyi.iot.mapper;
 
 import java.util.List;
 import com.ruoyi.iot.domain.DeviceUser;
+import org.springframework.stereotype.Repository;
 
 /**
  * 设备用户Mapper接口
@@ -9,6 +10,7 @@ import com.ruoyi.iot.domain.DeviceUser;
  * @author kerwincui
  * @date 2021-12-16
  */
+@Repository
 public interface DeviceUserMapper 
 {
     /**

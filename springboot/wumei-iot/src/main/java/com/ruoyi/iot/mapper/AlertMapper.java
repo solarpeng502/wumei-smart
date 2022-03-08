@@ -2,6 +2,7 @@ package com.ruoyi.iot.mapper;
 
 import java.util.List;
 import com.ruoyi.iot.domain.Alert;
+import org.springframework.stereotype.Repository;
 
 /**
  * 设备告警Mapper接口
@@ -9,6 +10,7 @@ import com.ruoyi.iot.domain.Alert;
  * @author kerwincui
  * @date 2022-01-13
  */
+@Repository
 public interface AlertMapper 
 {
     /**

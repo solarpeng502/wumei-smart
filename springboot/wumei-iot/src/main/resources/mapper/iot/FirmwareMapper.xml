@@ -4,7 +4,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.iot.mapper.FirmwareMapper">
     
-    <resultMap type="Firmware" id="FirmwareResult">
+    <resultMap type="com.ruoyi.iot.domain.Firmware" id="FirmwareResult">
         <result property="firmwareId"    column="firmware_id"    />
         <result property="firmwareName"    column="firmware_name"    />
         <result property="productId"    column="product_id"    />
@@ -23,7 +23,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select firmware_id, firmware_name, product_id, product_name, tenant_id, tenant_name, is_sys, version, file_path, create_time,  update_time, remark from iot_firmware
     </sql>
 
-    <select id="selectFirmwareList" parameterType="Firmware" resultMap="FirmwareResult">
+    <select id="selectFirmwareList" parameterType="com.ruoyi.iot.domain.Firmware" resultMap="FirmwareResult">
         <include refid="selectFirmwareVo"/>
         <where>  
             <if test="firmwareName != null  and firmwareName != ''"> and firmware_name like concat('%', #{firmwareName}, '%')</if>
@@ -39,7 +39,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where firmware_id = #{firmwareId}
     </select>
         
-    <insert id="insertFirmware" parameterType="Firmware" useGeneratedKeys="true" keyProperty="firmwareId">
+    <insert id="insertFirmware" parameterType="com.ruoyi.iot.domain.Firmware" useGeneratedKeys="true" keyProperty="firmwareId">
         insert into iot_firmware
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="firmwareName != null and firmwareName != ''">firmware_name,</if>
@@ -75,7 +75,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
     </insert>
 
-    <update id="updateFirmware" parameterType="Firmware">
+    <update id="updateFirmware" parameterType="com.ruoyi.iot.domain.Firmware">
         update iot_firmware
         <trim prefix="SET" suffixOverrides=",">
             <if test="firmwareName != null and firmwareName != ''">firmware_name = #{firmwareName},</if>
