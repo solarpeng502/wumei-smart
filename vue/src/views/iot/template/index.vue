@@ -93,7 +93,7 @@
                     <el-input v-model="form.identifier" placeholder="请输入标识符，例如：temperature" />
                 </el-form-item>
                 <el-form-item label="模型类别" prop="type">
-                    <el-radio-group v-model="form.type">
+                    <el-radio-group v-model="form.type" @change="typeChange(form.type)">
                         <el-radio-button label="1">属性</el-radio-button>
                         <el-radio-button label="2">功能</el-radio-button>
                         <el-radio-button label="3">事件</el-radio-button>
@@ -104,13 +104,18 @@
                     </el-switch>
                 </el-form-item>
                 <el-form-item label="实时监测" prop="isMonitor" v-show="form.type == 1">
-                    <el-switch v-model="form.isMonitor" active-text="" inactive-text="" :active-value="1" :inactive-value="0" active-color="#13ce66">
+                    <el-switch v-model="form.isMonitor" active-text="" inactive-text="" :active-value="1" :inactive-value="0" active-color="#13ce66" @change="changeMonitor(form.isMonitor)">
                     </el-switch>
                 </el-form-item>
                 <el-divider></el-divider>
                 <el-form-item label="数据类型" prop="datatype">
                     <el-select v-model="form.datatype" placeholder="请选择数据类型" @change="dataTypeChange">
-                        <el-option v-for="dict in dict.type.iot_data_type" :key="dict.value" :label="dict.label" :value="dict.value"></el-option>
+                        <el-option key="integer" label="整数" value="integer"></el-option>
+                        <el-option key="decimal" label="小数" value="decimal"></el-option>
+                        <el-option key="bool" label="布尔" value="bool" :disabled="form.isMonitor==1"></el-option>
+                        <el-option key="enum" label="枚举" value="enum" :disabled="form.isMonitor==1"></el-option>
+                        <el-option key="string" label="字符串" value="string" :disabled="form.isMonitor==1"></el-option>
+                        <el-option key="array" label="数组" value="array" :disabled="form.isMonitor==1"></el-option>
                     </el-select>
                 </el-form-item>
                 <div v-if="form.datatype == 'integer' || form.datatype == 'decimal'">
@@ -405,8 +410,17 @@ export default {
                 `template_${new Date().getTime()}.xlsx`
             );
         },
-        changeType(val) {
-            alert(val);
+        // 类型改变
+        typeChange(label){
+            if(label==2 || label==3){
+                this.form.isMonitor=0;
+            }
+        },
+        // 实时监测改变
+        changeMonitor(isMonitor){
+            if(isMonitor==1 && this.form.datatype!="integer" && this.form.datatype!="decimal"){
+                this.form.datatype="integer";
+            }
         },
         // 格式化物模型
         formatThingsSpecs() {
