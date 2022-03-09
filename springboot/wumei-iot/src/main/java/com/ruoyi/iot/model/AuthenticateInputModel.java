@@ -7,15 +7,16 @@ package com.ruoyi.iot.model;
  */
 public class AuthenticateInputModel
 {
-    public AuthenticateInputModel(String serialNumber,Long productId){
-        serialNumber=serialNumber;
-        productId=productId;
-    }
     /** 设备编号 */
     private String serialNumber;
 
     /** 产品ID */
     private Long productId;
+
+    public AuthenticateInputModel(String serialNumber,Long productId){
+        this.serialNumber=serialNumber;
+        this.productId=productId;
+    }
 
     public String getSerialNumber() {
         return serialNumber;

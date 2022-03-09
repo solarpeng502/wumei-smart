@@ -89,6 +89,14 @@ public interface ProductMapper
     public int deleteProductByProductIds(Long[] productIds);
 
     /**
+     * 批量删除产品物模型
+     *
+     * @param productIds 需要删除的数据主键集合
+     * @return 结果
+     */
+    public int deleteProductThingsModelByProductIds(Long[] productIds);
+
+    /**
      * 产品下的固件数量
      * @param productIds 需要删除的数据主键集合
      * @return 结果

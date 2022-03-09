@@ -12,6 +12,7 @@ import com.ruoyi.iot.model.IdAndName;
 import com.ruoyi.iot.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -153,6 +154,7 @@ public class ProductServiceImpl implements IProductService
      * @return 结果
      */
     @Override
+    @Transactional
     public AjaxResult deleteProductByProductIds(Long[] productIds)
     {
         // 删除物模型JSON缓存
@@ -169,6 +171,9 @@ public class ProductServiceImpl implements IProductService
         if(deviceCount>0){
             return AjaxResult.error("删除失败，请先删除对应产品下的设备");
         }
+        // 删除产品物模型
+        productMapper.deleteProductThingsModelByProductIds(productIds);
+        // 删除产品
         if(productMapper.deleteProductByProductIds(productIds)>0){
             return AjaxResult.success("删除成功");
         }

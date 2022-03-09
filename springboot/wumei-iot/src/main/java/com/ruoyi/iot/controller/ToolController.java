@@ -10,6 +10,7 @@ import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.exception.file.FileNameLengthLimitExceededException;
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.common.utils.file.FileUtils;
@@ -54,6 +55,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -88,9 +90,6 @@ public class ToolController extends BaseController {
     private ISysUserService userService;
 
     @Autowired
-    private TokenService tokenService;
-
-    @Autowired
     private EmqxService emqxService;
 
     @Autowired
@@ -120,7 +119,7 @@ public class ToolController extends BaseController {
     @PostMapping("/mqtt/auth")
     public ResponseEntity mqttAuth(@RequestParam String clientid, @RequestParam String username, @RequestParam String password) throws Exception {
         try {
-            if (clientid.startsWith("server") || clientid.startsWith("test")) {
+            if (clientid.startsWith("server")) {
                 // 服务端配置账号认证
                 if (mqttConfig.getusername().equals(username) && mqttConfig.getpassword().equals(password)) {
                     System.out.println("-----------认证成功,clientId:" + clientid + "---------------");
@@ -140,11 +139,17 @@ public class ToolController extends BaseController {
                     return returnUnauthorized(clientid, username, password, ex.getMessage());
                 }
             } else {
-                // 设备认证
+                // 设备端
                 String[] clientInfo=clientid.split("&");
                 if (clientInfo.length != 2) {
+                    // 设备未加密认证
+                    if (mqttConfig.getusername().equals(username) && mqttConfig.getpassword().equals(password)) {
+                        System.out.println("-----------认证成功,clientId:" + clientid + "---------------");
+                        return ResponseEntity.ok().body("ok");
+                    }
                     return returnUnauthorized(clientid, username, password, "认证信息有误");
                 }
+                // 设备加密认证
                 String deviceNum=clientInfo[0];
                 Long productId=Long.valueOf(clientInfo[1]);
                 AuthenticateInputModel authenticateInputModel=new AuthenticateInputModel(deviceNum,productId);
@@ -164,28 +169,24 @@ public class ToolController extends BaseController {
                 String mqttPassword = infos[0];
                 Long userId = Long.valueOf(infos[1]);
                 Long expireTime = Long.valueOf(infos[2]);
-                if (model.getDeviceId() != null || model.getDeviceId() != 0) {
-                    // 账号密码匹配，未过期、设备状态不是禁用(设备状态（1-未激活，2-禁用，3-在线，4-离线）)
-                    if (mqttPassword.equals(model.getMqttPassword())
-                            && username.equals(model.getMqttAccount())
-                            && expireTime > System.currentTimeMillis()
-                            && model.getStatus() != 2) {
+                // 账号密码验证，产品必须为发布状态：1-未发布，2-已发布
+                if (mqttPassword.equals(model.getMqttPassword())
+                        && username.equals(model.getMqttAccount())
+                        && expireTime > System.currentTimeMillis()
+                        && model.getProductStatus()==2) {
+
+                    // 设备状态验证 （1-未激活，2-禁用，3-在线，4-离线）
+                    if(model.getDeviceId() != null && model.getDeviceId() != 0 && model.getStatus() != 2){
                         System.out.println("-----------认证成功,clientId:" + clientid + "---------------");
                         return ResponseEntity.ok().body("ok");
+                    }else{
+                        // 自动添加设备
+                        int result=deviceService.insertDeviceAuto(deviceNum,userId,productId);
+                        if(result==1){
+                            System.out.println("-----------认证成功,clientId:" + clientid + "---------------");
+                            return ResponseEntity.ok().body("ok");
+                        }
                     }
-                } else {
-                    // 自动添加设备
-                    Device device = new Device();
-                    int random = (int) (Math.random() * (9000)) + 1000;
-                    device.setDeviceName("设备" + random);
-                    device.setSerialNumber(clientid);
-                    SysUser user=userService.selectUserById(userId);
-                    device.setUserId(userId);
-                    device.setUserName(user.getUserName());
-                    Product product=productService.selectProductByProductId(productId);
-                    device.setProductId(productId);
-                    device.setProductName(product.getProductName());
-                    deviceService.insertDeviceAuto(device);
                 }
             }
         } catch (Exception ex) {
@@ -220,7 +221,6 @@ public class ToolController extends BaseController {
             if (model.getClientid().startsWith("server") || model.getClientid().startsWith("web") || model.getClientid().startsWith("phone")) {
                 return AjaxResult.success();
             }
-
             Device device = deviceService.selectDeviceBySerialNumber(model.getClientid());
             // 设备状态（1-未激活，2-禁用，3-在线，4-离线）
             if (model.getAction().equals("client_disconnected")) {
@@ -263,7 +263,7 @@ public class ToolController extends BaseController {
                 throw new FileNameLengthLimitExceededException(FileUploadUtils.DEFAULT_FILE_NAME_LENGTH);
             }
             // 文件类型限制
-            assertAllowed(file, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION);
+            // assertAllowed(file, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION);
 
             // 获取文件名和文件类型
             String fileName = file.getOriginalFilename();

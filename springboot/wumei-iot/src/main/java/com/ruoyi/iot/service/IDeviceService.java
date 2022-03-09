@@ -88,10 +88,9 @@ public interface IDeviceService
     /**
      * 设备认证后自动添加设备
      *
-     * @param device 设备
      * @return 结果
      */
-    public Device insertDeviceAuto(Device device);
+    public int insertDeviceAuto(String serialNumber,Long userId,Long productId);
 
     /**
      * 修改设备

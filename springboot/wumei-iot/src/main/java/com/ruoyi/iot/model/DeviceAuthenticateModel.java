@@ -8,6 +8,7 @@ public class DeviceAuthenticateModel {
     /** 产品分类名称 */
     private String deviceName;
 
+    /**设备状态（1-未激活，2-禁用，3-在线，4-离线）**/
     private int status;
 
     /** 产品ID */
@@ -15,6 +16,9 @@ public class DeviceAuthenticateModel {
 
     /** 产品名称 */
     private String productName;
+
+    /** 产品状态 1-未发布，2-已发布 */
+    private int productStatus;
 
     /** 设备编号 */
     private String serialNumber;
@@ -28,7 +32,14 @@ public class DeviceAuthenticateModel {
     /** 产品秘钥 */
     private String mqttSecret;
 
-    /**设备状态（1-未激活，2-禁用，3-在线，4-离线）**/
+    public int getProductStatus() {
+        return productStatus;
+    }
+
+    public void setProductStatus(int productStatus) {
+        this.productStatus = productStatus;
+    }
+
     public int getStatus() {
         return status;
     }

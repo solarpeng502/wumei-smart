@@ -35,7 +35,7 @@ import static com.ruoyi.common.utils.SecurityUtils.getLoginUser;
 @Service
 public class ThingsModelServiceImpl implements IThingsModelService 
 {
-    private String tslPreKey ="tsl";
+    private String tslPreKey ="things_model:tsl";
 
     @Autowired
     private ThingsModelMapper thingsModelMapper;

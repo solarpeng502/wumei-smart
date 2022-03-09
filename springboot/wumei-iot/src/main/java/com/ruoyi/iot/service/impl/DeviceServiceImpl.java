@@ -10,6 +10,7 @@ import com.ruoyi.common.utils.http.HttpUtils;
 import com.ruoyi.common.utils.ip.IpUtils;
 import com.ruoyi.iot.domain.Device;
 import com.ruoyi.iot.domain.DeviceLog;
+import com.ruoyi.iot.domain.Product;
 import com.ruoyi.iot.mapper.DeviceLogMapper;
 import com.ruoyi.iot.mapper.DeviceMapper;
 import com.ruoyi.iot.mapper.DeviceUserMapper;
@@ -20,7 +21,9 @@ import com.ruoyi.iot.model.ThingsModels.ThingsModelValueItemDto;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesInput;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesOutput;
 import com.ruoyi.iot.service.IDeviceService;
+import com.ruoyi.iot.service.IProductService;
 import com.ruoyi.iot.service.IToolService;
+import com.ruoyi.system.service.ISysUserService;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +33,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,6 +67,12 @@ public class DeviceServiceImpl implements IDeviceService {
 
     @Autowired
     private IToolService toolService;
+
+    @Autowired
+    private IProductService productService;
+
+    @Autowired
+    private ISysUserService userService;
 
     /**
      * 查询设备
@@ -384,15 +394,31 @@ public class DeviceServiceImpl implements IDeviceService {
     /**
      * 设备认证后自动添加设备
      *
-     * @param device 设备
      * @return 结果
      */
     @Override
-    public Device insertDeviceAuto(Device device) {
+    public int insertDeviceAuto(String serialNumber,Long userId,Long productId) {
+        Device device = new Device();
+        int random = (int) (Math.random() * (9000)) + 1000;
+        device.setDeviceName("设备" + random);
+        device.setSerialNumber(serialNumber);
+        SysUser user=userService.selectUserById(userId);
+        device.setUserId(userId);
+        device.setUserName(user.getUserName());
+        Product product=productService.selectProductByProductId(productId);
+        device.setProductId(productId);
+        device.setProductName(product.getProductName());
+        device.setTenantId(userId);
+        device.setTenantName(user.getUserName());
+        device.setFirmwareVersion(BigDecimal.valueOf(1.0));
+        device.setStatus(3);
+        device.setActiveTime(DateUtils.getNowDate());
+        device.setIsShadow(0);
+        device.setRssi(0);
+        device.setIsCustomLocation(0);
         device.setCreateTime(DateUtils.getNowDate());
         device.setThingsModelValue(JSONObject.toJSONString(getThingsModelDefaultValue(device.getProductId())));
-        deviceMapper.insertDevice(device);
-        return device;
+        return deviceMapper.insertDevice(device);
     }
 
     /**
