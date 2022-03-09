@@ -44,7 +44,7 @@
             </el-table-column>
             <el-table-column label="固件版本" align="center" prop="version">
                 <template slot-scope="scope">
-                    <span>v </span> {{scope.row.version}}
+                    <span>Version </span> {{scope.row.version}}
                 </template>
             </el-table-column>
             <el-table-column label="路径" align="left" prop="filePath" />

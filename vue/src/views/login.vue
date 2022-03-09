@@ -12,7 +12,6 @@
             <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                 <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" style="z-index:1000">
                     <h3 class="title">账号登录</h3>
-                    <el-link type="danger" style="margin-bottom:10px;font-weight:bolder;font-size:16px;" :underline="false" target="_blank" href="http://wumei.live">项目马上发布，暂不提供演示。返回官网 >></el-link></el-link></el-link>
                     <el-form-item prop="username">
                         <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
                             <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />

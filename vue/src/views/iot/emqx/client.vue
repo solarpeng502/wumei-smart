@@ -43,7 +43,7 @@
             <el-table-column label="会话创建时间" align="center" prop="created_at" />
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="150">
                 <template slot-scope="scope">
-                    <el-button size="small" type="danger" v-if="scope.row.connected" style="padding:5px;" v-hasPermi="['iot:category:remove']">
+                    <el-button size="small" type="danger" v-if="scope.row.connected" style="padding:5px;" v-hasPermi="['monitor:online:edit']">
                         <svg-icon icon-class="disconnect" /> 断开连接
                     </el-button>
                 </template>
