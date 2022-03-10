@@ -83,9 +83,9 @@
         <el-col :span="15" :offset="1">
             <el-row :gutter="20">
                 <el-col :span="8" v-for="(item,index) in deviceInfo.readOnlyList" :key="index" style="margin-bottom:30px;">
-                    <el-card shadow="hover" :body-style="{ padding: '0px' }">
+                    <div style="border:1px solid #eee;border-radius:8px;background-color:#FAFAFA;">
                         <div ref="map" style="height:280px;width:200px;margin:0 auto;"></div>
-                    </el-card>
+                    </div>
                 </el-col>
             </el-row>
         </el-col>
@@ -145,21 +145,18 @@ export default {
     methods: {
         /** 是否启用设备影子*/
         getDeviceStatus(device) {
-            if (device.isShadow == 0) {
-                // 状态：1-未激活，2-禁用，3-在线，4-离线
-                if (device.status != 3) {
-                    // 不在线且未启用设备影子
-                    this.statusColor.background = '#909399';
-                    this.title += "（设备离线 未启用影子）";
-                    this.shadowUnEnable = true;
-                } else {
-                    // 在线
-                    this.statusColor.background = '#67C23A';
-                    this.title += "（在线）";
-                }
+            if (device.status == 3) {
+                this.statusColor.background = '#67C23A';
+                this.title += "（在线）";
             } else {
-                this.statusColor.background = '#409EFF';
-                this.title += "（设备影子启用）";
+                if (device.isShadow == 1) {
+                    this.statusColor.background = '#409EFF';
+                    this.title += "（影子模式）";
+                } else {
+                    this.statusColor.background = '#909399';
+                    this.title += "（设备不在线 未启用影子）";
+                    this.shadowUnEnable = true;
+                }
             }
         },
         /**监测图表*/
@@ -178,15 +175,15 @@ export default {
                         type: 'gauge',
                         min: this.deviceInfo.readOnlyList[i].min,
                         max: this.deviceInfo.readOnlyList[i].max,
-                        colorBy:'data',
-                        splitNumber:8,
+                        colorBy: 'data',
+                        splitNumber: 8,
                         radius: '100%',
                         // 分割线
                         splitLine: {
                             distance: 5,
                         },
-                        axisLabel:{
-                            fontSize:10
+                        axisLabel: {
+                            fontSize: 10
                         },
                         // 刻度线
                         axisTick: {
@@ -194,7 +191,7 @@ export default {
                         },
                         // 仪表盘轴线
                         axisLine: {
-                            lineStyle:{
+                            lineStyle: {
                                 width: 8
                             }
                         },
@@ -212,7 +209,7 @@ export default {
                             name: this.deviceInfo.readOnlyList[i].name + "（" + this.deviceInfo.readOnlyList[i].unit + "）"
                         }],
                         title: {
-                            offsetCenter: [0, "110%"],
+                            offsetCenter: [10, "110%"],
                             fontSize: 16
                         }
 
