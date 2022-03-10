@@ -48,13 +48,18 @@ void publishInfo();
 // 发布时钟同步信息
 void publishNtp();
 // 发布属性
-void publishProperty();
+void publishProperty(byte *payload);
 // 发布功能
-void publishFunction();
+void publishFunction(byte *payload);
 // 发布事件
 void publishFunction();
 // 发布实时监测数据
 void publishMonitor();
+// 属性处理
+void processProperty(byte *payload);
+// 功能处理
+void processFunction(byte *payload);
+
 
 // 生成密码
 String generationPwd();
@@ -67,5 +72,7 @@ String encrypt(String plain_data,char *wumei_key,char *wumei_iv);
 String decrypt(String encoded_data_str,char *wumei_key,char *wumei_iv);
 //打印提示信息
 void printMsg(String tips);
+// 控制指示灯闪烁,测试用
+void blink();
 
 #endif 
