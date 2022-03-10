@@ -31,35 +31,37 @@ public class EmqxService {
     @Autowired
     private IDeviceLogService deviceLogService;
 
+    /** 订阅的主题 */
     private static final String prefix="/+/+/";
-    private static final String suffixPost="post";
-    private static final String suffixGet="get";
+    String sInfoTopic = prefix + "info/post";
+    String sNtpTopic = prefix + "ntp/post";
+    String sPropertyTopic = prefix + "property/post";
+    String sFunctionTopic = prefix + "function/post";
+    String sEventTopic = prefix + "event/post";
+    String sShadowPropertyTopic = prefix + "sproperty/post";
+    String sShadowFunctionTopic = prefix + "sfunction/post";
 
-    private static final String shadow="shadow/";
-    private static final String info="info/";
-    private static final String ntp="ntp/";
-    private static final String ota="ota/";
-    private static final String status="status/";
-    private static final String property="property/";
-    private static final String function="function/";
-    private static final String event="event/";
-
+    /** 发布的主题 */
+    String pStatusTopic = "/status/post";
+    String pNtpTopic = "/ntp/get";
+    String pPropertyTopic = "/property/get";
+    String pFunctionTopic = "/function/get";
 
     public void subscribe(MqttClient client) throws MqttException {
         // 订阅设备信息
-        client.subscribe(prefix+info+suffixPost, 1);
+        client.subscribe(sInfoTopic, 1);
         // 订阅时钟同步
-        client.subscribe(prefix+ntp+suffixPost, 1);
+        client.subscribe(sNtpTopic, 1);
         // 订阅设备属性
-        client.subscribe(prefix+property+suffixPost,1);
+        client.subscribe(sPropertyTopic,1);
         // 订阅设备功能
-        client.subscribe(prefix+function+suffixPost,1);
+        client.subscribe(sFunctionTopic,1);
         // 订阅设备事件
-        client.subscribe(prefix+event+suffixPost,1);
+        client.subscribe(sEventTopic,1);
         // 订阅属性（影子模式）
-        client.subscribe(prefix+shadow+property+suffixPost,0);
+        client.subscribe(sShadowPropertyTopic,1);
         // 订阅功能（影子模式）
-        client.subscribe(prefix+shadow+function+suffixPost,0);
+        client.subscribe(sShadowFunctionTopic,1);
         logger.info("mqtt订阅了设备信息和物模型主题");
     }
 
@@ -75,20 +77,26 @@ public class EmqxService {
         String deviceNum=topicItem[1];
         String name=topicItem[2];
         switch (name){
-            case info:
+            case "info":
                 reportDevice(productId,deviceNum,message);
                 break;
-            case ntp:
+            case "ntp":
                 publishNtp(productId,deviceNum,message);
                 break;
-            case property:
+            case "property":
                 reportProperty(productId,deviceNum,message);
                 break;
-            case function:
+            case "function":
                 reportFunction(productId,deviceNum,message);
                 break;
-            case event:
+            case "event":
                 reportEvent(productId,deviceNum,message);
+                break;
+            case "sproperty":
+//                reportProperty(productId,deviceNum,message);
+                break;
+            case "sfunction":
+//                reportFunction(productId,deviceNum,message);
                 break;
         }
     }
@@ -155,7 +163,7 @@ public class EmqxService {
      * 1.发布设备状态
      */
     public void publishStatus(Long productId,String deviceNum,int deviceStatus){
-        emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+"/"+status+suffixPost, "{\"status\":"+deviceStatus+"}");
+        emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+pStatusTopic, "{\"status\":"+deviceStatus+"}");
     }
 
     /**
@@ -166,30 +174,21 @@ public class EmqxService {
         NtpModel ntpModel=JSON.parseObject(message,NtpModel.class);
         ntpModel.setServerRecvTime(System.currentTimeMillis());
         ntpModel.setServerSendTime(System.currentTimeMillis());
-        emqxClient.publish(1, false, "/"+productId+"/"+deviceNum+"/"+ntp+suffixGet, JSON.toJSONString(ntpModel));
+        emqxClient.publish(1, false, "/"+productId+"/"+deviceNum+pNtpTopic, JSON.toJSONString(ntpModel));
     }
 
     /**
-     * 3.发布设备升级
-     */
-    public void publishOta(Long productId,String deviceNum){
-        emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+"/"+ota+suffixGet, "");
-    }
-
-
-
-    /**
-     * 4.发布属性
+     * 3.发布属性
      */
     public void publishProperty(Long productId,String deviceNum,List<SimpleThingsModel> thingsList){
-        emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+"/"+property+suffixGet, JSON.toJSONString(thingsList));
+        emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+pPropertyTopic, JSON.toJSONString(thingsList));
     }
 
     /**
-     * 5.发布功能
+     * 4.发布功能
      */
     public void publishFunction(Long productId,String deviceNum,List<SimpleThingsModel> thingsList){
-        emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+"/"+function+suffixGet, JSON.toJSONString(thingsList));
+        emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+pFunctionTopic, JSON.toJSONString(thingsList));
     }
 
 
