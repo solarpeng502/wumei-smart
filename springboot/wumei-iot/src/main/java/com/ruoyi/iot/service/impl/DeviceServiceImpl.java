@@ -484,10 +484,13 @@ public class DeviceServiceImpl implements IDeviceService {
         Device device=new Device();
         device.setStatus(status);
         device.setSerialNumber(deviceNum);
-        // 设置定位
+        // 设置定位和状态
         if(ipAddress!="") {
             Device deviceEntity = deviceMapper.selectDeviceBySerialNumber(deviceNum);
-            if (deviceEntity.getIsCustomLocation() == 1) {
+            if(deviceEntity.getActiveTime()==null){
+                device.setActiveTime(DateUtils.getNowDate());
+            }
+            if (deviceEntity.getIsCustomLocation() == 0) {
                 device.setNetworkIp(ipAddress);
                 setLocation(ipAddress, device);
             }
@@ -519,7 +522,6 @@ public class DeviceServiceImpl implements IDeviceService {
                 // 查询经纬度
                 setLatitudeAndLongitude(obj.getString("city"),device);
             }
-
         }
         catch (Exception e){
             log.error(e.getMessage());
@@ -533,7 +535,7 @@ public class DeviceServiceImpl implements IDeviceService {
     private void setLatitudeAndLongitude(String city,Device device){
         String BAIDU_URL="https://api.map.baidu.com/geocoder";
         String baiduResponse = HttpUtils.sendGet(BAIDU_URL,"address="+city  + "&output=json", Constants.GBK);
-        if(StringUtils.isEmpty(baiduResponse)){
+        if(!StringUtils.isEmpty(baiduResponse)){
             JSONObject baiduObject = JSONObject.parseObject(baiduResponse);
             JSONObject location=baiduObject.getJSONObject("result").getJSONObject("location");
             device.setLongitude(location.getBigDecimal("lng"));

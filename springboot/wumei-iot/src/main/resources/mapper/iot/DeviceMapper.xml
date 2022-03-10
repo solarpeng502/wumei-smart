@@ -265,7 +265,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
     <update id="updateDeviceStatus" parameterType="com.ruoyi.iot.domain.Device">
-        update iot_device set status=#{status}
+        update iot_device
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="status != null">status = #{status},</if>
+            <if test="networkAddress != null">network_address = #{networkAddress},</if>
+            <if test="networkIp != null">network_ip = #{networkIp},</if>
+            <if test="longitude != null">longitude = #{longitude},</if>
+            <if test="latitude != null">latitude = #{latitude},</if>
+            <if test="activeTime != null">active_time = #{activeTime},</if>
+        </trim>
         where serial_number = #{serialNumber}
     </update>
 

@@ -75,7 +75,7 @@ import static com.ruoyi.common.utils.file.FileUploadUtils.getExtension;
 @RestController
 @RequestMapping("/iot/tool")
 public class ToolController extends BaseController {
-    private static final Logger log = LoggerFactory.getLogger(FirmwareController.class);
+    private static final Logger log = LoggerFactory.getLogger(ToolController.class);
 
     @Autowired
     private ICategoryService categoryService;
@@ -221,7 +221,9 @@ public class ToolController extends BaseController {
             if (model.getClientid().startsWith("server") || model.getClientid().startsWith("web") || model.getClientid().startsWith("phone")) {
                 return AjaxResult.success();
             }
-            Device device = deviceService.selectDeviceBySerialNumber(model.getClientid());
+            String[] clientInfo=model.getClientid().split("&");
+            String deviceNum=clientInfo[0];
+            Device device = deviceService.selectDeviceBySerialNumber(deviceNum);
             // 设备状态（1-未激活，2-禁用，3-在线，4-离线）
             if (model.getAction().equals("client_disconnected")) {
                 String ip = model.getIpaddress();
