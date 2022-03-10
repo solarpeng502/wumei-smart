@@ -13,28 +13,28 @@
 #include <ESP8266WiFi.h>
 #include <Ethernet.h>
 #include <ESP8266HTTPClient.h>
-#include <PubSubClient.h>     // 版本2.7.0
-#include <ArduinoJson.h>      // 版本6.19.1
+#include <PubSubClient.h>      // 版本2.7.0
+#include <ArduinoJson.h>       // 版本6.19.1
 
 extern WiFiClient wifiClient;
 extern PubSubClient mqttClient;
 
-extern String deviceNum ;     // 设备编号（重要，同时是Mqtt的clientId）
-extern String userId;         // 用户ID
-extern String productId;      // 产品ID
-extern float rssi;            // 信号强度（信号极好4格[-55— 0]，信号好3格[-70— -55]，信号一般2格[-85— -70]，信号差1格[-100— -85]）
-extern float firmwareVersion; // 固件版本
-extern char *wifiSsid;        // WIFI的SSID
-extern char *wifiPwd;         // WIFI的密码
-extern char *mqttHost;        // Mqtt消息服务器地址
-extern int mqttPort;          // Mqtt消息服务器端口
-extern char *mqttUserName;    // Mqtt消息服务器账号
-extern char *mqttPwd;         // Mqtt消息服务器密码
-extern char mqttSecret[17];   // Mqtt秘钥,16位
-extern char wumei_iv[17];     // AES加密偏移量，固定值16位
-extern String ntpServer;      // NTP服务地址，用于获取当前时间
-extern int publishNum;        // 发布监测数据的最大次数
-extern long publishInterval;  // 发布监测数据的间隔，默认600毫秒
+extern String deviceNum ;      // 设备编号（重要，同时是Mqtt的clientId）
+extern String userId;          // 用户ID
+extern String productId;       // 产品ID
+extern float rssi;             // 信号强度（信号极好4格[-55— 0]，信号好3格[-70— -55]，信号一般2格[-85— -70]，信号差1格[-100— -85]）
+extern String firmwareVersion; // 固件版本
+extern char *wifiSsid;         // WIFI的SSID
+extern char *wifiPwd;          // WIFI的密码
+extern char *mqttHost;         // Mqtt消息服务器地址
+extern int mqttPort;           // Mqtt消息服务器端口
+extern char *mqttUserName;     // Mqtt消息服务器账号
+extern char *mqttPwd;          // Mqtt消息服务器密码
+extern char mqttSecret[17];    // Mqtt秘钥,16位
+extern char wumei_iv[17];      // AES加密偏移量，固定值16位
+extern String ntpServer;       // NTP服务地址，用于获取当前时间
+extern int monitorCount;       // 发布监测数据的最大次数
+extern long monitorInterval;   // 发布监测数据的间隔，默认1000毫秒
 
 
 // 连接wifi
@@ -48,9 +48,9 @@ void publishInfo();
 // 发布时钟同步信息
 void publishNtp();
 // 发布属性
-void publishProperty(byte *payload);
+void publishProperty(char *msg);
 // 发布功能
-void publishFunction(byte *payload);
+void publishFunction(char *msg);
 // 发布事件
 void publishFunction();
 // 发布实时监测数据

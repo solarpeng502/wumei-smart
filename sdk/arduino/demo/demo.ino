@@ -36,7 +36,7 @@ void loop()
     connectWifi();
   }
 
-  // Mqtt非阻塞重连，间隔30秒
+  // 非阻塞Mqtt重连，间隔30秒
   if (WiFi.status() == WL_CONNECTED)
   {
     long now = millis();
@@ -54,13 +54,13 @@ void loop()
     }
   }
 
-  // 非阻塞发布实时监测数据,间隔默认600毫秒
-  if(WiFi.status() == WL_CONNECTED && publishNum>0){
+  // 非阻塞发布实时监测数据,间隔默认1000毫秒
+  if(WiFi.status() == WL_CONNECTED && monitorCount>0){
     long now = millis();
-    if (now - lastPublish > publishInterval)
+    if (now - lastPublish > monitorInterval)
       {
         lastPublish = now;
-        publishNum--;
+        monitorCount--;
         publishMonitor();
       }
   }

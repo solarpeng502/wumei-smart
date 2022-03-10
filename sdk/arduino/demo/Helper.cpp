@@ -12,15 +12,15 @@ WiFiClient wifiClient;
 PubSubClient mqttClient;
 float rssi = 0;
 char wumei_iv[17] = "wumei-smart-open";
-int publishNum = 0;
-long publishInterval = 600;
+int monitorCount = 0;
+long monitorInterval = 1000;
 
-//******************************** 需要配置的项 ********************************
+//==================================== 这是需要配置的项 ===============================
 // 设备信息
 String deviceNum = "DRO5938QISX72V6A";
 String userId = "1";
 String productId = "57";
-float firmwareVersion = 1.1;
+String firmwareVersion = "1.1";
 
 // Wifi配置
 char *wifiSsid = "huawei";
@@ -35,21 +35,22 @@ char mqttSecret[17] = "K674HDNN2N6683E3";
 
 // NTP地址（用于获取时间）
 String ntpServer = "http://wumei.live:8080/iot/tool/ntp?deviceSendTime=";
-//********************************************************************************/
+//====================================================================================
 
 // 订阅的主题
-String sOtaTopic = "/" + productId + "/" + deviceNum + "/ota/get";
-String sNtpTopic = "/" + productId + "/" + deviceNum + "/ntp/get";
-String sPropertyTopic = "/" + productId + "/" + deviceNum + "/property/get/#";
-String sFunctionTopic = "/" + productId + "/" + deviceNum + "/function/get/#";
-String sMonitorTopic = "/" + productId + "/" + deviceNum + "/monitor/get";
+String prefix = "/" + productId + "/" + deviceNum;
+String sOtaTopic = prefix + "/ota/get";
+String sNtpTopic = prefix + "/ntp/get";
+String sPropertyTopic = prefix + "/property/get/#";
+String sFunctionTopic = prefix + "/function/get/#";
+String sMonitorTopic = prefix + "/monitor/get";
 // 发布的主题
-String pInfoTopic = "/" + productId + "/" + deviceNum + "/info/post";
-String pNtpTopic = "/" + productId + "/" + deviceNum + "/ntp/post";
-String pPropertyTopic = "/" + productId + "/" + deviceNum + "/property/post";
-String pFunctionTopic = "/" + productId + "/" + deviceNum + "/function/post";
-String pMonitorTopic = "/" + productId + "/" + deviceNum + "/monitor/post";
-String pEventTopic = "/" + productId + "/" + deviceNum + "/event/post";
+String pInfoTopic = prefix + "/info/post";
+String pNtpTopic = prefix + "/ntp/post";
+String pPropertyTopic = prefix + "/property/post";
+String pFunctionTopic = prefix + "/function/post";
+String pMonitorTopic = prefix + "/monitor/post";
+String pEventTopic = prefix + "/event/post";
 
 // Mqtt回调
 void callback(char *topic, byte *payload, unsigned int length)
@@ -65,13 +66,12 @@ void callback(char *topic, byte *payload, unsigned int length)
 
   if (strcmp(topic, sOtaTopic.c_str()) == 0)
   {
-    // Http下载固件，设备升级
+    printMsg("订阅到设备升级指令...");
   }
   else if (strcmp(topic, sNtpTopic.c_str()) == 0)
   {
-    // 获取NTP时间
+    printMsg("订阅到NTP时间...");
     StaticJsonDocument<256> doc;
-    //解析JSON
     DeserializationError error = deserializeJson(doc, payload);
     if (error)
     {
@@ -89,73 +89,77 @@ void callback(char *topic, byte *payload, unsigned int length)
   }
   else if (strcmp(topic, sPropertyTopic.c_str()) == 0)
   {
-    // 属性处理
+    printMsg("订阅到属性指令...");
     processProperty(payload);
   }
   else if (strcmp(topic, sFunctionTopic.c_str()) == 0)
   {
-    // 功能处理
+    printMsg("订阅到功能指令...");
     processFunction(payload);
   }
   else if (strcmp(topic, sMonitorTopic.c_str()) == 0)
   {
-    // 设置对应的实时监测次数和间隔
+    printMsg("订阅到实时监测指令...");
+    StaticJsonDocument<128> doc;
+    DeserializationError error = deserializeJson(doc, payload);
+    if (error)
+    {
+      Serial.print(F("deserializeJson() failed: "));
+      Serial.println(error.f_str());
+      return;
+    }
+    monitorCount = doc["count"];
+    monitorInterval= doc["interval"];
   }
 }
 
 // 属性处理
 void processProperty(byte *payload)
 {
-  const size_t CAPACITY = JSON_ARRAY_SIZE(10);
-  StaticJsonDocument<CAPACITY> doc;
+  StaticJsonDocument<512> doc;
   deserializeJson(doc, payload);
   JsonArray array = doc.as<JsonArray>();
-  for (JsonVariant v : array)
+  for (JsonObject object : array)
   {
     // 匹配云端定义的属性（不包含属性中的监测数据）
-    JsonObject object = v.as<JsonObject>();
     String id = object["id"];
     String value = object["value"];
-    printMsg(id+"：" + value);
+    printMsg(id + "：" + value);
   }
-
-  // 最后发布属性
-  publishProperty(payload);
+  // 最后发布属性（重要）
+  publishProperty((char *)payload);
 }
 
 // 功能处理
 void processFunction(byte *payload)
 {
-  const size_t CAPACITY = JSON_ARRAY_SIZE(5);
-  StaticJsonDocument<CAPACITY> doc;
+  StaticJsonDocument<512> doc;
   deserializeJson(doc, payload);
   JsonArray array = doc.as<JsonArray>();
-  for (JsonVariant v : array)
+  for (JsonObject object : array)
   {
     // 匹配云端定义的功能
-    JsonObject object = v.as<JsonObject>();
     String id = object["id"];
     String value = object["value"];
     if (value == "switch")
     {
-      printMsg("switch：" + value);
+      printMsg("开关 switch：" + value);
     }
     else if (value == "gear")
     {
-      printMsg("gear：" + value);
+      printMsg("档位 gear：" + value);
     }
     else if (value == "light_color")
     {
-      printMsg("light_color：" + value);
+      printMsg("灯光颜色 light_color：" + value);
     }
     else if (value == "message")
     {
-      printMsg("message：" + value);
+      printMsg("屏显消息 message：" + value);
     }
   }
-
-  // 最后发布功能  
-  publishFunction(payload);
+  // 最后发布功能（重要）
+  publishFunction((char *)payload);
 }
 
 // 1.发布设备信息
@@ -166,13 +170,12 @@ void publishInfo()
   doc["firmwareVersion"] = firmwareVersion;
   doc["status"] = 3; // （1-未激活，2-禁用，3-在线，4-离线）
   doc["userId"] = (String)userId;
-  Serial.print("发布设备信息:");
+  printMsg("发布设备信息:");
   serializeJson(doc, Serial);
   //发布
   String output;
   serializeJson(doc, output);
-  const char *msg = output.c_str();
-  mqttClient.publish(pInfoTopic.c_str(), msg);
+  mqttClient.publish(pInfoTopic.c_str(), output.c_str());
 }
 
 // 2.发布时钟同步信，用于获取当前时间(可选)
@@ -180,55 +183,86 @@ void publishNtp()
 {
   StaticJsonDocument<128> doc;
   doc["deviceSendTime"] = millis();
-  Serial.print("发布NTP信息:");
+  printMsg("发布NTP信息:");
   serializeJson(doc, Serial);
   //发布
   String output;
   serializeJson(doc, output);
-  const char *msg = output.c_str();
-  mqttClient.publish(pNtpTopic.c_str(), msg);
+  mqttClient.publish(pNtpTopic.c_str(), output.c_str());
 }
 
 // 3.发布属性
 void publishProperty(char *msg)
 {
+  printMsg("发布属性:"+(String)msg);
   mqttClient.publish(pPropertyTopic.c_str(), msg);
 }
 
 // 4.发布功能
 void publishFunction(char *msg)
 {
+  printMsg("发布功能:"+(String)msg);
   mqttClient.publish(pFunctionTopic.c_str(), msg);
 }
 
 // 5.发布事件
 void publishEvent()
 {
-  StaticJsonDocument<1024> doc;
-  // 复制物模型中的事件
-  doc["event"] = 0;
-  Serial.print("发布事件:");
+  StaticJsonDocument<512> doc;
+  JsonArray array = doc.to<JsonArray>();
+  // 匹配云端的事件
+  JsonObject objTmeperature = doc.to<JsonObject>();
+  objTmeperature["id"] = "height_temperature";
+  objTmeperature["value"] = "40";
+  array.add(objTmeperature);
+
+  JsonObject objException = doc.to<JsonObject>();
+  objException["id"] = "exception";
+  objException["value"] = "设备异常掉线，请检查网络";
+  array.add(objException);
   serializeJson(doc, Serial);
-  //发布
+
+  printMsg("发布事件:");
   String output;
   serializeJson(doc, output);
-  const char *msg = output.c_str();
-  mqttClient.publish(pEventTopic.c_str(), msg);
+  mqttClient.publish(pEventTopic.c_str(), output.c_str());
 }
 
 // 6.发布实时监测数据
 void publishMonitor()
 {
+  // 匹配云端定义的监测数据，随机数代替监测结果
+  float randNumber = 0;
   StaticJsonDocument<512> doc;
-  // 复制物模型中的属性（实时监测模型）
-  doc["monitor"] = 0;
-  Serial.print("发布事件:");
+  JsonArray array = doc.to<JsonArray>();
+  JsonObject objTmeperature = doc.to<JsonObject>();
+  objTmeperature["id"] = "temperature";
+  randNumber = random(1000, 3000) / 100;
+  objTmeperature["value"] = (String)randNumber;
+  array.add(objTmeperature);
+
+  JsonObject objHumidity = doc.to<JsonObject>();
+  objHumidity["id"] = "humidity";
+  randNumber = random(3000, 6000) / 100;
+  objHumidity["value"] = (String)randNumber;
+  array.add(objHumidity);
+
+  JsonObject objCo2 = doc.to<JsonObject>();
+  objCo2["id"] = "co2";
+  randNumber = random(400, 1000);
+  objCo2["value"] = (String)randNumber;
+  array.add(objCo2);
+
+  JsonObject objBrightness = doc.to<JsonObject>();
+  objBrightness["id"] = "brightness";
+  randNumber = random(1000, 10000);
+  objBrightness["value"] = (String)randNumber;
+  array.add(objBrightness);
   serializeJson(doc, Serial);
-  //发布
+  // 发布
   String output;
   serializeJson(doc, output);
-  const char *msg = output.c_str();
-  mqttClient.publish(pMonitorTopic.c_str(), msg);
+  mqttClient.publish(pEventTopic.c_str(), output.c_str());
 }
 
 // 连接wifi
@@ -252,20 +286,20 @@ void connectWifi()
 void connectMqtt()
 {
   printMsg("连接Mqtt服务器...");
-  // 生成mqtt认证密码
+  // 生成mqtt认证密码（密码 = mqtt密码 & 用户ID & 过期时间）
   String password = generationPwd();
   String encryptPassword = encrypt(password, mqttSecret, wumei_iv);
   printMsg("密码(已加密)：" + encryptPassword);
   mqttClient.setClient(wifiClient);
   mqttClient.setServer(mqttHost, mqttPort);
   mqttClient.setCallback(callback);
-  //连接
+  //连接（客户端ID = 设备编号 & 产品ID）
   String clientId = deviceNum + "&" + productId;
   bool connectResult = mqttClient.connect(clientId.c_str(), mqttUserName, encryptPassword.c_str());
   if (connectResult)
   {
     printMsg("连接成功");
-    // 订阅(设备信息、OTA、NTP、属性、功能、实时监测)
+    // 订阅(OTA、NTP、属性、功能、实时监测)
     mqttClient.subscribe(sOtaTopic.c_str(), 1);
     mqttClient.subscribe(sNtpTopic.c_str(), 1);
     mqttClient.subscribe(sPropertyTopic.c_str(), 1);
@@ -290,8 +324,9 @@ void connectMqtt()
 String generationPwd()
 {
   String jsonTime = getTime();
-  StaticJsonDocument<128> doc; // 128字节内存池容量
-  //解析JSON
+  // 128字节内存池容量
+  StaticJsonDocument<128> doc; 
+  // 解析JSON
   DeserializationError error = deserializeJson(doc, jsonTime);
   if (error)
   {
@@ -305,13 +340,14 @@ String generationPwd()
   float serverRecvTime = doc["serverRecvTime"];
   float deviceRecvTime = millis();
   float now = (serverSendTime + serverRecvTime + deviceRecvTime - deviceSendTime) / 2;
-  float expireTime = now + 1 * 60 * 60 * 1000; // 过期时间 = 当前时间 + 1小时
+  // 过期时间 = 当前时间 + 1小时
+  float expireTime = now + 1 * 60 * 60 * 1000; 
   String password = (String)mqttPwd + "&" + userId + "&" + String(expireTime, 0);
   printMsg("密码(未加密):" + password);
   return password;
 }
 
-// 获取时间
+//  HTTP获取时间
 String getTime()
 {
   while (WiFi.status() == WL_CONNECTED)
