@@ -32,17 +32,18 @@ public class EmqxService {
     private IDeviceLogService deviceLogService;
 
     private static final String prefix="/+/+/";
-    private static final String suffixPost="/post";
-    private static final String suffixGet="/get";
+    private static final String suffixPost="post";
+    private static final String suffixGet="get";
 
-    private static final String info="info";
-    private static final String ntp="ntp";
-    private static final String ota="ota";
-    private static final String status="status";
-    private static final String property="property";
-    private static final String function="function";
-    private static final String event="event";
-    private static final String monitor="monitor";
+    private static final String shadow="shadow/";
+    private static final String info="info/";
+    private static final String ntp="ntp/";
+    private static final String ota="ota/";
+    private static final String status="status/";
+    private static final String property="property/";
+    private static final String function="function/";
+    private static final String event="event/";
+
 
     public void subscribe(MqttClient client) throws MqttException {
         // 订阅设备信息
@@ -55,8 +56,10 @@ public class EmqxService {
         client.subscribe(prefix+function+suffixPost,1);
         // 订阅设备事件
         client.subscribe(prefix+event+suffixPost,1);
-        // 订阅实时监测
-        client.subscribe(prefix+monitor+suffixPost,0);
+        // 订阅属性（影子模式）
+        client.subscribe(prefix+shadow+property+suffixPost,0);
+        // 订阅功能（影子模式）
+        client.subscribe(prefix+shadow+function+suffixPost,0);
         logger.info("mqtt订阅了设备信息和物模型主题");
     }
 
@@ -86,8 +89,6 @@ public class EmqxService {
                 break;
             case event:
                 reportEvent(productId,deviceNum,message);
-                break;
-            case monitor:
                 break;
         }
     }
@@ -151,7 +152,14 @@ public class EmqxService {
     }
 
     /**
-     * 发布时钟同步信息
+     * 1.发布设备状态
+     */
+    public void publishStatus(Long productId,String deviceNum,int deviceStatus){
+        emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+"/"+status+suffixPost, "{\"status\":"+deviceStatus+"}");
+    }
+
+    /**
+     * 2.发布时钟同步信息
      * @param message
      */
     private void publishNtp(Long productId,String deviceNum,String message){
@@ -162,28 +170,23 @@ public class EmqxService {
     }
 
     /**
-     * 发布设备升级
+     * 3.发布设备升级
      */
     public void publishOta(Long productId,String deviceNum){
         emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+"/"+ota+suffixGet, "");
     }
 
-    /**
-     * 发布设备状态
-     */
-    public void publishStatus(Long productId,String deviceNum,int status){
-        emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+"/"+status+suffixGet, "{\"status\":"+status+"}");
-    }
+
 
     /**
-     * 发布属性
+     * 4.发布属性
      */
     public void publishProperty(Long productId,String deviceNum,List<SimpleThingsModel> thingsList){
         emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+"/"+property+suffixGet, JSON.toJSONString(thingsList));
     }
 
     /**
-     * 发布功能
+     * 5.发布功能
      */
     public void publishFunction(Long productId,String deviceNum,List<SimpleThingsModel> thingsList){
         emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+"/"+function+suffixGet, JSON.toJSONString(thingsList));
