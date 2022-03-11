@@ -1,8 +1,22 @@
 <template>
 <div style="padding-left:20px;">
     <el-row :gutter="80">
-        <el-col :span="8">
+        <el-col :span="9">
             <el-descriptions :column="1" border :title="title">
+                <!-- 设备升级-->
+                <el-descriptions-item :labelStyle="statusColor">
+                    <template slot="label">
+                        <svg-icon icon-class="ota" />
+                        OTA升级
+                    </template>
+                    <el-link :underline="false" style="line-height:36px;font-size:16px;padding-right:10px;">Version {{deviceInfo.firmwareVersion}}</el-link>
+                    <el-link type="success" :underline="false" style="font-size:12px;">已经是最新版本</el-link>
+                    <el-button type="success" size="small" disabled style="float:right;">升级</el-button>
+                    <!-- <el-input v-model="deviceInfo.firmwareVersion" placeholder="版本 " disabled>
+                        <el-button slot="prepend" style="font-size:20px;">version</el-button>
+                        <el-button slot="append" disabled="true">升级</el-button>
+                    </el-input> -->
+                </el-descriptions-item>
                 <!-- bool类型-->
                 <el-descriptions-item v-for="(item,index) in deviceInfo.boolList" :key="index" :labelStyle="statusColor">
                     <template slot="label">
@@ -80,7 +94,7 @@
             </el-descriptions>
         </el-col>
 
-        <el-col :span="15" :offset="1">
+        <el-col :span="14" :offset="1">
             <el-row :gutter="20">
                 <el-col :span="8" v-for="(item,index) in deviceInfo.readOnlyList" :key="index" style="margin-bottom:30px;">
                     <div style="border:1px solid #eee;border-radius:8px;background-color:#FAFAFA;">
@@ -131,7 +145,7 @@ export default {
             // 控制项标题背景
             statusColor: {
                 background: '#67C23A',
-                color: '#fff'
+                color: '#fff',
             },
             // 遮罩层
             loading: true,

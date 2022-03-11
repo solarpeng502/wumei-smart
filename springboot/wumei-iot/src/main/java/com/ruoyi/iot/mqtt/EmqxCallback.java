@@ -1,5 +1,6 @@
 package com.ruoyi.iot.mqtt;
 
+import com.ruoyi.framework.web.domain.server.Sys;
 import org.eclipse.paho.client.mqttv3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public class EmqxCallback implements MqttCallback {
             // 重连mqtt
             while(true) {
                 logger.info("mqtt连接断开，重新连接中...");
-                Thread.sleep(5000);
+                Thread.sleep(10000);
                 EmqxClient.client.reconnect();
                 if(EmqxClient.client.isConnected()){
                     logger.info("mqtt已经重新连接");
@@ -34,9 +35,17 @@ public class EmqxCallback implements MqttCallback {
                 }
             }
         } catch (MqttException | InterruptedException e) {
+            // e.printStackTrace();
+            logger.info("发生错误："+e.getMessage());
             logger.info("mqtt重新连接失败，重启中...");
             // 重启Mqtt
-            mqttConfig.EmqxClientStart();
+            try {
+                EmqxClient.client.disconnect();
+                mqttConfig.EmqxClientStart();
+            } catch (MqttException mqttException) {
+                mqttException.printStackTrace();
+            }
+
         }
     }
 
