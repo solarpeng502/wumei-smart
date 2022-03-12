@@ -93,10 +93,10 @@ public class EmqxService {
                 reportEvent(productId,deviceNum,message);
                 break;
             case "sproperty":
-//                reportProperty(productId,deviceNum,message);
+                reportProperty(productId,deviceNum,message);
                 break;
             case "sfunction":
-//                reportFunction(productId,deviceNum,message);
+                reportFunction(productId,deviceNum,message);
                 break;
         }
     }
@@ -141,7 +141,6 @@ public class EmqxService {
      * 上报事件
      * @param message
      */
-    // @Transactional(rollbackFor = Exception.class)
     private void reportEvent(Long productId,String deviceNum,String message){
         List<ThingsModelValueItemInput> thingsModelValueItemInputs=JSON.parseArray(message,ThingsModelValueItemInput.class);
         Device device =deviceService.selectDeviceBySerialNumber(deviceNum);
@@ -150,14 +149,17 @@ public class EmqxService {
             DeviceLog deviceLog = new DeviceLog();
             deviceLog.setDeviceId(device.getDeviceId());
             deviceLog.setDeviceName(device.getDeviceName());
-            deviceLog.setLogName(thingsModelValueItemInputs.get(i).getName());
+//            deviceLog.setLogName(thingsModelValueItemInputs.get(i).getName());
             deviceLog.setLogValue(thingsModelValueItemInputs.get(i).getValue());
             deviceLog.setRemark(thingsModelValueItemInputs.get(i).getRemark());
+            deviceLog.setSerialNumber(device.getSerialNumber());
             deviceLog.setIdentity(thingsModelValueItemInputs.get(i).getId());
             deviceLog.setLogType(3);
             deviceLogService.insertDeviceLog(deviceLog);
         }
     }
+
+
 
     /**
      * 1.发布设备状态

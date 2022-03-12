@@ -23,30 +23,25 @@ public class EmqxCallback implements MqttCallback {
 
     @Override
     public void connectionLost(Throwable throwable) {
-        try {
-            // 重连mqtt
-            while(true) {
-                logger.info("mqtt连接断开，重新连接中...");
-                Thread.sleep(10000);
-                EmqxClient.client.reconnect();
-                if(EmqxClient.client.isConnected()){
-                    logger.info("mqtt已经重新连接");
-                    break;
-                }
-            }
-        } catch (MqttException | InterruptedException e) {
-            // e.printStackTrace();
-            logger.info("发生错误："+e.getMessage());
-            logger.info("mqtt重新连接失败，重启中...");
-            // 重启Mqtt
-            try {
-                EmqxClient.client.disconnect();
-                mqttConfig.EmqxClientStart();
-            } catch (MqttException mqttException) {
-                mqttException.printStackTrace();
-            }
-
-        }
+//        try {
+//            // 重连mqtt
+//            while(true) {
+//                logger.info("mqtt连接断开，重新连接中...");
+//                Thread.sleep(10000);
+//                EmqxClient.client.reconnect();
+//                if(EmqxClient.client.isConnected()){
+//                    logger.info("mqtt已经重新连接");
+//                    break;
+//                }
+//            }
+//        } catch (MqttException | InterruptedException e) {
+//            e.printStackTrace();
+//            logger.info("发生错误："+e.getMessage());
+//            logger.info("mqtt重新连接失败，重启中...");
+//            // 重启Mqtt
+//            mqttConfig.EmqxClientStart();
+//
+//        }
     }
 
 

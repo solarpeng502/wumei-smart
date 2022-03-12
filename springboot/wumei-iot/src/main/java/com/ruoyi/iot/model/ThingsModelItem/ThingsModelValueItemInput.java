@@ -11,9 +11,6 @@ public class ThingsModelValueItemInput
     /** 物模型唯一标识符 */
     private String id;
 
-    /** 物模型名称 */
-    private String name;
-
     /** 物模型值 */
     private String value;
 
@@ -42,14 +39,6 @@ public class ThingsModelValueItemInput
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
 }
