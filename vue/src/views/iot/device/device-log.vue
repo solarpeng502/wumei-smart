@@ -1,9 +1,9 @@
 <template>
 <div style="padding-left:20px;">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-        <el-form-item label="日志名称" prop="logName">
+        <!-- <el-form-item label="日志名称" prop="logName">
             <el-input v-model="queryParams.logName" placeholder="请输入日志名称" clearable size="small" @keyup.enter.native="handleQuery" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="类型" prop="logType">
             <el-select v-model="queryParams.logType" placeholder="请选择类型" clearable size="small">
                 <el-option v-for="dict in dict.type.iot_device_log_type" :key="dict.value" :label="dict.label" :value="dict.value" />
@@ -19,14 +19,14 @@
     </el-form>
 
     <el-table v-loading="loading" :data="deviceLogList" size="mini">
-        <el-table-column label="名称" align="center" prop="logName" />
-        <el-table-column label="动作" align="center" prop="logValue">
+        <el-table-column label="编号" align="center" prop="logId" width="100" />
+        <el-table-column label="名称" align="left" header-align="center" prop="logValue">
             <template slot-scope="scope">
                 <div v-html="formatValueDisplay(scope.row)"></div>
             </template>
         </el-table-column>
         <el-table-column label="标识符" align="center" prop="identity" />
-        <el-table-column label="类型" align="center" prop="logType" width="120">
+        <el-table-column label="类型" align="center" prop="logType">
             <template slot-scope="scope">
                 <dict-tag :options="dict.type.iot_device_log_type" :value="scope.row.logType" />
             </template>
@@ -150,24 +150,24 @@ export default {
             if (row.logType == 1) {
                 let propertyItem = this.getThingsModelItem(1, row.identity);
                 if (propertyItem != "") {
-                    return '监测值：<span style="color:#ff0000;">' + row.logValue + (propertyItem.datatype.unit != undefined ? propertyItem.datatype.unit : '') + '</span>';
+                    return propertyItem.name+'： <span style="color:#409EFF;">' + row.logValue +' '+ (propertyItem.datatype.unit != undefined ? propertyItem.datatype.unit : '') + '</span>';
                 }
             } else if (row.logType == 2) {
                 let eventItem = this.getThingsModelItem(2, row.identity);
                 if (eventItem != "") {
-                    return '事件：<span style="color:#FF0000">' + row.logValue + '</span>';
+                    return eventItem.name+'： <span style="color:#409EFF">' + row.logValue + '</span>';
                 }
             } else if (row.logType == 3) {
                 let functionItem = this.getThingsModelItem(2, row.identity);
                 if (functionItem != "") {
-                    return '功能：<span style="color:#FF0000">' + row.logValue + '</span>';
+                    return functionItem.name+'： <span style="color:#409EFF">' + row.logValue + '</span>';
                 }
             } else if (row.logType == 4) {
-                return '<span style="color:#0000FF">OTA</span>';
+                return '<span style="color:#E6A23C">设备升级</span>';
             } else if (row.logType == 5) {
-                return '<span style="color:#00FF00">上线</span>';
+                return '<span style="color:#67C23A">设备上线</span>';
             } else if (row.logType == 6) {
-                return '<span style="color:#FF0000">离线</span>';
+                return '<span style="color:#F56C6C">设备离线</span>';
             }
             return "";
         },
