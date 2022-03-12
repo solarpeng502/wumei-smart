@@ -87,12 +87,12 @@ void callback(char *topic, byte *payload, unsigned int length)
     float now = (serverSendTime + serverRecvTime + deviceRecvTime - deviceSendTime) / 2;
     printMsg("当前时间：" + String(now, 0));
   }
-  else if (strcmp(topic, sPropertyTopic.c_str()) == 0)
+  else if (strcmp(topic, sPropertyTopic.c_str()) == 0 || strcmp(topic, sPropertyTopic.substring(0, sPropertyTopic.lastIndexOf("/")).c_str()) == 0)
   {
     printMsg("订阅到属性指令...");
     processProperty(payload);
   }
-  else if (strcmp(topic, sFunctionTopic.c_str()) == 0)
+  else if (strcmp(topic, sFunctionTopic.c_str()) == 0 || strcmp(topic, sFunctionTopic.substring(0, sFunctionTopic.lastIndexOf("/")).c_str()) == 0)
   {
     printMsg("订阅到功能指令...");
     processFunction(payload);
@@ -109,7 +109,7 @@ void callback(char *topic, byte *payload, unsigned int length)
       return;
     }
     monitorCount = doc["count"];
-    monitorInterval= doc["interval"];
+    monitorInterval = doc["interval"];
   }
 }
 
@@ -170,9 +170,9 @@ void publishInfo()
   doc["firmwareVersion"] = firmwareVersion;
   doc["status"] = 3; // （1-未激活，2-禁用，3-在线，4-离线）
   doc["userId"] = (String)userId;
+
   printMsg("发布设备信息:");
   serializeJson(doc, Serial);
-  //发布
   String output;
   serializeJson(doc, output);
   mqttClient.publish(pInfoTopic.c_str(), output.c_str());
@@ -183,9 +183,9 @@ void publishNtp()
 {
   StaticJsonDocument<128> doc;
   doc["deviceSendTime"] = millis();
+
   printMsg("发布NTP信息:");
   serializeJson(doc, Serial);
-  //发布
   String output;
   serializeJson(doc, output);
   mqttClient.publish(pNtpTopic.c_str(), output.c_str());
@@ -194,75 +194,82 @@ void publishNtp()
 // 3.发布属性
 void publishProperty(char *msg)
 {
-  printMsg("发布属性:"+(String)msg);
+  printMsg("发布属性:" + (String)msg);
   mqttClient.publish(pPropertyTopic.c_str(), msg);
 }
 
 // 4.发布功能
 void publishFunction(char *msg)
 {
-  printMsg("发布功能:"+(String)msg);
+  printMsg("发布功能:" + (String)msg);
   mqttClient.publish(pFunctionTopic.c_str(), msg);
 }
 
 // 5.发布事件
 void publishEvent()
 {
-  StaticJsonDocument<512> doc;
-  JsonArray array = doc.to<JsonArray>();
   // 匹配云端的事件
-  JsonObject objTmeperature = doc.to<JsonObject>();
+  StaticJsonDocument<512> doc;
+  JsonObject objTmeperature = doc.createNestedObject();
   objTmeperature["id"] = "height_temperature";
   objTmeperature["value"] = "40";
-  array.add(objTmeperature);
+  objTmeperature["remark"] = "事件备注信息";
 
-  JsonObject objException = doc.to<JsonObject>();
+  JsonObject objException = doc.createNestedObject();
   objException["id"] = "exception";
   objException["value"] = "设备异常掉线，请检查网络";
-  array.add(objException);
-  serializeJson(doc, Serial);
+  objException["remark"] = "事件备注信息";
 
   printMsg("发布事件:");
+  serializeJson(doc, Serial);
   String output;
   serializeJson(doc, output);
   mqttClient.publish(pEventTopic.c_str(), output.c_str());
 }
 
-// 6.发布实时监测数据
-void publishMonitor()
+// 6.发布实时监测数据(1=只是监测数据，2=属性)
+void publishMonitor(int type)
 {
   // 匹配云端定义的监测数据，随机数代替监测结果
   float randNumber = 0;
-  StaticJsonDocument<512> doc;
-  JsonArray array = doc.to<JsonArray>();
-  JsonObject objTmeperature = doc.to<JsonObject>();
+  StaticJsonDocument<1024> doc;
+  JsonObject objTmeperature = doc.createNestedObject();
   objTmeperature["id"] = "temperature";
-  randNumber = random(1000, 3000) / 100;
-  objTmeperature["value"] = (String)randNumber;
-  array.add(objTmeperature);
+  randNumber = random(1000, 3000) ;
+  objTmeperature["value"] = (String)(randNumber/100);
+  objTmeperature["remark"] = "监测数据备注";
 
-  JsonObject objHumidity = doc.to<JsonObject>();
+  JsonObject objHumidity   = doc.createNestedObject();
   objHumidity["id"] = "humidity";
-  randNumber = random(3000, 6000) / 100;
-  objHumidity["value"] = (String)randNumber;
-  array.add(objHumidity);
+  randNumber = random(3000, 6000);
+  objHumidity["value"] = (String)(randNumber/100);
+  objHumidity["remark"] = "监测数据备注";
 
-  JsonObject objCo2 = doc.to<JsonObject>();
+  JsonObject objCo2 = doc.createNestedObject();
   objCo2["id"] = "co2";
   randNumber = random(400, 1000);
-  objCo2["value"] = (String)randNumber;
-  array.add(objCo2);
+  objCo2["value"] = (String)(randNumber);
+  objCo2["remark"] = "监测数据备注";
 
-  JsonObject objBrightness = doc.to<JsonObject>();
+  JsonObject objBrightness = doc.createNestedObject();
   objBrightness["id"] = "brightness";
   randNumber = random(1000, 10000);
-  objBrightness["value"] = (String)randNumber;
-  array.add(objBrightness);
+  objBrightness["value"] = (String)(randNumber);
+  objBrightness["remark"] = "监测数据备注";
+
+  printMsg("发布监测数据:");
   serializeJson(doc, Serial);
-  // 发布
   String output;
   serializeJson(doc, output);
-  mqttClient.publish(pEventTopic.c_str(), output.c_str());
+
+  if (type == 1)
+  {
+    mqttClient.publish(pMonitorTopic.c_str(), output.c_str());
+  }
+  else if (type == 2)
+  {
+    mqttClient.publish(pPropertyTopic.c_str(), output.c_str());
+  }
 }
 
 // 连接wifi
@@ -293,6 +300,8 @@ void connectMqtt()
   mqttClient.setClient(wifiClient);
   mqttClient.setServer(mqttHost, mqttPort);
   mqttClient.setCallback(callback);
+  mqttClient.setBufferSize(1024);
+  mqttClient.setKeepAlive(15);
   //连接（客户端ID = 设备编号 & 产品ID）
   String clientId = deviceNum + "&" + productId;
   bool connectResult = mqttClient.connect(clientId.c_str(), mqttUserName, encryptPassword.c_str());
@@ -325,7 +334,7 @@ String generationPwd()
 {
   String jsonTime = getTime();
   // 128字节内存池容量
-  StaticJsonDocument<128> doc; 
+  StaticJsonDocument<128> doc;
   // 解析JSON
   DeserializationError error = deserializeJson(doc, jsonTime);
   if (error)
@@ -341,7 +350,7 @@ String generationPwd()
   float deviceRecvTime = millis();
   float now = (serverSendTime + serverRecvTime + deviceRecvTime - deviceSendTime) / 2;
   // 过期时间 = 当前时间 + 1小时
-  float expireTime = now + 1 * 60 * 60 * 1000; 
+  float expireTime = now + 1 * 60 * 60 * 1000;
   String password = (String)mqttPwd + "&" + userId + "&" + String(expireTime, 0);
   printMsg("密码(未加密):" + password);
   return password;

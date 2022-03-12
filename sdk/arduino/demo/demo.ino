@@ -8,8 +8,9 @@
 
 #include "Helper.h"
 
-long lastMqttConn;    // 上次mqtt连接时间
-long lastPublish;     // 上次发布监测数据时间
+long lastMqttConn;          // 上次mqtt连接时间
+long lastPublishMonitor;    // 上次发布监测数据时间
+long lastTimerMonitor;      // 上次定时发布监测数据
 
 /**
  * 启动
@@ -54,14 +55,25 @@ void loop()
     }
   }
 
-  // 非阻塞发布实时监测数据,间隔默认1000毫秒
+  // 非阻塞发布实时监测数据,间隔默认1秒
   if(WiFi.status() == WL_CONNECTED && monitorCount>0){
     long now = millis();
-    if (now - lastPublish > monitorInterval)
+    if (now - lastPublishMonitor > monitorInterval)
       {
-        lastPublish = now;
+        lastPublishMonitor = now;
         monitorCount--;
-        publishMonitor();
+        publishMonitor(1);
       }
   }
+
+  // 分阻塞定时上报属性,60秒发布一次
+  if(WiFi.status() == WL_CONNECTED){
+    long now = millis();
+    if (now - lastTimerMonitor > 10000)
+      {
+        lastTimerMonitor = now;
+        publishMonitor(2);
+      }
+  }
+
 }

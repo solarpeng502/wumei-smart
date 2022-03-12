@@ -13,7 +13,7 @@
 #include <ESP8266WiFi.h>
 #include <Ethernet.h>
 #include <ESP8266HTTPClient.h>
-#include <PubSubClient.h>      // 版本2.7.0
+#include <PubSubClient.h>      // 版本2.8.0
 #include <ArduinoJson.h>       // 版本6.19.1
 
 extern WiFiClient wifiClient;
@@ -54,7 +54,7 @@ void publishFunction(char *msg);
 // 发布事件
 void publishFunction();
 // 发布实时监测数据
-void publishMonitor();
+void publishMonitor(int type);
 // 属性处理
 void processProperty(byte *payload);
 // 功能处理
