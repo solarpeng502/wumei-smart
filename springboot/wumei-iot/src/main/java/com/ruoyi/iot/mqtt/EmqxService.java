@@ -149,7 +149,6 @@ public class EmqxService {
             DeviceLog deviceLog = new DeviceLog();
             deviceLog.setDeviceId(device.getDeviceId());
             deviceLog.setDeviceName(device.getDeviceName());
-//            deviceLog.setLogName(thingsModelValueItemInputs.get(i).getName());
             deviceLog.setLogValue(thingsModelValueItemInputs.get(i).getValue());
             deviceLog.setRemark(thingsModelValueItemInputs.get(i).getRemark());
             deviceLog.setSerialNumber(device.getSerialNumber());

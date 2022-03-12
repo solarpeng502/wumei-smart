@@ -173,20 +173,8 @@ public class DeviceServiceImpl implements IDeviceService {
                     deviceLog.setDeviceId(deviceThings.getDeviceId());
                     deviceLog.setSerialNumber(deviceThings.getSerialNumber());
                     deviceLog.setDeviceName(deviceThings.getDeviceName());
-//                    deviceLog.setLogName(input.getThingsModelValueItemInputs().get(i).getName());
                     deviceLog.setLogValue(input.getThingsModelValueItemInputs().get(i).getValue());
                     deviceLog.setDatatype(valueList.get(k).getDataType().getType());
-                    // 前端处理
-//                    if (deviceLog.getDatatype().equals("decimal") || deviceLog.getDatatype().equals("integer")) {
-//                        deviceLog.setLogValue(deviceLog.getLogValue() + valueList.get(k).getDataType().getUnit());
-//                    } else if (deviceLog.getDatatype().equals("enum")) {
-//                        for (int e = 0; e < valueList.get(k).getDataType().getEnumList().size(); e++) {
-//                            if (deviceLog.getLogValue().equals(valueList.get(k).getDataType().getEnumList().get(e).getValue())) {
-//                                deviceLog.setLogValue(valueList.get(k).getDataType().getEnumList().get(e).getText());
-//                                break;
-//                            }
-//                        }
-//                    }
                     deviceLog.setRemark(input.getThingsModelValueItemInputs().get(i).getRemark());
                     deviceLog.setIdentity(input.getThingsModelValueItemInputs().get(i).getId());
                     deviceLog.setCreateTime(DateUtils.getNowDate());
