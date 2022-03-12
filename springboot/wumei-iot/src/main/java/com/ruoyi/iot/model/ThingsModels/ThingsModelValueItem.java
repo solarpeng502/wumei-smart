@@ -1,4 +1,4 @@
-package com.ruoyi.iot.model.ThingsModelItem;
+package com.ruoyi.iot.model.ThingsModels;
 
 /**
  * 物模型值的项
@@ -6,7 +6,7 @@ package com.ruoyi.iot.model.ThingsModelItem;
  * @author kerwincui
  * @date 2021-12-16
  */
-public class ThingsModelValueItemInput
+public class ThingsModelValueItem
 {
     /** 物模型唯一标识符 */
     private String id;
@@ -14,15 +14,15 @@ public class ThingsModelValueItemInput
     /** 物模型值 */
     private String value;
 
-    /** 备注 **/
-    private String remark;
+    /** 影子值 **/
+    private String shadow;
 
-    public String getRemark() {
-        return remark;
+    public String getShadow() {
+        return shadow;
     }
 
-    public void setRemark(String remark) {
-        this.remark = remark;
+    public void setShadow(String shadow) {
+        this.shadow = shadow;
     }
 
     public String getValue() {

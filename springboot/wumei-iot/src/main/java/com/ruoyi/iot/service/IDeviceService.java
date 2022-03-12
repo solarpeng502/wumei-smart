@@ -2,6 +2,7 @@ package com.ruoyi.iot.service;
 
 import com.ruoyi.iot.domain.Device;
 import com.ruoyi.iot.model.*;
+import com.ruoyi.iot.model.ThingsModels.ThingsModelShadow;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesInput;
 import org.quartz.SchedulerException;
 
@@ -52,7 +53,7 @@ public interface IDeviceService
      * @param input
      * @return
      */
-    public int reportDeviceThingsModelValue(ThingsModelValuesInput input,int type);
+    public int reportDeviceThingsModelValue(ThingsModelValuesInput input,int type,boolean isShadow);
 
     /**
      * 查询设备列表
@@ -91,6 +92,13 @@ public interface IDeviceService
      * @return 结果
      */
     public int insertDeviceAuto(String serialNumber,Long userId,Long productId);
+
+    /**
+     * 获取设备设置的影子
+     * @param device
+     * @return
+     */
+    public ThingsModelShadow getDeviceShadowThingsModel(Device device);
 
     /**
      * 修改设备

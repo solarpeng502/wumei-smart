@@ -1,7 +1,5 @@
 package com.ruoyi.iot.model.ThingsModels;
 
-import com.ruoyi.iot.model.ThingsModelItem.ThingsModelValueItemInput;
-
 import java.util.List;
 
 /**
@@ -24,7 +22,7 @@ public class ThingsModelValuesInput
     private String stringValue;
 
     /** 设备物模型值的集合 **/
-    private List<ThingsModelValueItemInput> thingsModelValueItemInputs;
+    private List<ThingsModelValueRemarkItem> thingsModelValueRemarkItem;
 
     public Long getDeviceId() {
         return deviceId;
@@ -58,11 +56,11 @@ public class ThingsModelValuesInput
         this.deviceNumber = deviceNumber;
     }
 
-    public List<ThingsModelValueItemInput> getThingsModelValueItemInputs() {
-        return thingsModelValueItemInputs;
+    public List<ThingsModelValueRemarkItem> getThingsModelValueRemarkItem() {
+        return thingsModelValueRemarkItem;
     }
 
-    public void setThingsModelValueItemInputs(List<ThingsModelValueItemInput> thingsModelValueItemInputs) {
-        this.thingsModelValueItemInputs = thingsModelValueItemInputs;
+    public void setThingsModelValueRemarkItem(List<ThingsModelValueRemarkItem> thingsModelValueRemarkItem) {
+        this.thingsModelValueRemarkItem = thingsModelValueRemarkItem;
     }
 }

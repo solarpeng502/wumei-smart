@@ -1,6 +1,6 @@
 package com.ruoyi.iot.model.ThingsModels;
 
-import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.math3.analysis.function.Identity;
 
 /**
  * 物模型值的项
@@ -8,13 +8,19 @@ import com.alibaba.fastjson.JSONObject;
  * @author kerwincui
  * @date 2021-12-16
  */
-public class ThingsModelValueItemDao
+public class IdentityAndName
 {
+    public IdentityAndName(){
+
+    }
+
+    public IdentityAndName(String id,String value){
+        this.id=id;
+        this.value=value;
+    }
+
     /** 物模型唯一标识符 */
     private String id;
-
-    /** 物模型名称 */
-    private String name;
 
     /** 物模型值 */
     private String value;
@@ -33,14 +39,6 @@ public class ThingsModelValueItemDao
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
 }

@@ -16,10 +16,8 @@ import com.ruoyi.iot.mapper.DeviceMapper;
 import com.ruoyi.iot.mapper.DeviceUserMapper;
 import com.ruoyi.iot.model.*;
 import com.ruoyi.iot.model.ThingsModelItem.*;
-import com.ruoyi.iot.model.ThingsModels.ThingsModelValueItemDao;
-import com.ruoyi.iot.model.ThingsModels.ThingsModelValueItemDto;
-import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesInput;
-import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesOutput;
+import com.ruoyi.iot.model.ThingsModels.*;
+import com.ruoyi.iot.service.IDeviceLogService;
 import com.ruoyi.iot.service.IDeviceService;
 import com.ruoyi.iot.service.IProductService;
 import com.ruoyi.iot.service.IToolService;
@@ -34,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,6 +72,9 @@ public class DeviceServiceImpl implements IDeviceService {
 
     @Autowired
     private ISysUserService userService;
+
+    @Autowired
+    private IDeviceLogService deviceLogService;
 
     /**
      * 查询设备
@@ -136,7 +138,7 @@ public class DeviceServiceImpl implements IDeviceService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int reportDeviceThingsModelValue(ThingsModelValuesInput input, int type) {
+    public int reportDeviceThingsModelValue(ThingsModelValuesInput input, int type,boolean isShadow) {
         // 查询物模型
         String thingsModels = thingsModelService.getCacheThingsModelByProductId(input.getProductId());
         JSONObject thingsModelObject = JSONObject.parseObject(thingsModels);
@@ -151,21 +153,25 @@ public class DeviceServiceImpl implements IDeviceService {
 
         // 查询物模型值
         ThingsModelValuesOutput deviceThings = deviceMapper.selectDeviceThingsModelValueBySerialNumber(input.getDeviceNumber());
-        List<ThingsModelValueItemDao> thingsModelValues = JSONObject.parseArray(deviceThings.getThingsModelValue(), ThingsModelValueItemDao.class);
+        List<ThingsModelValueItem> thingsModelValues = JSONObject.parseArray(deviceThings.getThingsModelValue(), ThingsModelValueItem.class);
 
-        for(int i=0;i<input.getThingsModelValueItemInputs().size();i++){
+        for(int i=0;i<input.getThingsModelValueRemarkItem().size();i++){
             // 赋值
             for(int j=0;j<thingsModelValues.size();j++){
-                if (input.getThingsModelValueItemInputs().get(i).getId().equals(thingsModelValues.get(j).getId())) {
-                    thingsModelValues.get(j).setValue(input.getThingsModelValueItemInputs().get(i).getValue());
+                if (input.getThingsModelValueRemarkItem().get(i).getId().equals(thingsModelValues.get(j).getId())) {
+                    // 影子模式不更新物模型值
+                    if(!isShadow){
+                        thingsModelValues.get(j).setValue(String.valueOf(input.getThingsModelValueRemarkItem().get(i).getValue()));
+                    }
+                    thingsModelValues.get(j).setShadow(String.valueOf(input.getThingsModelValueRemarkItem().get(i).getValue()));
                     break;
                 }
             }
 
             //日志
             for(int k=0;k<valueList.size();k++){
-                if (valueList.get(k).getId().equals(input.getThingsModelValueItemInputs().get(i).getId())) {
-                    valueList.get(k).setValue(input.getThingsModelValueItemInputs().get(i).getValue());
+                if (valueList.get(k).getId().equals(input.getThingsModelValueRemarkItem().get(i).getId())) {
+                    valueList.get(k).setValue(input.getThingsModelValueRemarkItem().get(i).getValue());
                     // TODO 场景联动、告警规则匹配处理
 
                     // 添加到设备日志
@@ -173,10 +179,10 @@ public class DeviceServiceImpl implements IDeviceService {
                     deviceLog.setDeviceId(deviceThings.getDeviceId());
                     deviceLog.setSerialNumber(deviceThings.getSerialNumber());
                     deviceLog.setDeviceName(deviceThings.getDeviceName());
-                    deviceLog.setLogValue(input.getThingsModelValueItemInputs().get(i).getValue());
+                    deviceLog.setLogValue(input.getThingsModelValueRemarkItem().get(i).getValue());
                     deviceLog.setDatatype(valueList.get(k).getDataType().getType());
-                    deviceLog.setRemark(input.getThingsModelValueItemInputs().get(i).getRemark());
-                    deviceLog.setIdentity(input.getThingsModelValueItemInputs().get(i).getId());
+                    deviceLog.setRemark(input.getThingsModelValueRemarkItem().get(i).getRemark());
+                    deviceLog.setIdentity(input.getThingsModelValueRemarkItem().get(i).getId());
                     deviceLog.setCreateTime(DateUtils.getNowDate());
                     deviceLog.setIsMonitor(valueList.get(k).getIsMonitor());
                     deviceLog.setLogType(type);
@@ -416,16 +422,69 @@ public class DeviceServiceImpl implements IDeviceService {
      * @param productId
      * @return
      */
-    private List<ThingsModelValueItemDao> getThingsModelDefaultValue(Long productId) {
+    private List<ThingsModelValueItem> getThingsModelDefaultValue(Long productId) {
         // 获取物模型,设置默认值
         String thingsModels = thingsModelService.getCacheThingsModelByProductId(productId);
         JSONObject thingsModelObject = JSONObject.parseObject(thingsModels);
         JSONArray properties = thingsModelObject.getJSONArray("properties");
         JSONArray functions = thingsModelObject.getJSONArray("functions");
-        List<ThingsModelValueItemDao> valueList = properties.toJavaList(ThingsModelValueItemDao.class);
-        valueList.addAll(functions.toJavaList(ThingsModelValueItemDao.class));
-        valueList.forEach(x -> x.setValue(""));
+        List<ThingsModelValueItem> valueList = properties.toJavaList(ThingsModelValueItem.class);
+        valueList.addAll(functions.toJavaList(ThingsModelValueItem.class));
+        valueList.forEach(x -> {
+            x.setValue("");
+            x.setShadow("");
+        });
         return valueList;
+    }
+
+    /**
+     * 获取设备设置的影子
+     * @param device
+     * @return
+     */
+    @Override
+    public ThingsModelShadow getDeviceShadowThingsModel(Device device) {
+        // 物模型
+        String thingsModels = thingsModelService.getCacheThingsModelByProductId(device.getProductId());
+        JSONObject thingsModelObject = JSONObject.parseObject(thingsModels);
+        JSONArray properties = thingsModelObject.getJSONArray("properties");
+        JSONArray functions = thingsModelObject.getJSONArray("functions");
+
+        // 物模型值
+        List<ThingsModelValueItem> thingsModelValueItems = JSONObject.parseArray(device.getThingsModelValue(), ThingsModelValueItem.class);
+
+        // 查询出设置的影子值
+        List<ThingsModelValueItem> shadowList = new ArrayList<>();
+        for (int i = 0; i < thingsModelValueItems.size(); i++) {
+            if (thingsModelValueItems.get(i).getValue().equals(thingsModelValueItems.get(i).getShadow())) {
+                shadowList.add(thingsModelValueItems.get(i));
+                System.out.println("添加影子："+thingsModelValueItems.get(i).getId());
+            }
+        }
+        ThingsModelShadow shadow=new ThingsModelShadow();
+        for (int i = 0; i < shadowList.size(); i++) {
+            boolean isGetValue = false;
+            for (int j = 0; j < properties.size(); j++) {
+                if (properties.getJSONObject(j).getString("id").equals(shadowList.get(i).getId())) {
+                    IdentityAndName item = new IdentityAndName(shadowList.get(i).getId(), shadowList.get(i).getShadow());
+                    shadow.getProperties().add(item);
+                    System.out.println("添加影子属性："+item.getId());
+                    isGetValue = true;
+                    break;
+                }
+            }
+            if (!isGetValue) {
+                for (int k = 0; k < functions.size(); k++) {
+                    if (functions.getJSONObject(k).getString("id").equals(shadowList.get(i).getId())) {
+                        IdentityAndName item = new IdentityAndName(shadowList.get(i).getId(), shadowList.get(i).getShadow());
+                        shadow.getFunctions().add(item);
+                        System.out.println("添加影子功能："+item.getId());
+                        break;
+                    }
+                }
+            }
+        }
+        return shadow;
     }
 
 
@@ -470,6 +529,7 @@ public class DeviceServiceImpl implements IDeviceService {
      * @return 结果
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int updateDeviceStatusAndLocation(String deviceNum,int status,String ipAddress) {
         Device device=new Device();
         device.setStatus(status);
@@ -485,6 +545,23 @@ public class DeviceServiceImpl implements IDeviceService {
                 setLocation(ipAddress, device);
             }
         }
+        // 添加到设备日志
+        DeviceLog deviceLog = new DeviceLog();
+        deviceLog.setDeviceId(device.getDeviceId());
+        deviceLog.setDeviceName(device.getDeviceName());
+        deviceLog.setSerialNumber(device.getSerialNumber());
+        if(status==3){
+            deviceLog.setLogValue("1");
+            deviceLog.setRemark("设备上线");
+            deviceLog.setIdentity("online");
+            deviceLog.setLogType(5);
+        }else if(status==4){
+            deviceLog.setLogValue("0");
+            deviceLog.setRemark("设备离线");
+            deviceLog.setIdentity("offline");
+            deviceLog.setLogType(6);
+        }
+        deviceLogService.insertDeviceLog(deviceLog);
         return deviceMapper.updateDeviceStatus(device);
     }
 

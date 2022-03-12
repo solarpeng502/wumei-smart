@@ -4,8 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.ruoyi.iot.domain.Device;
 import com.ruoyi.iot.domain.DeviceLog;
 import com.ruoyi.iot.model.NtpModel;
-import com.ruoyi.iot.model.SimpleThingsModel;
-import com.ruoyi.iot.model.ThingsModelItem.ThingsModelValueItemInput;
+import com.ruoyi.iot.model.ThingsModels.IdentityAndName;
+import com.ruoyi.iot.model.ThingsModels.ThingsModelValueItem;
+import com.ruoyi.iot.model.ThingsModels.ThingsModelValueRemarkItem;
 import com.ruoyi.iot.model.ThingsModels.ThingsModelValuesInput;
 import com.ruoyi.iot.service.IDeviceLogService;
 import com.ruoyi.iot.service.IDeviceService;
@@ -28,6 +29,7 @@ public class EmqxService {
 
     @Autowired
     private IDeviceService deviceService;
+
     @Autowired
     private IDeviceLogService deviceLogService;
 
@@ -84,19 +86,19 @@ public class EmqxService {
                 publishNtp(productId,deviceNum,message);
                 break;
             case "property":
-                reportProperty(productId,deviceNum,message);
+                reportProperty(productId,deviceNum,message,false);
                 break;
             case "function":
-                reportFunction(productId,deviceNum,message);
+                reportFunction(productId,deviceNum,message,false);
                 break;
             case "event":
                 reportEvent(productId,deviceNum,message);
                 break;
             case "sproperty":
-                reportProperty(productId,deviceNum,message);
+                reportProperty(productId,deviceNum,message,true);
                 break;
             case "sfunction":
-                reportFunction(productId,deviceNum,message);
+                reportFunction(productId,deviceNum,message,true);
                 break;
         }
     }
@@ -115,26 +117,26 @@ public class EmqxService {
      * 上报属性
      * @param message
      */
-    private void reportProperty(Long productId,String deviceNum,String message){
-        List<ThingsModelValueItemInput> thingsModelValueItemInputs=JSON.parseArray(message,ThingsModelValueItemInput.class);
+    private void reportProperty(Long productId,String deviceNum,String message,boolean isShadow){
+        List<ThingsModelValueRemarkItem> thingsModelValueRemarkItems=JSON.parseArray(message, ThingsModelValueRemarkItem.class);
         ThingsModelValuesInput input=new ThingsModelValuesInput();
         input.setProductId(productId);
         input.setDeviceNumber(deviceNum);
-        input.setThingsModelValueItemInputs(thingsModelValueItemInputs);
-        deviceService.reportDeviceThingsModelValue(input,1);
+        input.setThingsModelValueRemarkItem(thingsModelValueRemarkItems);
+        deviceService.reportDeviceThingsModelValue(input,1,isShadow);
     }
 
     /**
      * 上报功能
      * @param message
      */
-    private void reportFunction(Long productId,String deviceNum,String message){
-        List<ThingsModelValueItemInput> thingsModelValueItemInputs=JSON.parseArray(message,ThingsModelValueItemInput.class);
+    private void reportFunction(Long productId,String deviceNum,String message,boolean isShadow){
+        List<ThingsModelValueRemarkItem> thingsModelValueItemInputs=JSON.parseArray(message, ThingsModelValueRemarkItem.class);
         ThingsModelValuesInput input=new ThingsModelValuesInput();
         input.setProductId(productId);
         input.setDeviceNumber(deviceNum);
-        input.setThingsModelValueItemInputs(thingsModelValueItemInputs);
-        deviceService.reportDeviceThingsModelValue(input,2);
+        input.setThingsModelValueRemarkItem(thingsModelValueItemInputs);
+        deviceService.reportDeviceThingsModelValue(input,2,isShadow);
     }
 
     /**
@@ -142,17 +144,17 @@ public class EmqxService {
      * @param message
      */
     private void reportEvent(Long productId,String deviceNum,String message){
-        List<ThingsModelValueItemInput> thingsModelValueItemInputs=JSON.parseArray(message,ThingsModelValueItemInput.class);
+        List<ThingsModelValueRemarkItem> thingsModelValueRemarkItems=JSON.parseArray(message, ThingsModelValueRemarkItem.class);
         Device device =deviceService.selectDeviceBySerialNumber(deviceNum);
-        for(int i=0;i<thingsModelValueItemInputs.size();i++) {
+        for(int i=0;i<thingsModelValueRemarkItems.size();i++) {
             // 添加到设备日志
             DeviceLog deviceLog = new DeviceLog();
             deviceLog.setDeviceId(device.getDeviceId());
             deviceLog.setDeviceName(device.getDeviceName());
-            deviceLog.setLogValue(thingsModelValueItemInputs.get(i).getValue());
-            deviceLog.setRemark(thingsModelValueItemInputs.get(i).getRemark());
+            deviceLog.setLogValue(thingsModelValueRemarkItems.get(i).getValue());
+            deviceLog.setRemark(thingsModelValueRemarkItems.get(i).getRemark());
             deviceLog.setSerialNumber(device.getSerialNumber());
-            deviceLog.setIdentity(thingsModelValueItemInputs.get(i).getId());
+            deviceLog.setIdentity(thingsModelValueRemarkItems.get(i).getId());
             deviceLog.setLogType(3);
             deviceLogService.insertDeviceLog(deviceLog);
         }
@@ -181,14 +183,14 @@ public class EmqxService {
     /**
      * 3.发布属性
      */
-    public void publishProperty(Long productId,String deviceNum,List<SimpleThingsModel> thingsList){
+    public void publishProperty(Long productId,String deviceNum,List<IdentityAndName> thingsList){
         emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+pPropertyTopic, JSON.toJSONString(thingsList));
     }
 
     /**
      * 4.发布功能
      */
-    public void publishFunction(Long productId,String deviceNum,List<SimpleThingsModel> thingsList){
+    public void publishFunction(Long productId,String deviceNum,List<IdentityAndName> thingsList){
         emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+pFunctionTopic, JSON.toJSONString(thingsList));
     }
 

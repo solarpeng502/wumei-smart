@@ -14,13 +14,18 @@
 
     <el-card style="padding-bottom:100px;">
         <el-table v-loading="loading" :data="subscribeList">
-        <el-table-column label="类型" align="center" prop="type" width="150">
+            <el-table-column label="类型" align="center" prop="type" width="150">
                 <template slot-scope="scope">
                     <el-tag type="danger" v-if="scope.row.clientid.indexOf('server')==0">服务端</el-tag>
                     <el-tag type="success" v-else-if="scope.row.clientid.indexOf('web')==0">Web端</el-tag>
                     <el-tag type="warning" v-else-if="scope.row.clientid.indexOf('phone')==0">移动端</el-tag>
                     <el-tag type="info" v-else-if="scope.row.clientid.indexOf('test')==0">测试端</el-tag>
                     <el-tag type="primary" v-else>设备端</el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column label="主题" align="left" header-align="center" prop="topic">
+                <template slot-scope="scope">
+                    <span style="font-weight:bold">{{scope.row.topic}}</span>
                 </template>
             </el-table-column>
             <el-table-column label="客户端ID" align="center" header-align="center" prop="clientid">
@@ -30,11 +35,6 @@
             </el-table-column>
             <el-table-column label="Qos" align="center" prop="qos" width="100" />
             <el-table-column label="节点" align="center" prop="node" />
-             <el-table-column label="主题" align="left" header-align="center" prop="topic" >
-                <template slot-scope="scope">
-                    <span style="font-weight:bold">{{scope.row.topic}}</span>
-                </template>
-            </el-table-column>
         </el-table>
 
         <pagination v-show="total>0" :total="total" :page.sync="queryParams._page" :limit.sync="queryParams._limit" @pagination="getList" />

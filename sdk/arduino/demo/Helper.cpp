@@ -231,30 +231,31 @@ void publishEvent()
 void publishMonitor(int type)
 {
   // 匹配云端定义的监测数据，随机数代替监测结果
-  float randNumber = 0;
+  float randFloat = 0;
+  int randInt=0;
   StaticJsonDocument<1024> doc;
   JsonObject objTmeperature = doc.createNestedObject();
   objTmeperature["id"] = "temperature";
-  randNumber = random(1000, 3000) ;
-  objTmeperature["value"] = (String)(randNumber/100);
+  randFloat = random(1000, 3000) ;
+  objTmeperature["value"] = (String)(randFloat/100);
   objTmeperature["remark"] = "监测数据备注";
 
   JsonObject objHumidity   = doc.createNestedObject();
   objHumidity["id"] = "humidity";
-  randNumber = random(3000, 6000);
-  objHumidity["value"] = (String)(randNumber/100);
+  randFloat = random(3000, 6000);
+  objHumidity["value"] = (String)(randFloat/100);
   objHumidity["remark"] = "监测数据备注";
 
   JsonObject objCo2 = doc.createNestedObject();
   objCo2["id"] = "co2";
-  randNumber = random(400, 1000);
-  objCo2["value"] = (String)(randNumber);
+  randInt = random(400, 1000);
+  objCo2["value"] = (String)(randInt);
   objCo2["remark"] = "监测数据备注";
 
   JsonObject objBrightness = doc.createNestedObject();
   objBrightness["id"] = "brightness";
-  randNumber = random(1000, 10000);
-  objBrightness["value"] = (String)(randNumber);
+  randInt = random(1000, 10000);
+  objBrightness["value"] = (String)(randInt);
   objBrightness["remark"] = "监测数据备注";
 
   printMsg("发布监测数据:");

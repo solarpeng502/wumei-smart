@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.iot.domain.DeviceJob;
 import com.ruoyi.iot.model.Action;
-import com.ruoyi.iot.model.SimpleThingsModel;
+import com.ruoyi.iot.model.ThingsModels.IdentityAndName;
 import com.ruoyi.iot.mqtt.EmqxService;
 
 import java.util.ArrayList;
@@ -27,10 +27,10 @@ public class JobInvokeUtil
         if(deviceJob.getJobType()==1){
             System.out.println("------------------------执行定时任务-----------------------------");
             List<Action> actions= JSON.parseArray(deviceJob.getActions(),Action.class);
-            List<SimpleThingsModel> propertys=new ArrayList<>();
-            List<SimpleThingsModel> functions=new ArrayList<>();
+            List<IdentityAndName> propertys=new ArrayList<>();
+            List<IdentityAndName> functions=new ArrayList<>();
             for(int i=0;i<actions.size();i++){
-                SimpleThingsModel model=new SimpleThingsModel();
+                IdentityAndName model=new IdentityAndName();
                 model.setId(actions.get(i).getId());
                 model.setValue(actions.get(i).getValue());
                 if(actions.get(i).getType()==1){

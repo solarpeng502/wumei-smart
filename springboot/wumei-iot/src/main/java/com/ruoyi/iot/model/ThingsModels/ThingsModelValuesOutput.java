@@ -1,9 +1,5 @@
 package com.ruoyi.iot.model.ThingsModels;
 
-import com.ruoyi.iot.model.ThingsModelItem.ThingsModelValueItemInput;
-
-import java.util.List;
-
 /**
  * 设备输入物模型值参数
  *

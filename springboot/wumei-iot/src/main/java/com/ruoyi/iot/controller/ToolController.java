@@ -1,37 +1,34 @@
 package com.ruoyi.iot.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.exception.file.FileNameLengthLimitExceededException;
-import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.common.utils.file.FileUtils;
-import com.ruoyi.common.utils.file.MimeTypeUtils;
-import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.iot.domain.Device;
-import com.ruoyi.iot.domain.Product;
 import com.ruoyi.iot.model.AuthenticateInputModel;
 import com.ruoyi.iot.model.DeviceAuthenticateModel;
 import com.ruoyi.iot.model.MqttClientConnectModel;
 import com.ruoyi.iot.model.RegisterUserInput;
+import com.ruoyi.iot.model.ThingsModels.IdentityAndName;
+import com.ruoyi.iot.model.ThingsModels.ThingsModelValueItem;
+import com.ruoyi.iot.model.ThingsModels.ThingsModelShadow;
 import com.ruoyi.iot.mqtt.EmqxService;
 import com.ruoyi.iot.mqtt.MqttConfig;
-import com.ruoyi.iot.service.ICategoryService;
 import com.ruoyi.iot.service.IDeviceService;
-import com.ruoyi.iot.service.IProductService;
 import com.ruoyi.iot.service.IToolService;
+import com.ruoyi.iot.service.impl.ThingsModelServiceImpl;
 import com.ruoyi.iot.util.AESUtils;
 import com.ruoyi.iot.util.VelocityInitializer;
 import com.ruoyi.iot.util.VelocityUtils;
-import com.ruoyi.system.service.ISysUserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.swagger.annotations.Api;
@@ -55,14 +52,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static com.ruoyi.common.utils.file.FileUploadUtils.assertAllowed;
 import static com.ruoyi.common.utils.file.FileUploadUtils.getExtension;
 
 /**
@@ -78,16 +74,10 @@ public class ToolController extends BaseController {
     private static final Logger log = LoggerFactory.getLogger(ToolController.class);
 
     @Autowired
-    private ICategoryService categoryService;
-
-    @Autowired
     private IDeviceService deviceService;
 
     @Autowired
-    private IProductService productService;
-
-    @Autowired
-    private ISysUserService userService;
+    private ThingsModelServiceImpl thingsModelService;
 
     @Autowired
     private EmqxService emqxService;
@@ -140,7 +130,7 @@ public class ToolController extends BaseController {
                 }
             } else {
                 // 设备端
-                String[] clientInfo=clientid.split("&");
+                String[] clientInfo = clientid.split("&");
                 if (clientInfo.length != 2) {
                     // 设备未加密认证
                     if (mqttConfig.getusername().equals(username) && mqttConfig.getpassword().equals(password)) {
@@ -150,9 +140,9 @@ public class ToolController extends BaseController {
                     return returnUnauthorized(clientid, username, password, "认证信息有误");
                 }
                 // 设备加密认证
-                String deviceNum=clientInfo[0];
-                Long productId=Long.valueOf(clientInfo[1]);
-                AuthenticateInputModel authenticateInputModel=new AuthenticateInputModel(deviceNum,productId);
+                String deviceNum = clientInfo[0];
+                Long productId = Long.valueOf(clientInfo[1]);
+                AuthenticateInputModel authenticateInputModel = new AuthenticateInputModel(deviceNum, productId);
                 DeviceAuthenticateModel model = deviceService.selectDeviceAuthenticate(authenticateInputModel);
                 if (model == null) {
                     return returnUnauthorized(clientid, username, password, "认证信息有误");
@@ -173,16 +163,16 @@ public class ToolController extends BaseController {
                 if (mqttPassword.equals(model.getMqttPassword())
                         && username.equals(model.getMqttAccount())
                         && expireTime > System.currentTimeMillis()
-                        && model.getProductStatus()==2) {
+                        && model.getProductStatus() == 2) {
 
                     // 设备状态验证 （1-未激活，2-禁用，3-在线，4-离线）
-                    if(model.getDeviceId() != null && model.getDeviceId() != 0 && model.getStatus() != 2){
+                    if (model.getDeviceId() != null && model.getDeviceId() != 0 && model.getStatus() != 2) {
                         System.out.println("-----------认证成功,clientId:" + clientid + "---------------");
                         return ResponseEntity.ok().body("ok");
-                    }else{
+                    } else {
                         // 自动添加设备
-                        int result=deviceService.insertDeviceAuto(deviceNum,userId,productId);
-                        if(result==1){
+                        int result = deviceService.insertDeviceAuto(deviceNum, userId, productId);
+                        if (result == 1) {
                             System.out.println("-----------认证成功,clientId:" + clientid + "---------------");
                             return ResponseEntity.ok().body("ok");
                         }
@@ -221,8 +211,8 @@ public class ToolController extends BaseController {
             if (model.getClientid().startsWith("server") || model.getClientid().startsWith("web") || model.getClientid().startsWith("phone")) {
                 return AjaxResult.success();
             }
-            String[] clientInfo=model.getClientid().split("&");
-            String deviceNum=clientInfo[0];
+            String[] clientInfo = model.getClientid().split("&");
+            String deviceNum = clientInfo[0];
             Device device = deviceService.selectDeviceBySerialNumber(deviceNum);
             // 设备状态（1-未激活，2-禁用，3-在线，4-离线）
             if (model.getAction().equals("client_disconnected")) {
@@ -232,14 +222,25 @@ public class ToolController extends BaseController {
             } else if (model.getAction().equals("client_connected")) {
                 deviceService.updateDeviceStatusAndLocation(device.getSerialNumber(), 3, model.getIpaddress());
                 emqxService.publishStatus(device.getProductId(), device.getSerialNumber(), 3);
+                // 影子模式，发布属性和功能
+                if (device.getIsShadow() == 1) {
+                    ThingsModelShadow shadow=deviceService.getDeviceShadowThingsModel(device);
+                    if (shadow.getProperties().size() > 0) {
+                        emqxService.publishFunction(device.getProductId(), device.getSerialNumber(), shadow.getProperties());
+                    }
+                    if (shadow.getFunctions().size() > 0) {
+                        emqxService.publishProperty(device.getProductId(), device.getSerialNumber(), shadow.getFunctions());
+                    }
+                }
             }
         } catch (Exception ex) {
-            // ex.printStackTrace();
-            System.out.println("发生错误：" + ex.getMessage());
+            ex.printStackTrace();
             log.error("发生错误：" + ex.getMessage());
         }
         return AjaxResult.success();
     }
+
+
 
     @ApiOperation("获取NTP时间")
     @GetMapping("/ntp")
