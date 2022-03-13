@@ -168,24 +168,26 @@ export default {
             return "";
         },
         getThingsModelItem(type, identity) {
-            if (type == 1) {
+            if (type == 1 && this.thingsModel.properties) {
                 for (let i = 0; i < this.thingsModel.properties.length; i++) {
                     if (this.thingsModel.properties[i].id == identity) {
                         return this.thingsModel.properties[i];
                     }
                 }
-            } else if (type == 2) {
+            } else if (type == 2 && this.thingsModel.functions) {
                 for (let i = 0; i < this.thingsModel.functions.length; i++) {
                     if (this.thingsModel.functions[i].id == identity) {
                         return this.thingsModel.functions[i];
                     }
                 }
-            } else if (type == 3)
+            } else if (type == 3 && this.thingsModel.events){
                 for (let i = 0; i < this.thingsModel.events.length; i++) {
                     if (this.thingsModel.events[i].id == identity) {
                         return this.thingsModel.events[i];
                     }
                 }
+            }
+            return "";
         }
     }
 };

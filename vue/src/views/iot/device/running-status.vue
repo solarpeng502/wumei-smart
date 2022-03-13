@@ -83,7 +83,7 @@
             </el-descriptions>
 
             <!-- 监测数据-->
-            <el-descriptions :column="2" border size="mini" style="margin-top:35px;" title="监测数据">
+            <el-descriptions :column="2" border style="margin-top:35px;" title="监测数据">
                 <el-descriptions-item v-for="(item,index) in deviceInfo.readOnlyList" :key="index">
                     <template slot="label">
                         <i class="el-icon-odometer"></i>
@@ -92,14 +92,17 @@
                     <el-link type="primary" :underline="false">{{item.value}} {{item.unit==null?"":item.unit}}</el-link>
                 </el-descriptions-item>
             </el-descriptions>
+
+            <!-- Mqtt通讯 -->
+            <mqtt-client ref="mqttClient" :publish="publish" :subscribe="subscribes" @callbackEvent="mqttCallback($event)" />
         </el-col>
 
         <el-col :span="14" :offset="1">
             <el-row :gutter="20" style="background-color:#FAFAFA; padding:20px;padding-left:10px;">
-                <el-col :span="8" v-for="(item,index) in deviceInfo.readOnlyList" :key="index" style="margin-bottom:30px;">
-                    <div style="border:1px solid #ddd;border-radius:8px;background-color:#FFF;">
-                        <div ref="map" style="height:280px;width:190px;margin:0 auto;margin-top:-15px;"></div>
-                    </div>
+                <el-col :span="8" v-for="(item,index) in deviceInfo.readOnlyList" :key="index" style="margin-bottom:20px;">
+                    <el-card shadow="hover" style="border-radius:30px;">
+                        <div ref="map" style="height:230px;width:190px;margin:0 auto;margin-top:-10px;"></div>
+                    </el-card>
                 </el-col>
             </el-row>
         </el-col>
@@ -128,16 +131,22 @@ export default {
             if (this.deviceInfo && this.deviceInfo.deviceId != 0) {
                 getDeviceRunningStatus(this.deviceInfo.deviceId).then(response => {
                     this.deviceInfo = response.data;
-                    this.getDeviceStatus(this.deviceInfo);
+                    this.updateDeviceStatus(this.deviceInfo);
                     this.$nextTick(function () {
                         this.MonitorChart();
                     });
+                    // Mqtt订阅主题
+                    this.mqttSubscribe(this.deviceInfo);
                 });
             }
         }
     },
     data() {
         return {
+            // 发布消息
+            publish: {},
+            // 订阅集合
+            subscribes: [],
             // 控制模块标题
             title: "设备控制 ",
             // 未启用设备影子
@@ -150,15 +159,74 @@ export default {
             // 遮罩层
             loading: true,
             // 设备信息
-            deviceInfo: {},
+            deviceInfo: {
+                boolList: [],
+                enumList: [],
+                stringList: [],
+                integerList: [],
+                decimalList: [],
+                arrayList: [],
+                readonlyList: []
+            },
         }
     },
     created() {
 
     },
     methods: {
-        /** 是否启用设备影子*/
-        getDeviceStatus(device) {
+        /** Mqtt订阅主题 */
+        mqttSubscribe(device) {
+            // 订阅当前设备状态
+            let topic = "/" + device.productId + "/" + device.productId + "/status/post ";
+            this.mqttSubscribe.push({
+                topic: topic,
+            });
+        },
+        /** Mqtt发布消息(1=属性，2=功能，3=OTA升级)*/
+        mqttPublish(type, item) {
+            let topic = "";
+            let message = ""
+            if (type == 1) {
+                if (deviceInfo.status == 3) {
+                    // 属性,在线模式
+                    topic = "/" + deviceInfo.productId + "/" + deviceInfo.productId + "/property-online/get ";
+
+                } else if (deviceInfo.isShadow) {
+                    // 属性,离线模式
+                    topic = "/" + deviceInfo.productId + "/" + deviceInfo.productId + "/property-offline/get ";
+
+                }
+            } else if (type == 2) {
+                if (deviceInfo.status == 3) {
+                    // 功能,在线模式
+                    topic = "/" + deviceInfo.productId + "/" + deviceInfo.productId + "/function-online/get ";
+
+                } else if (deviceInfo.isShadow) {
+                    // 功能,离线模式
+                    topic = "/" + deviceInfo.productId + "/" + deviceInfo.productId + "/function-offline/get ";
+
+                }
+            } else if (type == 3) {
+                // OTA升级
+                topic = "/" + deviceInfo.productId + "/" + deviceInfo.productId + "/ota/get ";
+            }         
+            this.mqttPublish = {topic: topic, message: message}
+        },
+        /** 接收到Mqtt回调 */
+        mqttCallback(data) {
+            console.log(data);
+            let topics = [];
+            topics = data.topic.split("/");
+            if (this.deviceInfo.serialNumber == topics[2]) {
+                let message = JSON.parse(data.message);
+                this.deviceInfo.status = message.status;
+                this.deviceInfo.isShadow = message.isShadow;
+                this.updateDeviceStatus();
+            }
+        },
+
+        /** 更新设备状态 */
+        updateDeviceStatus(device) {
             if (device.status == 3) {
                 this.statusColor.background = '#67C23A';
                 this.title += "（在线）";
@@ -196,7 +264,7 @@ export default {
                         },
                         axisLabel: {
                             fontSize: 10,
-                            distance:10
+                            distance: 10
                         },
                         // 刻度线
                         axisTick: {
@@ -205,28 +273,28 @@ export default {
                         // 仪表盘轴线
                         axisLine: {
                             lineStyle: {
-                                width: 6,
+                                width: 8,
                                 color: [
                                     [0.3, '#409EFF'], // 0~30% 
                                     [0.7, '#67C23A'], // 30~70%
                                     [1, '#F56C6C'], // 70~100%
                                 ],
-                                opacity:0.3
+                                opacity: 0.3
                             }
 
                         },
-                        pointer:{
-                            icon:'triangle',
-                            length:'60%',
-                            width:7
+                        pointer: {
+                            icon: 'triangle',
+                            length: '60%',
+                            width: 7
                         },
                         progress: {
                             show: true,
-                            width:6,
+                            width: 8,
                         },
                         detail: {
                             valueAnimation: true,
-                            formatter: '{value}'+' ' + this.deviceInfo.readOnlyList[i].unit,
+                            formatter: '{value}' + ' ' + this.deviceInfo.readOnlyList[i].unit,
                             offsetCenter: [0, "80%"],
                             fontSize: 20,
                         },
@@ -235,7 +303,7 @@ export default {
                             name: this.deviceInfo.readOnlyList[i].name
                         }],
                         title: {
-                            offsetCenter: [0, "120%"],
+                            offsetCenter: [0, "110%"],
                             fontSize: 16
                         }
                     }]

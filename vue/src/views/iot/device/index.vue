@@ -159,12 +159,13 @@
             </div>
         </el-dialog>
 
+        <!-- Mqtt通讯 -->
+        <mqtt-client ref="mqttClient" :publish="publish" :subscribe="subscribes" @callbackEvent="mqttCallback($event)" />
     </el-card>
 </div>
 </template>
 
 <script>
-import mqtt from 'mqtt'
 import * as echarts from 'echarts';
 import {
     getToken
@@ -226,7 +227,7 @@ export default {
     },
     created() {
         this.getList();
-        this.connectMqtt();
+
     },
     activated() {
         const time = this.$route.query.t;
@@ -242,104 +243,59 @@ export default {
         }
     },
     methods: {
-        /** 连接Mqtt */
-        connectMqtt() {
-            let options = {
-                username: "wumei-smart",
-                password: getToken(),
-                cleanSession: false,
-                keepAlive: 60,
-                clientId: 'web-' + Math.random().toString(16).substr(2, 8),
-                connectTimeout: 60000
-            }
-            this.client = mqtt.connect('wss://iot.wumei.live/mqtt', options);
-            this.client.on("connect", (e) => {
-                console.log("成功连接服务器:", e);
-                // 订阅三个名叫'top/#', 'three/#'和'#'的主题
-                this.client.subscribe(['top/#', 'three/#', '#'], {
-                    qos: 1
-                }, (err) => {
-                    if (!err) {
-                        console.log("订阅成功");
-                        //向主题叫“pubtop”发布一则内容为'hello,this is a nice day!'的消息
-                        this.mqttPublish("pubtop", 'hello,this is a nice day!')
-                    } else {
-                        console.log('消息订阅失败！')
-                    }
-                });
-            });
-            //重新连接
-            this.reconnectMqtt()
-            //是否已经断开连接
-            this.mqttError()
-            //监听获取信息
-            this.mqttSubscribe()
-        },
-        /** 发布消息@topic主题  @message发布内容 */
-        mqttPublish(topic, message) {
-            if (!this.client.connected) {
-                console.log('客户端未连接')
-                return
-            }
-            this.client.publish(topic, message, {
-                qos: 1
-            }, (err) => {
-                if (!err) {
-                    console.log('主题为' + topic + "发布成功")
-                }
-            })
-        },
-        /** 监听Mqtt消息 */
-        mqttSubscribe() {
-            this.client.on("message", (topic, message) => {
-                if (message) {
-                    console.log('收到来着', topic, '的信息', message.toString())
-                    const res = JSON.parse(message.toString())
-                    //console.log(res, 'res')
-                    switch (topic) {
-                        case 'top/#':
-                            this.msg = res
-                            break;
-                        case 'three/#':
-                            this.msg = res
-                            break;
-                        case 'three/#':
-                            this.msg = res
-                            break;
-                        default:
-                            return
-                            this.msg = res
-                    }
-                    this.msg = message
-                }
+        /** Mqtt订阅主题 */
+        mqttSubscribe(device) {
+            // 订阅当前设备状态
+            let topic = "/" + device.productId + "/" + device.productId + "/status/post ";
+            this.mqttSubscribe.push({
+                topic: topic,
             });
         },
-        /** 监听服务器是否连接失败 */
-        mqttError() {
-            this.client.on('error', (error) => {
-                console.log('连接失败：', error)
-                this.client.end()
-            })
-        },
-        /** 取消订阅 */
-        unsubscribeMqtt() {
-            this.client.unsubscribe(this.mtopic, (error) => {
-                console.log('主题为' + this.mtopic + '取消订阅成功', error)
-            })
-        },
-        /** 断开连接 */
-        unconnectMqtt() {
-            this.client.end()
-            this.client = null
-            console.log('服务器已断开连接！')
-        },
-        /** 监听服务器重新连接 */
-        reconnectMqtt() {
-            this.client.on('reconnect', (error) => {
-                console.log('正在重连:', error)
-            });
-        },
+        /** Mqtt发布消息(1=属性，2=功能，3=OTA升级)*/
+        mqttPublish(type, item) {
+            let topic = "";
+            let message = ""
+            if (type == 1) {
+                if (deviceInfo.status == 3) {
+                    // 属性,在线模式
+                    topic = "/" + deviceInfo.productId + "/" + deviceInfo.productId + "/property-online/get ";
 
+                } else if (deviceInfo.isShadow) {
+                    // 属性,离线模式
+                    topic = "/" + deviceInfo.productId + "/" + deviceInfo.productId + "/property-offline/get ";
+
+                }
+            } else if (type == 2) {
+                if (deviceInfo.status == 3) {
+                    // 功能,在线模式
+                    topic = "/" + deviceInfo.productId + "/" + deviceInfo.productId + "/function-online/get ";
+
+                } else if (deviceInfo.isShadow) {
+                    // 功能,离线模式
+                    topic = "/" + deviceInfo.productId + "/" + deviceInfo.productId + "/function-offline/get ";
+
+                }
+            } else if (type == 3) {
+                // OTA升级
+                topic = "/" + deviceInfo.productId + "/" + deviceInfo.productId + "/ota/get ";
+            }
+            this.mqttPublish = {
+                topic: topic,
+                message: message
+            }
+        },
+        /** 接收到Mqtt回调 */
+        mqttCallback(data) {
+            console.log(data);
+            let topics = [];
+            topics = data.topic.split("/");
+            if (this.deviceInfo.serialNumber == topics[2]) {
+                let message = JSON.parse(data.message);
+                this.deviceInfo.status = message.status;
+                this.deviceInfo.isShadow = message.isShadow;
+                this.updateDeviceStatus();
+            }
+        },
         /** 查询设备列表 */
         getList() {
             this.loading = true;
@@ -394,9 +350,9 @@ export default {
             }).catch(() => {});
         },
         /** 未启用设备影子*/
-        shadowUnEnable(item){
+        shadowUnEnable(item) {
             // 1-未激活，2-禁用，3-在线，4-离线
-            if(item.status!=3 && item.isShadow==0){
+            if (item.status != 3 && item.isShadow == 0) {
                 return true;
             }
             return false;

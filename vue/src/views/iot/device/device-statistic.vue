@@ -61,10 +61,11 @@ export default {
                 // 筛选监测数据
                 this.monitorThings = thingsModel.properties.filter(item => item.isMonitor == 1);
                 // 加载图表
-                this.$nextTick(function () {
-                    this.getStatistic();
+                this.$nextTick(function () {   
+                    // 绘制图表
+                    this.getStatistic();                 
                     // 获取统计数据
-                    this.getStatisticData(this.monitorThings);
+                    this.getStatisticData(this.monitorThings);                    
                 });
 
             });
@@ -98,7 +99,6 @@ export default {
             for (let i = 0; i < this.monitorThings.length; i++) {
                 this.chart[i] = echarts.init(this.$refs.statisticMap[i]);
                 var option;
-
                 option = {
                     animationDurationUpdate:3000,
                     tooltip: {

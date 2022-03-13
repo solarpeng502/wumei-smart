@@ -130,7 +130,7 @@
         <el-tab-pane label="" disabled name="device03" />
         <el-tab-pane name="device05">
             <span slot="label">
-                <el-button type="info" size="mini" @click="goBack()">返回列表</el-button>
+                <el-button type="info" size="mini" @click="goBack()" :disabled="!isLoaded">返回列表</el-button>
             </span>
         </el-tab-pane>
     </el-tabs>
@@ -178,6 +178,8 @@ export default {
     },
     data() {
         return {
+            // 是否加载完成
+            isLoaded:false,
             // 生成设备编码是否禁用
             genDisabled: false,
             // 选中选项卡
@@ -223,7 +225,10 @@ export default {
         if (this.form.deviceId != 0) {
             this.getDevice(this.form.deviceId);
         }
-
+        // 未加载完，直接返回会报错
+        setTimeout(() => {
+            this.isLoaded=true;
+        }, 2000);
     },
     methods: {
         /**获取设备详情*/
