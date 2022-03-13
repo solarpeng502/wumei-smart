@@ -20,9 +20,7 @@ void setup()
   //打开串行端口：
   Serial.begin(115200);
   printMsg("wumei smart device starting...");
-  //连接WIFI
   connectWifi();
-  //连接MQTT
   connectMqtt();
 }
 
@@ -62,17 +60,34 @@ void loop()
       {
         lastPublishMonitor = now;
         monitorCount--;
-        publishMonitor(1);
+        publishMonitor();
       }
   }
 
-  // 分阻塞定时上报属性,60秒发布一次
+  // 非阻塞定时上报，测试用，60秒发布一次
   if(WiFi.status() == WL_CONNECTED){
     long now = millis();
-    if (now - lastTimerMonitor > 10000)
+    if (now - lastTimerMonitor > 60000)
       {
-        lastTimerMonitor = now;
-        publishMonitor(2);
+        // lastTimerMonitor = now;
+        // // 发布事件
+        // publishEvent();
+        // // 发布时钟同步
+        // publishNtp();
+
+        // // 发布属性
+        // String msg=randomPropertyData();
+        // publishProperty(msg);
+        
+        // // 发布功能
+        // StaticJsonDocument<256> docFunction;
+        // JsonObject objGear = docFunction.createNestedObject();
+        // objGear["id"] = "gear";
+        // objGear["value"] = "3";
+        // objGear["remark"] = "上报功能";
+        // String gearMsg;
+        // serializeJson(docFunction, gearMsg);
+        // publishFunction(gearMsg);
       }
   }
 

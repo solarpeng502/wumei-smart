@@ -40,8 +40,8 @@ public class EmqxService {
     String sPropertyTopic = prefix + "property/post";
     String sFunctionTopic = prefix + "function/post";
     String sEventTopic = prefix + "event/post";
-    String sShadowPropertyTopic = prefix + "sproperty/post";
-    String sShadowFunctionTopic = prefix + "sfunction/post";
+    String sShadowPropertyTopic = prefix + "property-offline/post";
+    String sShadowFunctionTopic = prefix + "function-offline/post";
 
     /** 发布的主题 */
     String pStatusTopic = "/status/post";
@@ -94,10 +94,10 @@ public class EmqxService {
             case "event":
                 reportEvent(productId,deviceNum,message);
                 break;
-            case "sproperty":
+            case "property-offline":
                 reportProperty(productId,deviceNum,message,true);
                 break;
-            case "sfunction":
+            case "function-offline":
                 reportFunction(productId,deviceNum,message,true);
                 break;
         }
@@ -131,11 +131,11 @@ public class EmqxService {
      * @param message
      */
     private void reportFunction(Long productId,String deviceNum,String message,boolean isShadow){
-        List<ThingsModelValueRemarkItem> thingsModelValueItemInputs=JSON.parseArray(message, ThingsModelValueRemarkItem.class);
+        List<ThingsModelValueRemarkItem> thingsModelValueRemarkItems=JSON.parseArray(message, ThingsModelValueRemarkItem.class);
         ThingsModelValuesInput input=new ThingsModelValuesInput();
         input.setProductId(productId);
         input.setDeviceNumber(deviceNum);
-        input.setThingsModelValueRemarkItem(thingsModelValueItemInputs);
+        input.setThingsModelValueRemarkItem(thingsModelValueRemarkItems);
         deviceService.reportDeviceThingsModelValue(input,2,isShadow);
     }
 
@@ -156,6 +156,7 @@ public class EmqxService {
             deviceLog.setSerialNumber(device.getSerialNumber());
             deviceLog.setIdentity(thingsModelValueRemarkItems.get(i).getId());
             deviceLog.setLogType(3);
+            deviceLog.setIsMonitor(0);
             deviceLogService.insertDeviceLog(deviceLog);
         }
     }

@@ -17,11 +17,31 @@ public class ThingsModelValuesOutput
 
     private String deviceName;
 
+    private int status;
+
+    private int isShadow;
+
     /** 设备ID **/
     private String serialNumber;
 
     /** 设备物模型值 **/
     private String thingsModelValue;
+
+    public int getIsShadow() {
+        return isShadow;
+    }
+
+    public void setIsShadow(int isShadow) {
+        this.isShadow = isShadow;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
 
     public Long getProductId() {
         return productId;

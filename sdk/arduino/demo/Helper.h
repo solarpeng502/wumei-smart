@@ -43,29 +43,30 @@ void connectWifi();
 void connectMqtt();
 // Mqtt回调
 void callback(char *topic, byte *payload, unsigned int length);
+
 // 发布设备信息
 void publishInfo();
 // 发布时钟同步信息
 void publishNtp();
-// 发布属性
-void publishProperty(char *msg);
-// 发布功能
-void publishFunction(char *msg);
 // 发布事件
-void publishFunction();
+void publishEvent();
 // 发布实时监测数据
-void publishMonitor(int type);
+void publishMonitor();
+// 随机生成监测值
+String randomPropertyData();
+// 发布属性
+void publishProperty(String msg);
+// 发布功能
+void publishFunction(String msg);
 // 属性处理
-void processProperty(byte *payload);
+void processProperty(String payload);
 // 功能处理
-void processFunction(byte *payload);
-
+void processFunction(String payload);
 
 // 生成密码
 String generationPwd();
 // 获取时间
 String getTime();
-
 // AES加密
 String encrypt(String plain_data,char *wumei_key,char *wumei_iv);
 // AES解密

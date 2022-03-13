@@ -31,11 +31,6 @@
                 <dict-tag :options="dict.type.iot_device_log_type" :value="scope.row.logType" />
             </template>
         </el-table-column>
-        <el-table-column label="数据类型" align="center" prop="datatype" width="100">
-            <template slot-scope="scope">
-                <dict-tag :options="dict.type.iot_data_type" :value="scope.row.datatype" />
-            </template>
-        </el-table-column>
         <el-table-column label="监测数据" align="center" prop="isMonitor" width="100">
             <template slot-scope="scope">
                 <dict-tag :options="dict.type.iot_yes_no" :value="scope.row.isMonitor" />
@@ -44,12 +39,13 @@
         <el-table-column label="备注" align="center" prop="remark" />
         <el-table-column label="创建时间" align="center" prop="createTime" width="180">
             <template slot-scope="scope">
-                <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
+                <span>{{ scope.row.createTime }}</span>
             </template>
         </el-table-column>
     </el-table>
-
-    <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
+    <div style="height:40px;">
+        <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
+    </div>
 
 </div>
 </template>
@@ -64,7 +60,7 @@ import {
 
 export default {
     name: "DeviceLog",
-    dicts: ['iot_device_log_type', "iot_data_type", "iot_yes_no"],
+    dicts: ['iot_device_log_type', "iot_yes_no"],
     props: {
         device: {
             type: Object,
@@ -146,28 +142,28 @@ export default {
         },
         /** 格式化显示数据定义 */
         formatValueDisplay(row) {
-            // 类型（1=属性上报，2=事件上报，3=调用功能，4=设备升级，5=设备上线，6=设备离线）
+            // 类型（1=属性上报，2=调用功能，3=事件上报，4=设备升级，5=设备上线，6=设备离线）
             if (row.logType == 1) {
                 let propertyItem = this.getThingsModelItem(1, row.identity);
                 if (propertyItem != "") {
-                    return propertyItem.name+'： <span style="color:#409EFF;">' + row.logValue +' '+ (propertyItem.datatype.unit != undefined ? propertyItem.datatype.unit : '') + '</span>';
+                    return propertyItem.name + '： <span style="color:#409EFF;">' + row.logValue + ' ' + (propertyItem.datatype.unit != undefined ? propertyItem.datatype.unit : '') + '</span>';
                 }
             } else if (row.logType == 2) {
-                let eventItem = this.getThingsModelItem(2, row.identity);
-                if (eventItem != "") {
-                    return eventItem.name+'： <span style="color:#409EFF">' + row.logValue + '</span>';
-                }
-            } else if (row.logType == 3) {
                 let functionItem = this.getThingsModelItem(2, row.identity);
                 if (functionItem != "") {
-                    return functionItem.name+'： <span style="color:#409EFF">' + row.logValue + '</span>';
+                    return functionItem.name + '： <span style="color:#409EFF">' + row.logValue + ' ' + (functionItem.datatype.unit != undefined ? functionItem.datatype.unit : '') + '</span>';
+                }
+            } else if (row.logType == 3) {
+                let eventItem = this.getThingsModelItem(3, row.identity);
+                if (eventItem != "") {
+                    return eventItem.name + '： <span style="color:#409EFF">' + row.logValue + ' ' + (eventItem.datatype.unit != undefined ? eventItem.datatype.unit : '') + '</span>';
                 }
             } else if (row.logType == 4) {
-                return '<span style="color:#E6A23C">设备升级</span>';
+                return '<span style="font-weight:bold">设备升级</span>';
             } else if (row.logType == 5) {
-                return '<span style="color:#67C23A">设备上线</span>';
+                return '<span style="font-weight:bold">设备上线</span>';
             } else if (row.logType == 6) {
-                return '<span style="color:#F56C6C">设备离线</span>';
+                return '<span style="font-weight:bold">设备离线</span>';
             }
             return "";
         },
@@ -184,8 +180,12 @@ export default {
                         return this.thingsModel.functions[i];
                     }
                 }
-            }
-            return "";
+            } else if (type == 3)
+                for (let i = 0; i < this.thingsModel.events.length; i++) {
+                    if (this.thingsModel.events[i].id == identity) {
+                        return this.thingsModel.events[i];
+                    }
+                }
         }
     }
 };

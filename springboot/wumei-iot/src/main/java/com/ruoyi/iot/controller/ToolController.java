@@ -226,10 +226,10 @@ public class ToolController extends BaseController {
                 if (device.getIsShadow() == 1) {
                     ThingsModelShadow shadow=deviceService.getDeviceShadowThingsModel(device);
                     if (shadow.getProperties().size() > 0) {
-                        emqxService.publishFunction(device.getProductId(), device.getSerialNumber(), shadow.getProperties());
+                        emqxService.publishProperty(device.getProductId(), device.getSerialNumber(), shadow.getProperties());
                     }
                     if (shadow.getFunctions().size() > 0) {
-                        emqxService.publishProperty(device.getProductId(), device.getSerialNumber(), shadow.getFunctions());
+                        emqxService.publishFunction(device.getProductId(), device.getSerialNumber(), shadow.getFunctions());
                     }
                 }
             }

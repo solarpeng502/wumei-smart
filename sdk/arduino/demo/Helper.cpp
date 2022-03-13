@@ -41,8 +41,10 @@ String ntpServer = "http://wumei.live:8080/iot/tool/ntp?deviceSendTime=";
 String prefix = "/" + productId + "/" + deviceNum;
 String sOtaTopic = prefix + "/ota/get";
 String sNtpTopic = prefix + "/ntp/get";
-String sPropertyTopic = prefix + "/property/get/#";
-String sFunctionTopic = prefix + "/function/get/#";
+String sPropertyTopic = prefix + "/property/get";
+String sFunctionTopic = prefix + "/function/get";
+String sPropertyOnline = prefix + "/property-online/get";
+String sFunctionOnline = prefix + "/function-online/get";
 String sMonitorTopic = prefix + "/monitor/get";
 // 发布的主题
 String pInfoTopic = prefix + "/info/post";
@@ -87,15 +89,15 @@ void callback(char *topic, byte *payload, unsigned int length)
     float now = (serverSendTime + serverRecvTime + deviceRecvTime - deviceSendTime) / 2;
     printMsg("当前时间：" + String(now, 0));
   }
-  else if (strcmp(topic, sPropertyTopic.c_str()) == 0 || strcmp(topic, sPropertyTopic.substring(0, sPropertyTopic.lastIndexOf("/")).c_str()) == 0)
+  else if (strcmp(topic, sPropertyTopic.c_str()) == 0 || strcmp(topic, sPropertyOnline.c_str()) == 0)
   {
     printMsg("订阅到属性指令...");
-    processProperty(payload);
+    processProperty(data);
   }
-  else if (strcmp(topic, sFunctionTopic.c_str()) == 0 || strcmp(topic, sFunctionTopic.substring(0, sFunctionTopic.lastIndexOf("/")).c_str()) == 0)
+  else if (strcmp(topic, sFunctionTopic.c_str()) == 0 || strcmp(topic, sFunctionOnline.c_str()) == 0)
   {
     printMsg("订阅到功能指令...");
-    processFunction(payload);
+    processFunction(data);
   }
   else if (strcmp(topic, sMonitorTopic.c_str()) == 0)
   {
@@ -114,52 +116,60 @@ void callback(char *topic, byte *payload, unsigned int length)
 }
 
 // 属性处理
-void processProperty(byte *payload)
+void processProperty(String payload)
 {
-  StaticJsonDocument<512> doc;
-  deserializeJson(doc, payload);
-  JsonArray array = doc.as<JsonArray>();
-  for (JsonObject object : array)
+  StaticJsonDocument<1024> doc;
+  DeserializationError error = deserializeJson(doc, payload);
+  if (error) {
+    Serial.print(F("deserializeJson() failed: "));
+    Serial.println(error.f_str());
+    return;
+  }
+  for (JsonObject object : doc.as<JsonArray>())
   {
     // 匹配云端定义的属性（不包含属性中的监测数据）
-    String id = object["id"];
-    String value = object["value"];
-    printMsg(id + "：" + value);
+    const char* id = object["id"];
+    const char* value = object["value"];
+    printMsg((String)id + "：" + (String)value);
   }
   // 最后发布属性（重要）
-  publishProperty((char *)payload);
+  publishProperty(payload);
 }
 
 // 功能处理
-void processFunction(byte *payload)
+void processFunction(String payload)
 {
-  StaticJsonDocument<512> doc;
-  deserializeJson(doc, payload);
-  JsonArray array = doc.as<JsonArray>();
-  for (JsonObject object : array)
+  StaticJsonDocument<1024> doc;
+  DeserializationError error = deserializeJson(doc, payload);
+  if (error) {
+    Serial.print(F("deserializeJson() failed: "));
+    Serial.println(error.f_str());
+    return;
+  }
+  for (JsonObject object : doc.as<JsonArray>())
   {
     // 匹配云端定义的功能
-    String id = object["id"];
-    String value = object["value"];
-    if (value == "switch")
+    const char* id = object["id"];
+    const char* value = object["value"];
+    if (strcmp(id, "switch") == 0)
     {
-      printMsg("开关 switch：" + value);
+      printMsg("开关 switch：" + (String) value);
     }
-    else if (value == "gear")
+    else if (strcmp(id, "gear") == 0)
     {
-      printMsg("档位 gear：" + value);
+      printMsg("档位 gear：" + (String)value);
     }
-    else if (value == "light_color")
+    else if (strcmp(id, "light_color") == 0)
     {
-      printMsg("灯光颜色 light_color：" + value);
+      printMsg("灯光颜色 light_color：" + (String)value);
     }
-    else if (value == "message")
+    else if (strcmp(id, "message") == 0)
     {
-      printMsg("屏显消息 message：" + value);
+      printMsg("屏显消息 message：" + (String)value);
     }
   }
   // 最后发布功能（重要）
-  publishFunction((char *)payload);
+  publishFunction(payload);
 }
 
 // 1.发布设备信息
@@ -192,17 +202,17 @@ void publishNtp()
 }
 
 // 3.发布属性
-void publishProperty(char *msg)
+void publishProperty(String msg)
 {
-  printMsg("发布属性:" + (String)msg);
-  mqttClient.publish(pPropertyTopic.c_str(), msg);
+  printMsg("发布属性:" + msg);
+  mqttClient.publish(pPropertyTopic.c_str(), msg.c_str());
 }
 
 // 4.发布功能
-void publishFunction(char *msg)
+void publishFunction(String msg)
 {
-  printMsg("发布功能:" + (String)msg);
-  mqttClient.publish(pFunctionTopic.c_str(), msg);
+  printMsg("发布功能:" + msg);
+  mqttClient.publish(pFunctionTopic.c_str(), msg.c_str());
 }
 
 // 5.发布事件
@@ -217,7 +227,7 @@ void publishEvent()
 
   JsonObject objException = doc.createNestedObject();
   objException["id"] = "exception";
-  objException["value"] = "设备异常掉线，请检查网络";
+  objException["value"] = "异常消息，消息内容XXXXXXXX";
   objException["remark"] = "事件备注信息";
 
   printMsg("发布事件:");
@@ -227,9 +237,16 @@ void publishEvent()
   mqttClient.publish(pEventTopic.c_str(), output.c_str());
 }
 
-// 6.发布实时监测数据(1=只是监测数据，2=属性)
-void publishMonitor(int type)
+// 6.发布实时监测数据
+void publishMonitor()
 {
+  String msg=randomPropertyData();
+  // 发布为实时监测数据，不会存储
+  mqttClient.publish(pMonitorTopic.c_str(), msg.c_str());
+}
+
+// 随机生成监测值
+String randomPropertyData(){
   // 匹配云端定义的监测数据，随机数代替监测结果
   float randFloat = 0;
   int randInt=0;
@@ -262,15 +279,7 @@ void publishMonitor(int type)
   serializeJson(doc, Serial);
   String output;
   serializeJson(doc, output);
-
-  if (type == 1)
-  {
-    mqttClient.publish(pMonitorTopic.c_str(), output.c_str());
-  }
-  else if (type == 2)
-  {
-    mqttClient.publish(pPropertyTopic.c_str(), output.c_str());
-  }
+  return output;
 }
 
 // 连接wifi
@@ -314,11 +323,15 @@ void connectMqtt()
     mqttClient.subscribe(sNtpTopic.c_str(), 1);
     mqttClient.subscribe(sPropertyTopic.c_str(), 1);
     mqttClient.subscribe(sFunctionTopic.c_str(), 1);
+    mqttClient.subscribe(sPropertyOnline.c_str(), 1);
+    mqttClient.subscribe(sFunctionOnline.c_str(), 1);
     mqttClient.subscribe(sMonitorTopic.c_str(), 1);
     printMsg("订阅主题：" + sOtaTopic);
     printMsg("订阅主题：" + sNtpTopic);
     printMsg("订阅主题：" + sPropertyTopic);
     printMsg("订阅主题：" + sFunctionTopic);
+    printMsg("订阅主题：" + sPropertyOnline);
+    printMsg("订阅主题：" + sFunctionOnline);
     printMsg("订阅主题：" + sMonitorTopic);
     // 发布设备信息
     publishInfo();

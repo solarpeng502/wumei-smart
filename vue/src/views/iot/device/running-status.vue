@@ -95,10 +95,10 @@
         </el-col>
 
         <el-col :span="14" :offset="1">
-            <el-row :gutter="20">
+            <el-row :gutter="20" style="background-color:#FAFAFA; padding:20px;padding-left:10px;">
                 <el-col :span="8" v-for="(item,index) in deviceInfo.readOnlyList" :key="index" style="margin-bottom:30px;">
-                    <div style="border:1px solid #eee;border-radius:8px;background-color:#FAFAFA;">
-                        <div ref="map" style="height:280px;width:200px;margin:0 auto;"></div>
+                    <div style="border:1px solid #ddd;border-radius:8px;background-color:#FFF;">
+                        <div ref="map" style="height:280px;width:190px;margin:0 auto;margin-top:-15px;"></div>
                     </div>
                 </el-col>
             </el-row>
@@ -178,58 +178,68 @@ export default {
             for (let i = 0; i < this.deviceInfo.readOnlyList.length; i++) {
                 var myChart = echarts.init(this.$refs.map[i]);
                 var option;
-
                 option = {
                     tooltip: {
-                        formatter: '{a} <br/>{b} : {c}' + this.deviceInfo.readOnlyList[i].unit
+                        formatter: ' {b} <br/> {c}' + this.deviceInfo.readOnlyList[i].unit
                     },
-
                     series: [{
                         name: this.deviceInfo.readOnlyList[i].type,
                         type: 'gauge',
                         min: this.deviceInfo.readOnlyList[i].min,
                         max: this.deviceInfo.readOnlyList[i].max,
                         colorBy: 'data',
-                        splitNumber: 8,
+                        splitNumber: 10,
                         radius: '100%',
                         // 分割线
                         splitLine: {
-                            distance: 5,
+                            distance: 4,
                         },
                         axisLabel: {
-                            fontSize: 10
+                            fontSize: 10,
+                            distance:10
                         },
                         // 刻度线
                         axisTick: {
-                            distance: 5,
+                            distance: 4,
                         },
                         // 仪表盘轴线
                         axisLine: {
                             lineStyle: {
-                                width: 8
+                                width: 6,
+                                color: [
+                                    [0.3, '#409EFF'], // 0~30% 
+                                    [0.7, '#67C23A'], // 30~70%
+                                    [1, '#F56C6C'], // 70~100%
+                                ],
+                                opacity:0.3
                             }
+
+                        },
+                        pointer:{
+                            icon:'triangle',
+                            length:'60%',
+                            width:7
                         },
                         progress: {
                             show: true,
+                            width:6,
                         },
                         detail: {
                             valueAnimation: true,
-                            formatter: '{value}',
-                            offsetCenter: [0, "70%"],
+                            formatter: '{value}'+' ' + this.deviceInfo.readOnlyList[i].unit,
+                            offsetCenter: [0, "80%"],
                             fontSize: 20,
                         },
                         data: [{
                             value: this.deviceInfo.readOnlyList[i].value,
-                            name: this.deviceInfo.readOnlyList[i].name + "（" + this.deviceInfo.readOnlyList[i].unit + "）"
+                            name: this.deviceInfo.readOnlyList[i].name
                         }],
                         title: {
-                            offsetCenter: [10, "110%"],
+                            offsetCenter: [0, "120%"],
                             fontSize: 16
                         }
-
                     }]
                 };
-
                 option && myChart.setOption(option);
             }
         }

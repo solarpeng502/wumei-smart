@@ -159,7 +159,7 @@ public class DeviceServiceImpl implements IDeviceService {
             // 赋值
             for(int j=0;j<thingsModelValues.size();j++){
                 if (input.getThingsModelValueRemarkItem().get(i).getId().equals(thingsModelValues.get(j).getId())) {
-                    // 影子模式不更新物模型值
+                    // 影子模式只更新影子值
                     if(!isShadow){
                         thingsModelValues.get(j).setValue(String.valueOf(input.getThingsModelValueRemarkItem().get(i).getValue()));
                     }
@@ -456,7 +456,7 @@ public class DeviceServiceImpl implements IDeviceService {
         // 查询出设置的影子值
         List<ThingsModelValueItem> shadowList = new ArrayList<>();
         for (int i = 0; i < thingsModelValueItems.size(); i++) {
-            if (thingsModelValueItems.get(i).getValue().equals(thingsModelValueItems.get(i).getShadow())) {
+            if (!thingsModelValueItems.get(i).getValue().equals(thingsModelValueItems.get(i).getShadow())) {
                 shadowList.add(thingsModelValueItems.get(i));
                 System.out.println("添加影子："+thingsModelValueItems.get(i).getId());
             }
@@ -535,8 +535,8 @@ public class DeviceServiceImpl implements IDeviceService {
         device.setStatus(status);
         device.setSerialNumber(deviceNum);
         // 设置定位和状态
+        Device deviceEntity = deviceMapper.selectDeviceBySerialNumber(deviceNum);
         if(ipAddress!="") {
-            Device deviceEntity = deviceMapper.selectDeviceBySerialNumber(deviceNum);
             if(deviceEntity.getActiveTime()==null){
                 device.setActiveTime(DateUtils.getNowDate());
             }
@@ -545,11 +545,14 @@ public class DeviceServiceImpl implements IDeviceService {
                 setLocation(ipAddress, device);
             }
         }
+        int result=deviceMapper.updateDeviceStatus(device);
+
         // 添加到设备日志
         DeviceLog deviceLog = new DeviceLog();
-        deviceLog.setDeviceId(device.getDeviceId());
-        deviceLog.setDeviceName(device.getDeviceName());
-        deviceLog.setSerialNumber(device.getSerialNumber());
+        deviceLog.setDeviceId(deviceEntity.getDeviceId());
+        deviceLog.setDeviceName(deviceEntity.getDeviceName());
+        deviceLog.setSerialNumber(deviceEntity.getSerialNumber());
+        deviceLog.setIsMonitor(0);
         if(status==3){
             deviceLog.setLogValue("1");
             deviceLog.setRemark("设备上线");
@@ -562,7 +565,7 @@ public class DeviceServiceImpl implements IDeviceService {
             deviceLog.setLogType(6);
         }
         deviceLogService.insertDeviceLog(deviceLog);
-        return deviceMapper.updateDeviceStatus(device);
+        return result;
     }
 
     /**
