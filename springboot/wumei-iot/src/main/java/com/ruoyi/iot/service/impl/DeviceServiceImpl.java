@@ -465,7 +465,7 @@ public class DeviceServiceImpl implements IDeviceService {
         for (int i = 0; i < shadowList.size(); i++) {
             boolean isGetValue = false;
             for (int j = 0; j < properties.size(); j++) {
-                if (properties.getJSONObject(j).getString("id").equals(shadowList.get(i).getId())) {
+                if (properties.getJSONObject(j).getInteger("isMonitor")==0 && properties.getJSONObject(j).getString("id").equals(shadowList.get(i).getId())) {
                     IdentityAndName item = new IdentityAndName(shadowList.get(i).getId(), shadowList.get(i).getShadow());
                     shadow.getProperties().add(item);
                     System.out.println("添加影子属性："+item.getId());

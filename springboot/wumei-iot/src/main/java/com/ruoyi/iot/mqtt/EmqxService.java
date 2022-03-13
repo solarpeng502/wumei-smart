@@ -166,8 +166,9 @@ public class EmqxService {
     /**
      * 1.发布设备状态
      */
-    public void publishStatus(Long productId,String deviceNum,int deviceStatus){
-        emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+pStatusTopic, "{\"status\":"+deviceStatus+"}");
+    public void publishStatus(Long productId,String deviceNum,int deviceStatus,int isShadow){
+        String message="{\"status\":"+deviceStatus+",\"isShadow\":"+isShadow+"}";
+        emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+pStatusTopic, message);
     }
 
     /**

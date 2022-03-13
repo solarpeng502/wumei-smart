@@ -218,10 +218,10 @@ public class ToolController extends BaseController {
             if (model.getAction().equals("client_disconnected")) {
                 String ip = model.getIpaddress();
                 deviceService.updateDeviceStatusAndLocation(device.getSerialNumber(), 4, "");
-                emqxService.publishStatus(device.getProductId(), device.getSerialNumber(), 4);
+                emqxService.publishStatus(device.getProductId(), device.getSerialNumber(), 4,device.getIsShadow());
             } else if (model.getAction().equals("client_connected")) {
                 deviceService.updateDeviceStatusAndLocation(device.getSerialNumber(), 3, model.getIpaddress());
-                emqxService.publishStatus(device.getProductId(), device.getSerialNumber(), 3);
+                emqxService.publishStatus(device.getProductId(), device.getSerialNumber(), 3,device.getIsShadow());
                 // 影子模式，发布属性和功能
                 if (device.getIsShadow() == 1) {
                     ThingsModelShadow shadow=deviceService.getDeviceShadowThingsModel(device);
