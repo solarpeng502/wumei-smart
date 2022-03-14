@@ -94,7 +94,7 @@
             </el-descriptions>
 
             <!-- Mqtt通讯 -->
-            <mqtt-client ref="mqttClient" :publish="publish" :subscribe="subscribes" @callbackEvent="mqttCallback($event)" />
+            <mqtt-client ref="mqttClient" :publish="publish" :subscribes="subscribes" @callbackEvent="mqttCallback($event)" />
         </el-col>
 
         <el-col :span="14" :offset="1">
@@ -177,10 +177,8 @@ export default {
         /** Mqtt订阅主题 */
         mqttSubscribe(device) {
             // 订阅当前设备状态
-            let topic = "/" + device.productId + "/" + device.productId + "/status/post ";
-            this.mqttSubscribe.push({
-                topic: topic,
-            });
+            let topic = "/" + device.productId + "/" + device.serialNumber + "/status/post ";
+            this.subscribes=[topic];
         },
         /** Mqtt发布消息(1=属性，2=功能，3=OTA升级)*/
         mqttPublish(type, item) {
@@ -189,35 +187,35 @@ export default {
             if (type == 1) {
                 if (deviceInfo.status == 3) {
                     // 属性,在线模式
-                    topic = "/" + deviceInfo.productId + "/" + deviceInfo.productId + "/property-online/get ";
+                    topic = "/" + deviceInfo.productId + "/" + deviceInfo.serialNumber + "/property-online/get ";
 
                 } else if (deviceInfo.isShadow) {
                     // 属性,离线模式
-                    topic = "/" + deviceInfo.productId + "/" + deviceInfo.productId + "/property-offline/get ";
+                    topic = "/" + deviceInfo.productId + "/" + deviceInfo.serialNumber + "/property-offline/get ";
 
                 }
             } else if (type == 2) {
                 if (deviceInfo.status == 3) {
                     // 功能,在线模式
-                    topic = "/" + deviceInfo.productId + "/" + deviceInfo.productId + "/function-online/get ";
+                    topic = "/" + deviceInfo.productId + "/" + deviceInfo.serialNumber + "/function-online/get ";
 
                 } else if (deviceInfo.isShadow) {
                     // 功能,离线模式
-                    topic = "/" + deviceInfo.productId + "/" + deviceInfo.productId + "/function-offline/get ";
+                    topic = "/" + deviceInfo.productId + "/" + deviceInfo.serialNumber + "/function-offline/get ";
 
                 }
             } else if (type == 3) {
                 // OTA升级
-                topic = "/" + deviceInfo.productId + "/" + deviceInfo.productId + "/ota/get ";
+                topic = "/" + deviceInfo.productId + "/" + deviceInfo.serialNumber + "/ota/get ";
             }         
-            this.mqttPublish = {topic: topic, message: message}
+            this.publish = {topic: topic, message: message}
         },
         /** 接收到Mqtt回调 */
         mqttCallback(data) {
             console.log(data);
             let topics = [];
             topics = data.topic.split("/");
-            if (this.deviceInfo.serialNumber == topics[2]) {
+            if (topics[3]=="status") {
                 let message = JSON.parse(data.message);
                 this.deviceInfo.status = message.status;
                 this.deviceInfo.isShadow = message.isShadow;
@@ -229,14 +227,14 @@ export default {
         updateDeviceStatus(device) {
             if (device.status == 3) {
                 this.statusColor.background = '#67C23A';
-                this.title += "（在线）";
+                this.title = "设备控制（在线）";
             } else {
                 if (device.isShadow == 1) {
                     this.statusColor.background = '#409EFF';
-                    this.title += "（影子模式）";
+                    this.title = "设备控制（影子模式）";
                 } else {
                     this.statusColor.background = '#909399';
-                    this.title += "（设备不在线 未启用影子）";
+                    this.title = "设备控制（设备不在线 未启用影子）";
                     this.shadowUnEnable = true;
                 }
             }

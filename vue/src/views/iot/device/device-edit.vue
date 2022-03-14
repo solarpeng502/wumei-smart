@@ -128,6 +128,13 @@
         <el-tab-pane label="" disabled name="device01" />
         <el-tab-pane label="" disabled name="device02" />
         <el-tab-pane label="" disabled name="device03" />
+        <el-tab-pane name="device04">
+            <span slot="label">
+                <el-tooltip class="item" effect="dark" content="用于查看发送的指令，设备是否已经响应" placement="right-start">
+                    <el-button type="success" size="mini" @click="dataSynchronization()" :disabled="form.deviceId==0">数据同步</el-button>
+                </el-tooltip>
+            </span>
+        </el-tab-pane>
         <el-tab-pane name="device05">
             <span slot="label">
                 <el-button type="info" size="mini" @click="goBack()" :disabled="!isLoaded">返回列表</el-button>
@@ -171,7 +178,7 @@ export default {
             if (val == "deviceStastic") {
                 this.$nextTick(() => {
                     // TODO 重置统计表格的尺寸
-                    
+
                 })
             }
         }
@@ -179,7 +186,7 @@ export default {
     data() {
         return {
             // 是否加载完成
-            isLoaded:false,
+            isLoaded: false,
             // 生成设备编码是否禁用
             genDisabled: false,
             // 选中选项卡
@@ -227,10 +234,27 @@ export default {
         }
         // 未加载完，直接返回会报错
         setTimeout(() => {
-            this.isLoaded=true;
+            this.isLoaded = true;
         }, 2000);
     },
     methods: {
+        /** 数据同步*/
+        dataSynchronization(){
+            getDevice(this.form.deviceId).then(response => {
+                this.form = response.data;
+                // 选项卡切换
+                this.activeName='runningStatus';
+                // 禁用状态
+                if (this.form.status == 2) {
+                    this.deviceStatus = 1;
+                }
+                if (this.form.imgUrl != null && this.form.imgUrl != "") {
+                    this.imageUrl = this.form.imgUrl;
+                }
+                this.loadMap();
+
+            });
+        },
         /**获取设备详情*/
         getDevice(deviceId) {
             getDevice(deviceId).then(response => {
