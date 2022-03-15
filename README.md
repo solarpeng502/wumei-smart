@@ -88,7 +88,6 @@
 * [物美智能官网 >>](http://wumei.live/)
 * [权限管理系统ruoyi-vue >>](https://gitee.com/y_project/RuoYi-Vue)
 * [Mqtt消息服务器EMQX4.0 >>](https://github.com/emqx/emqx)
-* [安卓UI框架 XUI >>](https://github.com/xuexiangjys/XUI)
 * [ESP8266 Core For Arduino](https://github.com/esp8266/Arduino)
 
 
