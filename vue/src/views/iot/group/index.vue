@@ -64,7 +64,7 @@
                     <el-input v-model="form.groupName" placeholder="请输入分组名称" />
                 </el-form-item>
                 <el-form-item label="分组排序" prop="groupOrder">
-                    <el-input v-model="form.groupOrder" type="integer" placeholder="请输入分组排序" />
+                    <el-input v-model="form.groupOrder" type="number" placeholder="请输入分组排序" />
                 </el-form-item>
                 <el-form-item label="备注" prop="remark">
                     <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />

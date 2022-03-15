@@ -1,9 +1,6 @@
 <template>
 <div style="padding-left:20px;">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-        <!-- <el-form-item label="日志名称" prop="logName">
-            <el-input v-model="queryParams.logName" placeholder="请输入日志名称" clearable size="small" @keyup.enter.native="handleQuery" />
-        </el-form-item> -->
         <el-form-item label="类型" prop="logType">
             <el-select v-model="queryParams.logType" placeholder="请选择类型" clearable size="small">
                 <el-option v-for="dict in dict.type.iot_device_log_type" :key="dict.value" :label="dict.label" :value="dict.value" />
@@ -20,28 +17,28 @@
 
     <el-table v-loading="loading" :data="deviceLogList" size="mini">
         <el-table-column label="编号" align="center" prop="logId" width="100" />
-        <el-table-column label="名称" align="left" header-align="center" prop="logValue">
+        <el-table-column label="类型" align="center" prop="logType" width="120">
+            <template slot-scope="scope">
+                <dict-tag :options="dict.type.iot_device_log_type" :value="scope.row.logType" />
+            </template>
+        </el-table-column>
+        <el-table-column label="时间" align="center" prop="createTime" width="180">
+            <template slot-scope="scope">
+                <span>{{ scope.row.createTime }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column label="动作" align="left" header-align="center" prop="logValue">
             <template slot-scope="scope">
                 <div v-html="formatValueDisplay(scope.row)"></div>
             </template>
         </el-table-column>
         <el-table-column label="标识符" align="center" prop="identity" />
-        <el-table-column label="类型" align="center" prop="logType">
+        <el-table-column label="备注" header-align="center" align="left" prop="remark">
             <template slot-scope="scope">
-                <dict-tag :options="dict.type.iot_device_log_type" :value="scope.row.logType" />
+                {{scope.row.remark==null ?"无":scope.row.remark}}
             </template>
         </el-table-column>
-        <el-table-column label="监测数据" align="center" prop="isMonitor" width="100">
-            <template slot-scope="scope">
-                <dict-tag :options="dict.type.iot_yes_no" :value="scope.row.isMonitor" />
-            </template>
-        </el-table-column>
-        <el-table-column label="备注" align="center" prop="remark" />
-        <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-            <template slot-scope="scope">
-                <span>{{ scope.row.createTime }}</span>
-            </template>
-        </el-table-column>
+
     </el-table>
     <div style="height:40px;">
         <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
@@ -94,7 +91,6 @@ export default {
             queryParams: {
                 pageNum: 1,
                 pageSize: 10,
-                logName: null,
                 logType: null,
                 logValue: null,
                 deviceId: null,
@@ -146,17 +142,17 @@ export default {
             if (row.logType == 1) {
                 let propertyItem = this.getThingsModelItem(1, row.identity);
                 if (propertyItem != "") {
-                    return propertyItem.name + '： <span style="color:#409EFF;">' + row.logValue + ' ' + (propertyItem.datatype.unit != undefined ? propertyItem.datatype.unit : '') + '</span>';
+                    return propertyItem.name + '： <span style="color:#409EFF;">' + this.getThingsModelItemValue(propertyItem, row.logValue) + ' ' + (propertyItem.datatype.unit != undefined ? propertyItem.datatype.unit : '') + '</span>';
                 }
             } else if (row.logType == 2) {
                 let functionItem = this.getThingsModelItem(2, row.identity);
                 if (functionItem != "") {
-                    return functionItem.name + '： <span style="color:#409EFF">' + row.logValue + ' ' + (functionItem.datatype.unit != undefined ? functionItem.datatype.unit : '') + '</span>';
+                    return functionItem.name + '： <span style="color:#409EFF">' + this.getThingsModelItemValue(functionItem, row.logValue) + ' ' + (functionItem.datatype.unit != undefined ? functionItem.datatype.unit : '') + '</span>';
                 }
             } else if (row.logType == 3) {
                 let eventItem = this.getThingsModelItem(3, row.identity);
                 if (eventItem != "") {
-                    return eventItem.name + '： <span style="color:#409EFF">' + row.logValue + ' ' + (eventItem.datatype.unit != undefined ? eventItem.datatype.unit : '') + '</span>';
+                    return eventItem.name + '： <span style="color:#409EFF">' + this.getThingsModelItemValue(eventItem, row.logValue) + ' ' + (eventItem.datatype.unit != undefined ? eventItem.datatype.unit : '') + '</span>';
                 }
             } else if (row.logType == 4) {
                 return '<span style="font-weight:bold">设备升级</span>';
@@ -167,6 +163,24 @@ export default {
             }
             return "";
         },
+        /** 获取物模型项中的值*/
+        getThingsModelItemValue(item, oldValue) {
+            if (item.datatype.type == "bool") {
+                if (oldValue == "0") {
+                    return item.datatype.falseText;
+                } else if (oldValue == "1") {
+                    return item.datatype.trueText;
+                }
+            } else if (item.datatype.type == "enum") {
+                for (let i = 0; i < item.datatype.enumList.length; i++) {
+                    if (oldValue == item.datatype.enumList[i].value) {
+                        return item.datatype.enumList[i].text;
+                    }
+                }
+            }
+            return oldValue;
+        },
+        /** 获取物模型中的项*/
         getThingsModelItem(type, identity) {
             if (type == 1 && this.thingsModel.properties) {
                 for (let i = 0; i < this.thingsModel.properties.length; i++) {
@@ -180,7 +194,7 @@ export default {
                         return this.thingsModel.functions[i];
                     }
                 }
-            } else if (type == 3 && this.thingsModel.events){
+            } else if (type == 3 && this.thingsModel.events) {
                 for (let i = 0; i < this.thingsModel.events.length; i++) {
                     if (this.thingsModel.events[i].id == identity) {
                         return this.thingsModel.events[i];

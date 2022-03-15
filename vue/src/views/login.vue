@@ -37,8 +37,8 @@
                             <span v-else>登 录 中...</span>
                         </el-button>
                         <div style="float: right;margin-top:10px;" v-if="register">
-                            <span style="margin-right:20px; color:#EE0000">项目测试中，暂停演示 <span style="margin:0 10px;"></span></span>
-                            <a style="margin-right:20px;" target="_blank" href="http://wumei.live">返回官网</a>
+                            <span style="margin-right:20px; color:#eee">演示账号：wumei<span style="margin:0 10px;">123456</span></span>
+                            <a style="margin-right:20px;color:#222" target="_blank" href="http://wumei.live">返回官网</a>
                             <router-link style="color:#fff;font-size:16px;display:none;" :to="'/register'" >立即注册 >></router-link>
                         </div>
                     </el-form-item>

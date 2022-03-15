@@ -66,7 +66,7 @@
                     <el-input v-model="form.categoryName" placeholder="请输入产品分类名称" />
                 </el-form-item>
                 <el-form-item label="显示顺序" prop="orderNum">
-                    <el-input v-model="form.orderNum" placeholder="请输入显示顺序" />
+                    <el-input v-model="form.orderNum" type="number" placeholder="请输入显示顺序" />
                 </el-form-item>
                 <el-form-item label="备注" prop="remark">
                     <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />

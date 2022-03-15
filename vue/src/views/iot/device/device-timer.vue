@@ -590,6 +590,7 @@ export default {
                     this.form.serialNumber = this.deviceInfo.serialNumber;
                     this.form.productId = this.deviceInfo.productId;
                     this.form.productName = this.deviceInfo.productName;
+                    console.log("this.form:",this.form);
                     // 按钮等待后端加载完
                     this.submitButtonLoading = true;
                     if (this.form.jobId != undefined) {

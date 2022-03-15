@@ -92,7 +92,7 @@
             <!---设备状态(影子模式，value值不会更新)-->
             <el-descriptions :column="1" border size="mini" v-if="deviceInfo.isShadow==1 && deviceInfo.status!=3">
                 <template slot="title">
-                    <span style="font-size:14px;color:#606266;">设备状态</span>
+                    <span style="font-size:14px;color:#606266;">设备处于离线状态</span>
                 </template>
                 <!-- bool类型-->
                 <el-descriptions-item v-for="(item,index) in deviceInfo.boolList" :key="index">

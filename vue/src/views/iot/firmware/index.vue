@@ -77,7 +77,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="固件版本" prop="version">
-                    <el-input v-model="form.version" placeholder="请输入固件版本" />
+                    <el-input v-model="form.version" placeholder="请输入固件版本" type="number" />
                 </el-form-item>
 
                 <el-form-item label="固件上传" prop="filePath">

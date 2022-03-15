@@ -371,6 +371,9 @@ export default {
                     // 数据加载到图表
                     for (let i = 0; i < this.dataList.length; i++) {
                         if (id == this.dataList[i].id) {
+                            if (this.dataList[i].length > 50) {
+                                this.dataList[i].shift();
+                            }
                             this.dataList[i].data.push([this.getTime(), value]);
                             // 更新图表
                             this.chart[i].setOption({
@@ -410,7 +413,7 @@ export default {
             // Mqtt发布实时监测消息
             let model = {};
             model.name = "更新实时监测";
-            model.value=this.monitorNumber;
+            model.value = this.monitorNumber;
             this.mqttPublish(4, this.monitorDevice, model);
             this.chartLoading = true;
         },
@@ -424,14 +427,14 @@ export default {
             // Mqtt发布实时监测
             let model = {};
             model.name = "";
-            model.value=this.monitorNumber;
+            model.value = this.monitorNumber;
             this.mqttPublish(4, item, model);
         },
         /** 停止实时监测 */
         stopMonitor() {
             // 清空图表数据
             this.dataList = [];
-            this.chartLoading=true;
+            this.chartLoading = true;
             // Mqtt发布实时监测
             let model = {};
             model.name = "";
