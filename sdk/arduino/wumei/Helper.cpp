@@ -106,10 +106,10 @@ void processFunction(String payload)
     {
       printMsg("屏显消息 message：" + (String)value);
     }else if(strcmp(id,"report_monitor")==0){
-      // 上报属性中的监测数据
       String msg=randomPropertyData();
+      printMsg("订阅到上报监测数据指令，上报数据：");
+      printMsg(msg);
       publishProperty(msg);
-      return;
     }
   }
   // 最后发布功能,服务端订阅存储（重要）
