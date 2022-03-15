@@ -186,14 +186,23 @@ public class EmqxService {
      * 3.发布属性
      */
     public void publishProperty(Long productId,String deviceNum,List<IdentityAndName> thingsList){
-        emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+pPropertyTopic, JSON.toJSONString(thingsList));
+        if(thingsList==null){
+            emqxClient.publish(1,true,"/"+productId+"/"+deviceNum+pPropertyTopic, "");
+        }else{
+            emqxClient.publish(1,true,"/"+productId+"/"+deviceNum+pPropertyTopic, JSON.toJSONString(thingsList));
+        }
     }
 
     /**
      * 4.发布功能
      */
     public void publishFunction(Long productId,String deviceNum,List<IdentityAndName> thingsList){
-        emqxClient.publish(1,false,"/"+productId+"/"+deviceNum+pFunctionTopic, JSON.toJSONString(thingsList));
+        if(thingsList==null){
+            emqxClient.publish(1,true,"/"+productId+"/"+deviceNum+pFunctionTopic, "");
+        }else{
+            emqxClient.publish(1,true,"/"+productId+"/"+deviceNum+pFunctionTopic, JSON.toJSONString(thingsList));
+        }
+
     }
 
 

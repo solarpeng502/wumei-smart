@@ -101,6 +101,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select device_id, device_name, product_id, product_name, user_id, user_name, tenant_id, tenant_name, serial_number, firmware_version, status,rssi,is_shadow ,is_custom_location,things_model_value, active_time,img_url from iot_device
     </sql>
 
+    <sql id="selectWebhookDeviceVo">
+        select device_id, device_name,product_id, serial_number, status,is_shadow ,is_custom_location,things_model_value, active_time from iot_device
+    </sql>
+
     <select id="selectDeviceList" parameterType="com.ruoyi.iot.domain.Device" resultMap="DeviceResult">
         <include refid="selectDeviceVo"/>
         <where>  
@@ -166,6 +170,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectDeviceBySerialNumber" parameterType="String" resultMap="DeviceResult">
         <include refid="selectDeviceVo"/>
+        where serial_number = #{serialNumber}
+    </select>
+
+    <select id="selectShortDeviceBySerialNumber" parameterType="String" resultMap="DeviceResult">
+        <include refid="selectWebhookDeviceVo"/>
         where serial_number = #{serialNumber}
     </select>
 

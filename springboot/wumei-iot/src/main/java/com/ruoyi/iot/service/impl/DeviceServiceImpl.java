@@ -99,6 +99,17 @@ public class DeviceServiceImpl implements IDeviceService {
     }
 
     /**
+     * 根据设备编号查询简介设备
+     *
+     * @param serialNumber 设备主键
+     * @return 设备
+     */
+    @Override
+    public Device selectShortDeviceBySerialNumber(String serialNumber) {
+        return deviceMapper.selectShortDeviceBySerialNumber(serialNumber);
+    }
+
+    /**
      * 根据设备编号查询设备认证信息
      *
      * @param model 设备编号和产品ID
@@ -180,7 +191,6 @@ public class DeviceServiceImpl implements IDeviceService {
                     deviceLog.setSerialNumber(deviceThings.getSerialNumber());
                     deviceLog.setDeviceName(deviceThings.getDeviceName());
                     deviceLog.setLogValue(input.getThingsModelValueRemarkItem().get(i).getValue());
-                    deviceLog.setDatatype(valueList.get(k).getDataType().getType());
                     deviceLog.setRemark(input.getThingsModelValueRemarkItem().get(i).getRemark());
                     deviceLog.setIdentity(input.getThingsModelValueRemarkItem().get(i).getId());
                     deviceLog.setCreateTime(DateUtils.getNowDate());
@@ -373,6 +383,7 @@ public class DeviceServiceImpl implements IDeviceService {
         device.setUserName(sysUser.getUserName());
         device.setTenantId(sysUser.getUserId());
         device.setTenantName(sysUser.getUserName());
+        device.setRssi(0);
         deviceMapper.insertDevice(device);
         // 添加设备用户
 //        DeviceUser deviceUser = new DeviceUser();
@@ -525,23 +536,18 @@ public class DeviceServiceImpl implements IDeviceService {
 
     /**
      *
-     * @param deviceNum 设备编号
-     * @param status 设备状态（1-未激活，2-禁用，3-在线，4-离线）
+     * @param device 设备
      * @return 结果
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateDeviceStatusAndLocation(String deviceNum,int status,String ipAddress) {
-        Device device=new Device();
-        device.setStatus(status);
-        device.setSerialNumber(deviceNum);
+    public int updateDeviceStatusAndLocation(Device device,String ipAddress) {
         // 设置定位和状态
-        Device deviceEntity = deviceMapper.selectDeviceBySerialNumber(deviceNum);
         if(ipAddress!="") {
-            if(deviceEntity.getActiveTime()==null){
+            if(device.getActiveTime()==null){
                 device.setActiveTime(DateUtils.getNowDate());
             }
-            if (deviceEntity.getIsCustomLocation() == 0) {
+            if (device.getIsCustomLocation() == 0) {
                 device.setNetworkIp(ipAddress);
                 setLocation(ipAddress, device);
             }
@@ -550,16 +556,16 @@ public class DeviceServiceImpl implements IDeviceService {
 
         // 添加到设备日志
         DeviceLog deviceLog = new DeviceLog();
-        deviceLog.setDeviceId(deviceEntity.getDeviceId());
-        deviceLog.setDeviceName(deviceEntity.getDeviceName());
-        deviceLog.setSerialNumber(deviceEntity.getSerialNumber());
+        deviceLog.setDeviceId(device.getDeviceId());
+        deviceLog.setDeviceName(device.getDeviceName());
+        deviceLog.setSerialNumber(device.getSerialNumber());
         deviceLog.setIsMonitor(0);
-        if(status==3){
+        if(device.getStatus()==3){
             deviceLog.setLogValue("1");
             deviceLog.setRemark("设备上线");
             deviceLog.setIdentity("online");
             deviceLog.setLogType(5);
-        }else if(status==4){
+        }else if(device.getStatus()==4){
             deviceLog.setLogValue("0");
             deviceLog.setRemark("设备离线");
             deviceLog.setIdentity("offline");

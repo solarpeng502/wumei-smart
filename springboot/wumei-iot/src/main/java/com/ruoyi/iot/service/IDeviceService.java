@@ -33,6 +33,14 @@ public interface IDeviceService
     public Device selectDeviceBySerialNumber(String serialNumber);
 
     /**
+     * 根据设备编号查询简介设备
+     *
+     * @param serialNumber 设备主键
+     * @return 设备
+     */
+    public Device selectShortDeviceBySerialNumber(String serialNumber);
+
+    /**
      * 根据设备编号查询设备认证信息
      *
      * @param model 设备编号和产品ID
@@ -110,11 +118,10 @@ public interface IDeviceService
 
     /**
      * 更新设备状态
-     * @param deviceNUm 设备编号
-     * @param status 设备状态（1-未激活，2-禁用，3-在线，4-离线）
+     * @param device 设备
      * @return 结果
      */
-    public int updateDeviceStatusAndLocation(String deviceNUm,int status,String ipAddress);
+    public int updateDeviceStatusAndLocation(Device device,String ipAddress);
 
     /**
      * 上报设备信息

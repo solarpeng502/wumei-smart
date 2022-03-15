@@ -94,7 +94,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="deviceName != null and deviceName != ''">device_name = #{deviceName},</if>
 			<if test="serialNumber != null and serialNumber != ''">serial_number = #{serialNumber},</if>
 			<if test="actions != null and actions != ''">actions = #{actions},</if>
-			<if test="isAdvance != null and isAdvance != ''">is_advance = #{isAdvance},</if>
  			<if test="cronExpression != null and cronExpression != ''">cron_expression = #{cronExpression},</if>
  			<if test="misfirePolicy != null and misfirePolicy != ''">misfire_policy = #{misfirePolicy},</if>
  			<if test="concurrent != null and concurrent != ''">concurrent = #{concurrent},</if>
@@ -106,6 +105,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="productName != null and productName!=''">product_name = #{productName},</if>
 			<if test="sceneId != null and sceneId!=0">scene_id = #{sceneId},</if>
 			<if test="alertId != null and alertId!=0">alert_id = #{alertId},</if>
+			is_advance =#{isAdvance},
  			update_time = sysdate()
  		</set>
  		where job_id = #{jobId}

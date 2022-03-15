@@ -37,6 +37,14 @@ public interface DeviceMapper
     public Device selectDeviceBySerialNumber(String serialNumber);
 
     /**
+     * 根据设备编号查询简介设备
+     *
+     * @param serialNumber 设备主键
+     * @return 设备
+     */
+    public Device selectShortDeviceBySerialNumber(String serialNumber);
+
+    /**
      * 根据设备编号查询设备认证信息
      *
      * @param model 设备编号和产品ID

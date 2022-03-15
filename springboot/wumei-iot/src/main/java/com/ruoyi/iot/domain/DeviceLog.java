@@ -18,10 +18,6 @@ public class DeviceLog extends BaseEntity
     /** 设备日志ID */
     private Long logId;
 
-    /** 日志名称 */
-    @Excel(name = "日志名称")
-    private String logName;
-
     /** 类型（1=属性上报，2=事件上报，3=调用功能，4=设备升级，5=设备上线，6=设备离线） */
     @Excel(name = "类型", readConverterExp = "1==属性上报，2=事件上报，3=调用功能，4=设备升级，5=设备上线，6=设备离线")
     private Integer logType;
@@ -46,10 +42,6 @@ public class DeviceLog extends BaseEntity
     @Excel(name = "标识符")
     private String identity;
 
-    /** 数据类型 */
-    @Excel(name = "数据类型")
-    private String datatype;
-
     /** 是否监测数据（1=是，0=否） */
     @Excel(name = "是否监测数据", readConverterExp = "1==是，0=否")
     private Integer isMonitor;
@@ -71,15 +63,7 @@ public class DeviceLog extends BaseEntity
     {
         return logId;
     }
-    public void setLogName(String logName) 
-    {
-        this.logName = logName;
-    }
 
-    public String getLogName() 
-    {
-        return logName;
-    }
     public void setLogType(Integer logType) 
     {
         this.logType = logType;
@@ -125,15 +109,6 @@ public class DeviceLog extends BaseEntity
     {
         return identity;
     }
-    public void setDatatype(String datatype) 
-    {
-        this.datatype = datatype;
-    }
-
-    public String getDatatype() 
-    {
-        return datatype;
-    }
     public void setIsMonitor(Integer isMonitor) 
     {
         this.isMonitor = isMonitor;
@@ -148,13 +123,11 @@ public class DeviceLog extends BaseEntity
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("logId", getLogId())
-            .append("logName", getLogName())
             .append("logType", getLogType())
             .append("logValue", getLogValue())
             .append("deviceId", getDeviceId())
             .append("deviceName", getDeviceName())
             .append("identity", getIdentity())
-            .append("datatype", getDatatype())
             .append("createBy", getCreateBy())
             .append("isMonitor", getIsMonitor())
             .append("createTime", getCreateTime())

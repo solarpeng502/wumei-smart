@@ -213,18 +213,24 @@ public class ToolController extends BaseController {
             }
             String[] clientInfo = model.getClientid().split("&");
             String deviceNum = clientInfo[0];
-            Device device = deviceService.selectDeviceBySerialNumber(deviceNum);
+            Device device = deviceService.selectShortDeviceBySerialNumber(deviceNum);
             // 设备状态（1-未激活，2-禁用，3-在线，4-离线）
             if (model.getAction().equals("client_disconnected")) {
-                String ip = model.getIpaddress();
-                deviceService.updateDeviceStatusAndLocation(device.getSerialNumber(), 4, "");
-                emqxService.publishStatus(device.getProductId(), device.getSerialNumber(), 4,device.getIsShadow());
+                device.setStatus(4);
+                deviceService.updateDeviceStatusAndLocation(device, "");
+                // 发布设备状态
+                emqxService.publishStatus(device.getProductId(), device.getSerialNumber(), 4, device.getIsShadow());
+                // 清空保留消息，上线后发布新的属性功能保留消息
+                emqxService.publishProperty(device.getProductId(), device.getSerialNumber(), null);
+                emqxService.publishFunction(device.getProductId(), device.getSerialNumber(), null);
             } else if (model.getAction().equals("client_connected")) {
-                deviceService.updateDeviceStatusAndLocation(device.getSerialNumber(), 3, model.getIpaddress());
-                emqxService.publishStatus(device.getProductId(), device.getSerialNumber(), 3,device.getIsShadow());
+                device.setStatus(3);
+                deviceService.updateDeviceStatusAndLocation(device, model.getIpaddress());
+                // 发布设备状态
+                emqxService.publishStatus(device.getProductId(), device.getSerialNumber(), 3, device.getIsShadow());
                 // 影子模式，发布属性和功能
                 if (device.getIsShadow() == 1) {
-                    ThingsModelShadow shadow=deviceService.getDeviceShadowThingsModel(device);
+                    ThingsModelShadow shadow = deviceService.getDeviceShadowThingsModel(device);
                     if (shadow.getProperties().size() > 0) {
                         emqxService.publishProperty(device.getProductId(), device.getSerialNumber(), shadow.getProperties());
                     }
@@ -239,7 +245,6 @@ public class ToolController extends BaseController {
         }
         return AjaxResult.success();
     }
-
 
 
     @ApiOperation("获取NTP时间")
@@ -301,9 +306,9 @@ public class ToolController extends BaseController {
     @GetMapping("/download")
     public void download(String fileName, HttpServletResponse response, HttpServletRequest request) {
         try {
-            if (!FileUtils.checkAllowDownload(fileName)) {
-                throw new Exception(StringUtils.format("文件名称({})非法，不允许下载。 ", fileName));
-            }
+//            if (!FileUtils.checkAllowDownload(fileName)) {
+//                throw new Exception(StringUtils.format("文件名称({})非法，不允许下载。 ", fileName));
+//            }
             String filePath = RuoYiConfig.getProfile();
             // 资源地址
             String downloadPath = filePath + fileName.replace("/profile", "");
