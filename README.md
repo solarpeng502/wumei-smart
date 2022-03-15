@@ -62,8 +62,18 @@
     - 相关技术：WPF
     - 开发工具：Visual Studio
 
+### 四、硬件接入
+1. 设备认证
+    * 加密认证（推荐）
+    * 简单认证
+    * EMQX支持的其他认证方式 
+2. 设备交互
+    * 发布物模型、设备信息、时钟同步相关Mqtt主题
+    * 订阅物模型、设备升级、时钟同步相关Mqtt主题
+##### 具体参考文档，项目提供了示例SDK，使用ESP8266芯片，基于Arduino开发。支持Wifi和Mqtt连接、物模型响应、实时监测、管理平台配置定时上传监测数据、AES加密、Http和Mqtt获取NTP时间等。
 
-### 四、项目目录
+
+### 五、项目目录
 &nbsp;&nbsp;&nbsp;&nbsp; spring-boot ---------------------------------------------------- 后端<br/>
 &nbsp;&nbsp;&nbsp;&nbsp; vue ------------------------------------------------------------- 前端<br />
 &nbsp;&nbsp;&nbsp;&nbsp; docker ---------------------------------------------------------- docker部署文件<br />
@@ -71,7 +81,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp; download ------------------------------------------------------- 工具下载<br />
 
 
-### 五、相关文档
+### 六、相关文档
 ##### 权限管理基于ruoyi-vue系统，Mqtt消息服务器基于EMQX4.0开源版，Android模拟器基于XUI框架,SDK示例使用ESP8266 Core For Arduino开发
 * [项目文档(编写中...) >>](http://wumei.live/kerwincui/document/wiki/)
 * [物美智能官网 >>](http://wumei.live/)
@@ -81,12 +91,12 @@
 * [ESP8266 Core For Arduino](https://github.com/esp8266/Arduino)
 
 
-### 六、其他
+### 七、其他
 * 互助交流群：1073236354
 * [演示地址>>](https://iot.wumei.live/)
 
 
-### 七、界面图片
+### 八、界面图片
 * web端
 ![图片一](https://raw.githubusercontent.com/kerwincui/wumei-smart/master/document/01.png)
 ![图片一](https://raw.githubusercontent.com/kerwincui/wumei-smart/master/document/02.png)
