@@ -12,7 +12,6 @@
 
 
 ### 二、功能
-
 - 权限管理： 用户管理、部门管理、岗位管理、菜单管理、角色管理、字典和参数管理等
 - 系统监控： 操作日志、登录日志、系统日志、在线用户、服务监控、连接池监控、缓存监控等
 - 产品管理： 产品、产品物模型、产品分类、产品固件等
@@ -50,7 +49,7 @@
     - 相关技术：WPF
     - 开发工具：Visual Studio
 
-### 四、硬件接入（具体参考文档，项目提供了示例SDK，使用ESP8266芯片，基于Arduino开发）
+### 五、硬件接入（具体参考文档，项目提供了示例SDK，使用ESP8266芯片，基于Arduino开发）
 1. 设备认证
     * 加密认证（推荐）
     * 简单认证
@@ -59,7 +58,7 @@
     * 发布物模型、设备信息、时钟同步相关Mqtt主题
     * 订阅物模型、设备升级、时钟同步相关Mqtt主题
 
-### 五、项目目录
+### 六、项目目录
 &nbsp;&nbsp;&nbsp;&nbsp; spring-boot ---------------------------------------------------- 后端<br/>
 &nbsp;&nbsp;&nbsp;&nbsp; vue ------------------------------------------------------------- 前端<br />
 &nbsp;&nbsp;&nbsp;&nbsp; docker ---------------------------------------------------------- docker部署文件<br />
@@ -67,7 +66,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp; download ------------------------------------------------------- 工具下载<br />
 
 
-### 六、相关文档
+### 七、相关文档
 ##### 权限管理基于ruoyi-vue系统，Mqtt消息服务器基于EMQX4.0开源版，Android模拟器基于XUI框架,SDK示例使用ESP8266 Core For Arduino开发
 * [项目文档(编写中...) >>](http://wumei.live/kerwincui/document/wiki/)
 * [物美智能官网 >>](http://wumei.live/)
@@ -76,12 +75,12 @@
 * [ESP8266 Core For Arduino](https://github.com/esp8266/Arduino)
 
 
-### 七、其他
+### 八、其他
 * 互助交流群：1073236354
 * [演示地址>>](https://iot.wumei.live/)
 
 
-### 八、界面图片
+### 九、界面图片
 * web端
 ![图片一](https://raw.githubusercontent.com/kerwincui/wumei-smart/master/document/01.png)
 ![图片一](https://raw.githubusercontent.com/kerwincui/wumei-smart/master/document/02.png)
