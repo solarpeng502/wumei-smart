@@ -59,7 +59,7 @@
                                     {{item.serialNumber}}
                                 </el-descriptions-item>
                                 <el-descriptions-item label="产品">
-                                    <el-link type="primary" :underline="false">{{item.productName}}</el-link>
+                                    {{item.productName}}
                                 </el-descriptions-item>
                                 <el-descriptions-item label="激活时间">
                                     {{ parseTime(item.activeTime, '{y}-{m}-{d}') }}
@@ -84,19 +84,19 @@
                             <template slot="label">
                                 <span style="white-space: nowrap;text-overflow: ellipsis;width:40px;overflow:hidden;height:40px;">{{subItem.name}}</span>
                             </template>
-                            <el-link type="primary" :underline="false" style="white-space: nowrap;">{{subItem.value}} {{subItem.unit==null?"":subItem.unit}}</el-link>
+                            <el-link type="primary" :underline="false" style="white-space: nowrap;">{{subItem.shadow==""?"0":subItem.shadow}} {{subItem.unit==null?"":subItem.unit}}</el-link>
                         </el-descriptions-item>
                         <el-descriptions-item v-for="subItem in item.boolList" :key="subItem.id" :contentStyle="{height:'40px'}">
                             <template slot="label">
                                 <div style="white-space: nowrap;text-overflow:ellipsis;width:40px;overflow:hidden;" :title="subItem.name">{{subItem.name}}</div>
                             </template>
-                            <el-switch v-model="subItem.value" @change="publishThingsModel($event,item,subItem)" :active-value="'1'" :inactive-value="'0'" :disabled="shadowUnEnable(item)" />
+                            <el-switch v-model="subItem.shadow" @change="publishThingsModel(item,subItem)" :active-value="'1'" :inactive-value="'0'" :disabled="shadowUnEnable(item)" />
                         </el-descriptions-item>
                         <el-descriptions-item v-for="subItem in item.enumList" :key="subItem.id" :contentStyle="{height:'40px'}">
                             <template slot="label">
                                 <div style="white-space: nowrap;text-overflow:ellipsis;width:40px;overflow:hidden;" :title="subItem.name">{{subItem.name}}</div>
                             </template>
-                            <el-select v-model="subItem.value" placeholder="请选择" @change="publishThingsModel($event,item,subItem)" clearable size="mini" :title="subItem.name" :disabled="shadowUnEnable(item)">
+                            <el-select v-model="subItem.shadow" placeholder="请选择" @change="publishThingsModel(item,subItem)" clearable size="mini" :title="subItem.name" :disabled="shadowUnEnable(item)">
                                 <el-option v-for="children in subItem.enumList" :key="children.value" :label="children.text" :value="children.value" />
                             </el-select>
                         </el-descriptions-item>
@@ -104,32 +104,32 @@
                             <template slot="label">
                                 <div style="white-space: nowrap;text-overflow:ellipsis;width:40px;overflow:hidden;" :title="subItem.name">{{subItem.name}}</div>
                             </template>
-                            <el-input v-model="subItem.value" :placeholder="'小数：'+subItem.name" size="mini" :title="'小数：'+subItem.name" :disabled="shadowUnEnable(item)">
-                                <el-button slot="append" icon="el-icon-s-promotion" @click="publishThingsModel(subItem.value,item,subItem)" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
+                            <el-input v-model="subItem.shadow" :placeholder="'小数：'+subItem.name" size="mini" :title="'小数：'+subItem.name" :disabled="shadowUnEnable(item)">
+                                <el-button slot="append" icon="el-icon-s-promotion" @click="publishThingsModel(item,subItem)" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
                             </el-input>
                         </el-descriptions-item>
                         <el-descriptions-item v-for="subItem in item.integerList" :key="subItem.id" :contentStyle="{height:'40px'}">
                             <template slot="label">
                                 <div style="white-space: nowrap;text-overflow:ellipsis;width:40px;overflow:hidden;" :title="subItem.name">{{subItem.name}}</div>
                             </template>
-                            <el-input v-model="subItem.value" :placeholder="'整数：'+subItem.name" :title="'整数：'+subItem.name" size="mini" :disabled="shadowUnEnable(item)">
-                                <el-button slot="append" icon="el-icon-s-promotion" @click="publishThingsModel(subItem.value,item,subItem)" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
+                            <el-input v-model="subItem.shadow" :placeholder="'整数：'+subItem.name" :title="'整数：'+subItem.name" size="mini" :disabled="shadowUnEnable(item)">
+                                <el-button slot="append" icon="el-icon-s-promotion" @click="publishThingsModel(item,subItem)" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
                             </el-input>
                         </el-descriptions-item>
                         <el-descriptions-item v-for="subItem in item.arrayList" :key="subItem.id" :contentStyle="{height:'40px'}">
                             <template slot="label">
                                 <div style="white-space: nowrap;text-overflow:ellipsis;width:40px;overflow:hidden;" :title="subItem.name">{{subItem.name}}</div>
                             </template>
-                            <el-input v-model="subItem.value" :placeholder="'数组：'+subItem.name" :title="'数组：'+subItem.name" size="mini" :disabled="shadowUnEnable(item)">
-                                <el-button slot="append" icon="el-icon-s-promotion" @click="publishThingsModel(subItem.value,item,subItem)" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
+                            <el-input v-model="subItem.shadow" :placeholder="'数组：'+subItem.name" :title="'数组：'+subItem.name" size="mini" :disabled="shadowUnEnable(item)">
+                                <el-button slot="append" icon="el-icon-s-promotion" @click="publishThingsModel(item,subItem)" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
                             </el-input>
                         </el-descriptions-item>
                         <el-descriptions-item v-for="subItem in item.stringList" :key="subItem.id" :contentStyle="{height:'40px'}">
                             <template slot="label">
                                 <div style="white-space: nowrap;text-overflow:ellipsis;width:40px;overflow:hidden;" :title="subItem.name">{{subItem.name}}</div>
                             </template>
-                            <el-input v-model="subItem.value" :placeholder="'字符串：'+subItem.name" :title="'字符串：'+subItem.name" size="mini" :disabled="shadowUnEnable(item)">
-                                <el-button slot="append" icon="el-icon-s-promotion" @click="publishThingsModel(subItem.value,item,subItem)" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
+                            <el-input v-model="subItem.shadow" :placeholder="'字符串：'+subItem.name" :title="'字符串：'+subItem.name" size="mini" :disabled="shadowUnEnable(item)">
+                                <el-button slot="append" icon="el-icon-s-promotion" @click="publishThingsModel(item,subItem)" style="font-size:16px;padding:10px;" title="指令发送"></el-button>
                             </el-input>
                         </el-descriptions-item>
                     </el-descriptions>
@@ -149,7 +149,7 @@
             <div style="margin-top:-50px;">
                 <el-divider></el-divider>
             </div>
-            <el-form :inline="true" label-width="100px" style="">
+            <el-form :inline="true" label-width="100px">
                 <el-form-item label="监测间隔(ms)">
                     <el-tooltip class="item" effect="light" content="取值范围500-10000毫秒" placement="top">
                         <el-input v-model="monitorInterval" placeholder="请输入监测间隔" type="number" clearable size="small" style="width:180px;" />
@@ -161,13 +161,13 @@
                     </el-tooltip>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="success" icon="el-icon-refresh" size="mini" @click="updateMonitorParameters()" style="margin-left:30px;">更 新</el-button>
+                    <el-button type="success" icon="el-icon-refresh" size="mini" @click="updateMonitorParameters()" style="margin-left:30px;" :disabled="monitorDevice.status !=3">更 新</el-button>
                 </el-form-item>
             </el-form>
-            <el-row :gutter="20">
+            <el-row :gutter="20" v-loading="chartLoading" element-loading-text="正在接收设备数据，请耐心等待......" element-loading-spinner="el-icon-loading" element-loading-background="rgba(0, 0, 0, 0.8)">
                 <el-col :span="12" v-for="(item,index) in monitorThings" :key="index" style="margin-bottom:20px;">
-                    <el-card shadow="hover" :body-style="{ padding: '10px 0px' }">
-                        <div ref="monitor" style="height:250px;"></div>
+                    <el-card shadow="hover" :body-style="{ paddingTop: '10px',marginBottom:'-20px' }">
+                        <div ref="monitor" style="height:210px;padding:0"></div>
                     </el-card>
                 </el-col>
             </el-row>
@@ -201,7 +201,7 @@ export default {
             // 实时监测间隔
             monitorInterval: 1000,
             // 实时监测次数
-            monitorNumber: 60,
+            monitorNumber: 30,
             // 选中的实时监测设备
             monitorDevice: {},
             // 发布消息
@@ -210,17 +210,16 @@ export default {
             subscribes: [],
             // 图表集合
             chart: [],
-            // 图标数据集合
+            // 图表数据集合
             dataList: [],
-            // 计时器
-            interval: null,
-            now: new Date(2021, 9, 3),
             // 监测物模型
             monitorThings: [],
             // mqtt客户端
             client: {},
             // 遮罩层
             loading: true,
+            // 图表遮罩层
+            chartLoading: true,
             // 总条数
             total: 0,
             // 设备列表数据
@@ -269,12 +268,10 @@ export default {
     },
     methods: {
         /** 发布物模型 类型(1=属性，2=功能) */
-        publishThingsModel(value, device, model) {
+        publishThingsModel(device, model) {
             // 获取缓存的Json物模型
             cacheJsonThingsModel(device.productId).then(response => {
                 let thingsModel = JSON.parse(response.data);
-                console.log(thingsModel);
-                console.log(model);
                 let type = 0;
                 for (let i = 0; i < thingsModel.functions.length; i++) {
                     if (model.id == thingsModel.functions[i].id) {
@@ -291,7 +288,7 @@ export default {
                     }
                 }
                 if (type != 0) {
-                    this.mqttPublish(type, device, model, value);
+                    this.mqttPublish(type, device, model);
                 }
             })
         },
@@ -300,38 +297,37 @@ export default {
          * @type 类型(1=属性，2=功能，3=OTA升级，4=实时监测)
          * @device 设备
          * @model 物模型
-         * @value 物模型的值
          * */
-        mqttPublish(type, device, model, value) {
+        mqttPublish(type, device, model) {
             let topic = "";
             let message = ""
             if (type == 1) {
                 if (device.status == 3) {
                     // 属性,在线模式
-                    topic = "/" + device.productId + "/" + device.serialNumber + "/property-online/get ";
+                    topic = "/" + device.productId + "/" + device.serialNumber + "/property-online/get";
                 } else if (device.isShadow) {
                     // 属性,离线模式
-                    topic = "/" + device.productId + "/" + device.serialNumber + "/property-offline/get ";
+                    topic = "/" + device.productId + "/" + device.serialNumber + "/property-offline/post";
                 }
-                message = '[{"id":"' + model.id + '","value":"' + value + '"}]';
+                message = '[{"id":"' + model.id + '","value":"' + model.shadow + '"}]';
             } else if (type == 2) {
                 if (device.status == 3) {
                     // 功能,在线模式
-                    topic = "/" + device.productId + "/" + device.serialNumber + "/function-online/get ";
+                    topic = "/" + device.productId + "/" + device.serialNumber + "/function-online/get";
 
                 } else if (device.isShadow) {
                     // 功能,离线模式
-                    topic = "/" + device.productId + "/" + device.serialNumber + "/function-offline/get ";
+                    topic = "/" + device.productId + "/" + device.serialNumber + "/function-offline/post";
                 }
-                message = '[{"id":"' + model.id + '","value":"' + value + '"}]';
+                message = '[{"id":"' + model.id + '","value":"' + model.shadow + '"}]';
             } else if (type == 3) {
                 // OTA升级
-                topic = "/" + device.productId + "/" + device.serialNumber + "/ota/get ";
+                topic = "/" + device.productId + "/" + device.serialNumber + "/ota/get";
                 message = '{"version":1.1}';
             } else if (type == 4) {
                 // 实时监测
-                topic = "/" + device.productId + "/" + device.serialNumber + "/monitor/get ";
-                message = '{"count":' + this.monitorNumber + ',"interval":' + this.monitorInterval + '}'
+                topic = "/" + device.productId + "/" + device.serialNumber + "/monitor/get";
+                message = '{"count":' + model.value + ',"interval":' + this.monitorInterval + '}'
             } else {
                 return;
             }
@@ -340,29 +336,60 @@ export default {
                 this.publish = {
                     topic: topic,
                     message: message
+                };
+                if (model.name != "") {
+                    this.$modal.notifySuccess("[ " + model.name + " ] 指令发送成功");
                 }
             }
         },
         /** 接收到Mqtt回调 */
         mqttCallback(data) {
-            console.log(data);
             let topics = [];
             topics = data.topic.split("/");
+            let productId = topics[1];
+            let deviceNum = topics[2]
             if (topics[3] == "status") {
-                let message = JSON.parse(data.message);
-                // this.deviceInfo.status = message.status;
-                // this.deviceInfo.isShadow = message.isShadow;
-            } else {
-
+                // 更新列表中设备的状态
+                for (let i = 0; i < this.deviceList.length; i++) {
+                    if (this.deviceList[i].serialNumber == deviceNum) {
+                        this.deviceList[i].status = data.message.status;
+                        this.deviceList[i].isShadow = data.message.isShadow;
+                    }
+                }
+                // 更新实时监测模型的状态
+                if (this.monitorDevice.serialNumber == deviceNum) {
+                    this.monitorDevice.status = data.message.status;
+                    this.monitorDevice.isShadow = data.message.isShadow;
+                }
+            } else if (topics[3] == "monitor") {
+                // 实时监测
+                this.chartLoading = false;
+                for (let k = 0; k < data.message.length; k++) {
+                    let value = data.message[k].value;
+                    let id = data.message[k].id;
+                    let remark = data.message[k].remark;
+                    // 数据加载到图表
+                    for (let i = 0; i < this.dataList.length; i++) {
+                        if (id == this.dataList[i].id) {
+                            this.dataList[i].data.push([this.getTime(), value]);
+                            // 更新图表
+                            this.chart[i].setOption({
+                                series: [{
+                                    data: this.dataList[i].data
+                                }]
+                            });
+                        }
+                    }
+                }
             }
         },
         /** Mqtt订阅主题 */
         mqttSubscribe(list) {
-            // 订阅当前页面设备状态
+            // 订阅当前页面设备状态和实时监测
             let topics = [];
             for (let i = 0; i < list.length; i++) {
-                let topicStatus = "/" + list[i].productId + "/" + list[i].serialNumber + "/status/post ";
-                let topicMonitor = "/" + list[i].productId + "/" + list[i].serialNumber + "/monitor/post ";
+                let topicStatus = "/" + list[i].productId + "/" + list[i].serialNumber + "/status/post";
+                let topicMonitor = "/" + list[i].productId + "/" + list[i].serialNumber + "/monitor/post";
                 topics.push(topicStatus);
                 topics.push(topicMonitor);
             }
@@ -370,6 +397,10 @@ export default {
         },
         /** 更新实时监测参数*/
         updateMonitorParameters() {
+            // 清空图表数据
+            for (let i = 0; i < this.dataList.length; i++) {
+                this.dataList[i].data = [];
+            }
             if (this.monitorInterval < 500 || this.monitorInterval > 10000) {
                 this.$modal.alertError("实时监测的间隔范围500-10000毫秒");
             }
@@ -377,7 +408,35 @@ export default {
                 this.$modal.alertError("实时监测数量范围1-300");
             }
             // Mqtt发布实时监测消息
-            this.mqttPublish(4, this.monitorDevice);
+            let model = {};
+            model.name = "更新实时监测";
+            model.value=this.monitorNumber;
+            this.mqttPublish(4, this.monitorDevice, model);
+            this.chartLoading = true;
+        },
+        /** 查看监测数据 */
+        handleMonitor(item) {
+            this.open = true;
+            this.monitorLoading = true;
+            this.monitorDevice = item;
+            // 获取物模型
+            this.getCacheThingsModdel(item.productId);
+            // Mqtt发布实时监测
+            let model = {};
+            model.name = "";
+            model.value=this.monitorNumber;
+            this.mqttPublish(4, item, model);
+        },
+        /** 停止实时监测 */
+        stopMonitor() {
+            // 清空图表数据
+            this.dataList = [];
+            this.chartLoading=true;
+            // Mqtt发布实时监测
+            let model = {};
+            model.name = "";
+            model.value = 0;
+            this.mqttPublish(4, this.monitorDevice, model);
         },
         /** 查询设备列表 */
         getList() {
@@ -397,6 +456,7 @@ export default {
         // 取消按钮
         cancel() {
             this.open = false;
+            this.stopMonitor();
         },
         /** 搜索按钮操作 */
         handleQuery() {
@@ -442,15 +502,6 @@ export default {
             }
             return false;
         },
-        /** 查看监测数据 */
-        handleMonitor(item) {
-            this.open = true;
-            this.monitorDevice = item;
-            // 获取物模型
-            this.getCacheThingsModdel(item.productId);
-            // Mqtt发布实时监测
-            this.mqttPublish(4, item);
-        },
         /** 获取物模型*/
         getCacheThingsModdel(productId) {
             // 获取缓存的Json物模型
@@ -458,53 +509,20 @@ export default {
                 let thingsModel = JSON.parse(response.data);
                 // 筛选监测数据
                 this.monitorThings = thingsModel.properties.filter(item => item.isMonitor == 1);
+                // 监测数据集合初始化
+                for (let i = 0; i < this.monitorThings.length; i++) {
+                    this.dataList.push({
+                        id: this.monitorThings[i].id,
+                        name: this.monitorThings[i].name,
+                        data: []
+                    });
+                    // this.dataList[i].data.push(["2022-03-14 23:32:09", "30"]);
+                }
                 // 绘制监测图表
                 this.$nextTick(function () {
                     this.getMonitorChart();
-                    this.randomMqttData();
                 });
             });
-        },
-        // 模拟Mqtt数据
-        randomMqttData() {
-            let self = this;
-            self.dataList = [];
-            if (self.interval != null) { //判断计时器是否为空
-                clearInterval(self.interval);
-                self.interval = null;
-            }
-            self.interval = setInterval(function () {
-                let seconds = 1000;
-                self.now = new Date(+self.now + seconds);
-                for (let i = 0; i < self.monitorThings.length; i++) {
-                    let date = [
-                        self.now.getFullYear(),
-                        self.now.getMonth(),
-                        self.now.getDate(),
-                    ].join('/');
-                    let time = [
-                        self.now.getHours(),
-                        self.now.getMinutes(),
-                        self.now.getSeconds()
-                    ].join(':');
-                    let value = Math.floor(Math.random() * (40.3 - 20.46)) + 10.46;
-                    if (self.dataList[i] == undefined) {
-                        self.dataList[i] = [];
-                    }
-                    if (self.dataList[i].length > 60) {
-                        self.dataList[i].shift();
-                    }
-                    self.dataList[i].push([date + ' ' + time, value]);
-
-                    // 更新图表
-                    self.chart[i].setOption({
-                        series: [{
-                            data: self.dataList[i]
-                        }]
-                    });
-                }
-
-            }, 1000);
         },
         /**监测数据 */
         getMonitorChart() {
@@ -514,13 +532,16 @@ export default {
                 option = {
                     title: {
                         left: 'center',
-                        text: this.monitorThings[i].name + ' 单位 ' + (this.monitorThings[i].datatype.unit != undefined ? this.monitorThings[i].datatype.unit : "无") + "）"
+                        text: this.monitorThings[i].name + ' 单位 ' + (this.monitorThings[i].datatype.unit != undefined ? this.monitorThings[i].datatype.unit : "无") + "）",
+                        textStyle: {
+                            fontSize: 14,
+                        }
                     },
                     grid: {
-                        top: '50px',
+                        top: '40px',
                         left: '20px',
                         right: '20px',
-                        bottom: '20px',
+                        bottom: '10px',
                         containLabel: true
                     },
                     tooltip: {
@@ -547,13 +568,25 @@ export default {
                         name: this.monitorThings[i].name,
                         type: 'line',
                         showSymbol: false,
-                        data: []
+                        data: this.dataList[i].data
                     }]
                 };
                 option && this.chart[i].setOption(option);
             }
         },
-
+        getTime() {
+            let date = new Date();
+            let y = date.getFullYear();
+            let m = date.getMonth() + 1;
+            let d = date.getDate();
+            let H = date.getHours();
+            let mm = date.getMinutes();
+            let s = date.getSeconds()
+            m = m < 10 ? "0" + m : m;
+            d = d < 10 ? "0" + d : d;
+            H = H < 10 ? "0" + H : H;
+            return y + "-" + m + "-" + d + " " + H + ":" + mm + ":" + s;
+        },
     }
 };
 </script>

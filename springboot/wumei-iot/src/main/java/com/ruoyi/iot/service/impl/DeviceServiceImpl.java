@@ -271,6 +271,7 @@ public class DeviceServiceImpl implements IDeviceService {
             for (int j = 0; j < thingsValueArray.size(); j++) {
                 if (thingsValueArray.getJSONObject(j).getString("id").equals(thingsModel.getId())) {
                     thingsModel.setValue(thingsValueArray.getJSONObject(j).getString("value"));
+                    thingsModel.setShadow(thingsValueArray.getJSONObject(j).getString("shadow"));
                     break;
                 }
             }

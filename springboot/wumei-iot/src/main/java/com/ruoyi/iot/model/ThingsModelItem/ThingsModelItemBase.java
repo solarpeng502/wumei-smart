@@ -16,6 +16,16 @@ public class ThingsModelItemBase
     private Integer isMonitor;
     /** 数据类型 */
     private String type;
+    /** 影子值 */
+    private String shadow;
+
+    public String getShadow() {
+        return shadow;
+    }
+
+    public void setShadow(String shadow) {
+        this.shadow = shadow;
+    }
 
     public String getType() {
         return type;

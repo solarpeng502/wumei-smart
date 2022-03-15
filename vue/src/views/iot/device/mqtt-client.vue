@@ -48,9 +48,9 @@ export default {
                 username: "wumei-smart",
                 password: getToken(),
                 cleanSession: false,
-                keepAlive: 60,
+                keepAlive: 30,
                 clientId: 'web-' + Math.random().toString(16).substr(2),
-                connectTimeout: 10000
+                connectTimeout: 60000
             }
             this.client = mqtt.connect(process.env.VUE_APP_BROKEN_URL, options);
             this.client.on("connect", (e) => {
@@ -85,8 +85,8 @@ export default {
                 qos: 1
             }, (err) => {
                 if (!err) {
-                    console.log('主题为' + topic + "发布成功")
-                    console.log('内容：' + message);
+                    console.log('成功发布主题：' + topic)
+                    console.log('主题内容：' + message);
                 }
             })
         },
@@ -98,7 +98,7 @@ export default {
                 // 传递信息到父组件
                 let data = {};
                 data.topic = topic;
-                data.message = message;
+                data.message = JSON.parse(message.toString());
                 this.$emit('callbackEvent', data);
             });
         },
