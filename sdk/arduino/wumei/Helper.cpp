@@ -1,5 +1,5 @@
 /***********************************************************
- * author: kerwincui
+ * author: kerwincui [物美智能 wumei-smart]
  * create: 2022-02-20
  * email：164770707@qq.com
  * source:https://github.com/kerwincui/wumei-smart
@@ -16,24 +16,24 @@ int monitorCount = 0;
 long monitorInterval = 1000;
 
 //==================================== 这是需要配置的项 ===============================
-// 设备信息
-String deviceNum = "DRO5938QISX72V6A";
-String userId = "1";
-String productId = "57";
-String firmwareVersion = "1.1";
-
 // Wifi配置
-char *wifiSsid = "huawei";
-char *wifiPwd = "15208747707";
+char *wifiSsid = "wifi账号";
+char *wifiPwd = "wifi密码";
+
+// 设备信息配置
+String deviceNum = "D6329VL54419L1Y0";
+String userId = "1";
+String productId = "2";
+String firmwareVersion = "1.0";
 
 // Mqtt配置
 char *mqttHost = "wumei.live";
 int mqttPort = 1883;
 char *mqttUserName = "wumei-smart";
-char *mqttPwd = "PHA8VG19W5IE7743";
-char mqttSecret[17] = "K674HDNN2N6683E3";
+char *mqttPwd = "P5FJKZJHIR82GNB2";
+char mqttSecret[17] = "K63C4EA3AI5TER97";
 
-// NTP地址（用于获取时间）
+// NTP地址（用于获取时间,可选的修改为自己部署项目的地址）
 String ntpServer = "http://wumei.live:8080/iot/tool/ntp?deviceSendTime=";
 //====================================================================================
 
@@ -53,6 +53,68 @@ String pPropertyTopic = prefix + "/property/post";
 String pFunctionTopic = prefix + "/function/post";
 String pMonitorTopic = prefix + "/monitor/post";
 String pEventTopic = prefix + "/event/post";
+
+// 物模型-属性处理
+void processProperty(String payload)
+{
+  StaticJsonDocument<1024> doc;
+  DeserializationError error = deserializeJson(doc, payload);
+  if (error) {
+    Serial.print(F("deserializeJson() failed: "));
+    Serial.println(error.f_str());
+    return;
+  }
+  for (JsonObject object : doc.as<JsonArray>())
+  {
+    // 匹配云端定义的属性（不包含属性中的监测数据）
+    const char* id = object["id"];
+    const char* value = object["value"];
+    printMsg((String)id + "：" + (String)value);
+  }
+  // 最后发布属性，服务端订阅存储（重要）
+  publishProperty(payload);
+}
+
+// 物模型-功能处理
+void processFunction(String payload)
+{
+  StaticJsonDocument<1024> doc;
+  DeserializationError error = deserializeJson(doc, payload);
+  if (error) {
+    Serial.print(F("deserializeJson() failed: "));
+    Serial.println(error.f_str());
+    return;
+  }
+  for (JsonObject object : doc.as<JsonArray>())
+  {
+    // 匹配云端定义的功能
+    const char* id = object["id"];
+    const char* value = object["value"];
+    if (strcmp(id, "switch") == 0)
+    {
+      printMsg("开关 switch：" + (String) value);
+    }
+    else if (strcmp(id, "gear") == 0)
+    {
+      printMsg("档位 gear：" + (String)value);
+    }
+    else if (strcmp(id, "light_color") == 0)
+    {
+      printMsg("灯光颜色 light_color：" + (String)value);
+    }
+    else if (strcmp(id, "message") == 0)
+    {
+      printMsg("屏显消息 message：" + (String)value);
+    }else if(strcmp(id,"report_monitor")==0){
+      // 上报属性中的监测数据
+      String msg=randomPropertyData();
+      publishProperty(msg);
+      return;
+    }
+  }
+  // 最后发布功能,服务端订阅存储（重要）
+  publishFunction(payload);
+}
 
 // Mqtt回调
 void callback(char *topic, byte *payload, unsigned int length)
@@ -112,64 +174,68 @@ void callback(char *topic, byte *payload, unsigned int length)
     }
     monitorCount = doc["count"];
     monitorInterval = doc["interval"];
-  }
+  }  
 }
 
-// 属性处理
-void processProperty(String payload)
+// 连接wifi
+void connectWifi()
 {
-  StaticJsonDocument<1024> doc;
-  DeserializationError error = deserializeJson(doc, payload);
-  if (error) {
-    Serial.print(F("deserializeJson() failed: "));
-    Serial.println(error.f_str());
-    return;
-  }
-  for (JsonObject object : doc.as<JsonArray>())
+  printMsg("连接 ");
+  Serial.print(wifiSsid);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(wifiSsid, wifiPwd);
+  while (WiFi.status() != WL_CONNECTED)
   {
-    // 匹配云端定义的属性（不包含属性中的监测数据）
-    const char* id = object["id"];
-    const char* value = object["value"];
-    printMsg((String)id + "：" + (String)value);
+    delay(500);
+    Serial.print(".");
   }
-  // 最后发布属性（重要）
-  publishProperty(payload);
+  printMsg("WiFi连接成功");
+  printMsg("IP地址: ");
+  Serial.print(WiFi.localIP());
 }
 
-// 功能处理
-void processFunction(String payload)
+// 连接mqtt
+void connectMqtt()
 {
-  StaticJsonDocument<1024> doc;
-  DeserializationError error = deserializeJson(doc, payload);
-  if (error) {
-    Serial.print(F("deserializeJson() failed: "));
-    Serial.println(error.f_str());
-    return;
-  }
-  for (JsonObject object : doc.as<JsonArray>())
+  printMsg("连接Mqtt服务器...");
+  // 生成mqtt认证密码（密码 = mqtt密码 & 用户ID & 过期时间）
+  String password = generationPwd();
+  String encryptPassword = encrypt(password, mqttSecret, wumei_iv);
+  printMsg("密码(已加密)：" + encryptPassword);
+  mqttClient.setClient(wifiClient);
+  mqttClient.setServer(mqttHost, mqttPort);
+  mqttClient.setCallback(callback);
+  mqttClient.setBufferSize(1024);
+  mqttClient.setKeepAlive(10);
+  //连接（客户端ID = 设备编号 & 产品ID）
+  String clientId = deviceNum + "&" + productId;
+  bool connectResult = mqttClient.connect(clientId.c_str(), mqttUserName, encryptPassword.c_str());
+  if (connectResult)
   {
-    // 匹配云端定义的功能
-    const char* id = object["id"];
-    const char* value = object["value"];
-    if (strcmp(id, "switch") == 0)
-    {
-      printMsg("开关 switch：" + (String) value);
-    }
-    else if (strcmp(id, "gear") == 0)
-    {
-      printMsg("档位 gear：" + (String)value);
-    }
-    else if (strcmp(id, "light_color") == 0)
-    {
-      printMsg("灯光颜色 light_color：" + (String)value);
-    }
-    else if (strcmp(id, "message") == 0)
-    {
-      printMsg("屏显消息 message：" + (String)value);
-    }
+    printMsg("连接成功");
+    // 订阅(OTA、NTP、属性、功能、实时监测)
+    mqttClient.subscribe(sOtaTopic.c_str(), 1);
+    mqttClient.subscribe(sNtpTopic.c_str(), 1);
+    mqttClient.subscribe(sPropertyTopic.c_str(), 1);
+    mqttClient.subscribe(sFunctionTopic.c_str(), 1);
+    mqttClient.subscribe(sPropertyOnline.c_str(), 1);
+    mqttClient.subscribe(sFunctionOnline.c_str(), 1);
+    mqttClient.subscribe(sMonitorTopic.c_str(), 1);
+    printMsg("订阅主题：" + sOtaTopic);
+    printMsg("订阅主题：" + sNtpTopic);
+    printMsg("订阅主题：" + sPropertyTopic);
+    printMsg("订阅主题：" + sFunctionTopic);
+    printMsg("订阅主题：" + sPropertyOnline);
+    printMsg("订阅主题：" + sFunctionOnline);
+    printMsg("订阅主题：" + sMonitorTopic);
+    // 发布设备信息
+    publishInfo();
   }
-  // 最后发布功能（重要）
-  publishFunction(payload);
+  else
+  {
+    printMsg("连接失败, rc=");
+    Serial.print(mqttClient.state());
+  }
 }
 
 // 1.发布设备信息
@@ -223,12 +289,12 @@ void publishEvent()
   JsonObject objTmeperature = doc.createNestedObject();
   objTmeperature["id"] = "height_temperature";
   objTmeperature["value"] = "40";
-  objTmeperature["remark"] = "事件备注信息";
+  objTmeperature["remark"] = "温度过高警告";
 
   JsonObject objException = doc.createNestedObject();
   objException["id"] = "exception";
   objException["value"] = "异常消息，消息内容XXXXXXXX";
-  objException["remark"] = "事件备注信息";
+  objException["remark"] = "设备发生错误";
 
   printMsg("发布事件:");
   serializeJson(doc, Serial);
@@ -242,6 +308,7 @@ void publishMonitor()
 {
   String msg=randomPropertyData();
   // 发布为实时监测数据，不会存储
+  printMsg("发布实时监测数据:"+msg);
   mqttClient.publish(pMonitorTopic.c_str(), msg.c_str());
 }
 
@@ -255,92 +322,31 @@ String randomPropertyData(){
   objTmeperature["id"] = "temperature";
   randFloat = random(1000, 3000) ;
   objTmeperature["value"] = (String)(randFloat/100);
-  objTmeperature["remark"] = "监测数据备注";
+  objTmeperature["remark"] = (String)millis();
 
   JsonObject objHumidity   = doc.createNestedObject();
   objHumidity["id"] = "humidity";
   randFloat = random(3000, 6000);
   objHumidity["value"] = (String)(randFloat/100);
-  objHumidity["remark"] = "监测数据备注";
+  objHumidity["remark"] = (String)millis();
 
   JsonObject objCo2 = doc.createNestedObject();
   objCo2["id"] = "co2";
   randInt = random(400, 1000);
   objCo2["value"] = (String)(randInt);
-  objCo2["remark"] = "监测数据备注";
+  objCo2["remark"] = (String)millis();
 
   JsonObject objBrightness = doc.createNestedObject();
   objBrightness["id"] = "brightness";
   randInt = random(1000, 10000);
   objBrightness["value"] = (String)(randInt);
-  objBrightness["remark"] = "监测数据备注";
+  objBrightness["remark"] = (String)millis();
 
-  printMsg("发布监测数据:");
+  printMsg("随机生成监测数据值:");
   serializeJson(doc, Serial);
   String output;
   serializeJson(doc, output);
   return output;
-}
-
-// 连接wifi
-void connectWifi()
-{
-  printMsg("连接 ");
-  Serial.print(wifiSsid);
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(wifiSsid, wifiPwd);
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(500);
-    Serial.print(".");
-  }
-  printMsg("WiFi连接成功");
-  printMsg("IP地址: ");
-  Serial.print(WiFi.localIP());
-}
-
-// 连接mqtt
-void connectMqtt()
-{
-  printMsg("连接Mqtt服务器...");
-  // 生成mqtt认证密码（密码 = mqtt密码 & 用户ID & 过期时间）
-  String password = generationPwd();
-  String encryptPassword = encrypt(password, mqttSecret, wumei_iv);
-  printMsg("密码(已加密)：" + encryptPassword);
-  mqttClient.setClient(wifiClient);
-  mqttClient.setServer(mqttHost, mqttPort);
-  mqttClient.setCallback(callback);
-  mqttClient.setBufferSize(1024);
-  mqttClient.setKeepAlive(15);
-  //连接（客户端ID = 设备编号 & 产品ID）
-  String clientId = deviceNum + "&" + productId;
-  bool connectResult = mqttClient.connect(clientId.c_str(), mqttUserName, encryptPassword.c_str());
-  if (connectResult)
-  {
-    printMsg("连接成功");
-    // 订阅(OTA、NTP、属性、功能、实时监测)
-    mqttClient.subscribe(sOtaTopic.c_str(), 1);
-    mqttClient.subscribe(sNtpTopic.c_str(), 1);
-    mqttClient.subscribe(sPropertyTopic.c_str(), 1);
-    mqttClient.subscribe(sFunctionTopic.c_str(), 1);
-    mqttClient.subscribe(sPropertyOnline.c_str(), 1);
-    mqttClient.subscribe(sFunctionOnline.c_str(), 1);
-    mqttClient.subscribe(sMonitorTopic.c_str(), 1);
-    printMsg("订阅主题：" + sOtaTopic);
-    printMsg("订阅主题：" + sNtpTopic);
-    printMsg("订阅主题：" + sPropertyTopic);
-    printMsg("订阅主题：" + sFunctionTopic);
-    printMsg("订阅主题：" + sPropertyOnline);
-    printMsg("订阅主题：" + sFunctionOnline);
-    printMsg("订阅主题：" + sMonitorTopic);
-    // 发布设备信息
-    publishInfo();
-  }
-  else
-  {
-    printMsg("连接失败, rc=");
-    Serial.print(mqttClient.state());
-  }
 }
 
 // 生成密码
@@ -417,13 +423,14 @@ void printMsg(String msg)
 // 控制指示灯闪烁
 void blink()
 {
+  printMsg("指示灯闪烁...");
   pinMode(15, OUTPUT);
-  for (int i = 0; i < 3; i++)
+  for (int i = 0; i < 2; i++)
   {
     digitalWrite(15, HIGH);
-    delay(1000);
+    delay(200);
     digitalWrite(15, LOW);
-    delay(1000);
+    delay(200);
   }
 }
 

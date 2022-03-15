@@ -1,5 +1,5 @@
 /***********************************************************
- * author: kerwincui
+ * author: kerwincui [物美智能 wumei-smart]
  * create: 2022-02-20
  * email：164770707@qq.com
  * source:https://github.com/kerwincui/wumei-smart
@@ -69,25 +69,16 @@ void loop()
     long now = millis();
     if (now - lastTimerMonitor > 60000)
       {
-        // lastTimerMonitor = now;
-        // // 发布事件
-        // publishEvent();
-        // // 发布时钟同步
-        // publishNtp();
+        lastTimerMonitor = now;
+        printMsg("执行定时上报");
+        // 发布事件
+        publishEvent();
+        // 发布时钟同步
+        publishNtp();
 
-        // // 发布属性
-        // String msg=randomPropertyData();
-        // publishProperty(msg);
-        
-        // // 发布功能
-        // StaticJsonDocument<256> docFunction;
-        // JsonObject objGear = docFunction.createNestedObject();
-        // objGear["id"] = "gear";
-        // objGear["value"] = "3";
-        // objGear["remark"] = "上报功能";
-        // String gearMsg;
-        // serializeJson(docFunction, gearMsg);
-        // publishFunction(gearMsg);
+        // 发布属性(监测值)
+        String msg=randomPropertyData();
+        publishProperty(msg);
       }
   }
 

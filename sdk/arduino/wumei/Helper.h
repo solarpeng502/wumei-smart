@@ -1,5 +1,5 @@
 /***********************************************************
- * author: kerwincui
+ * author: kerwincui [物美智能 wumei-smart]
  * create: 2022-02-20
  * email：164770707@qq.com
  * source:https://github.com/kerwincui/wumei-smart
@@ -73,7 +73,7 @@ String encrypt(String plain_data,char *wumei_key,char *wumei_iv);
 String decrypt(String encoded_data_str,char *wumei_key,char *wumei_iv);
 //打印提示信息
 void printMsg(String tips);
-// 控制指示灯闪烁,测试用
+// 控制指示灯闪烁
 void blink();
 
 #endif 
