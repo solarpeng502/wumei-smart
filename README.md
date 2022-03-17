@@ -1,14 +1,14 @@
 
-### 一、项目简介（[查看旧版本>>](https://github.com/kerwincui/wumei-iot)）
+### 一、项目简介
 
-1. 物美智能 [wumei-smart](http://wumei.live/) 是一个简单易用的生活物联网平台。可用于搭建物联网平台以及二次开发和学习。
+1. 物美智能 [wumei-smart](http://wumei.live/) 是一个简单易用的生活物联网平台。可用于搭建物联网平台以及二次开发和学习。使用流程如下：
+![使用流程图](https://gitee.com/kerwincui/wumei-smart/raw/master/document/process.png)
 
-2. 设备接入使用EMQX消息服务器，认证采用EMQX内置的Http插件对称加密认证。后端采用Spring boot；前端采用Vue；移动端采用Uniapp；数据库采用Mysql、Redis和TDengine；设备端支持硬件SDK生成，例如ESP32、ESP8266、树莓派等；设备模拟器采用Android和WPF框架，不仅能模拟硬件设备，还可以控制和监测电脑、手机。
+2. 设备接入使用EMQX消息服务器，认证采用EMQX内置的Http插件对称加密认证。后端采用Spring boot；前端采用Vue；移动端采用Uniapp；数据库采用Mysql、Redis和TDengine；设备端支持硬件SDK生成，例如ESP32、ESP8266、树莓派等；设备模拟器采用Android和WPF框架，不仅能模拟硬件设备，还可以控制和监测电脑、手机。系统架构图如下：
+![系统架构图](https://gitee.com/kerwincui/wumei-smart/raw/master/document/sys.png)
 
-3. 系统架构图
-![系统架构图](https://github.com/kerwincui/wumei-smart/blob/master/document/sys.png?raw=true)
-4. 使用流程
-![使用流程图](https://raw.githubusercontent.com/kerwincui/wumei-smart/master/document/process.png)
+3. 设备烧录代码示例
+![使用流程图](https://gitee.com/kerwincui/wumei-smart/raw/master/document/flash.png)
 
 
 ### 二、功能
@@ -62,7 +62,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp; spring-boot ---------------------------------------------------- 后端<br/>
 &nbsp;&nbsp;&nbsp;&nbsp; vue ------------------------------------------------------------- 前端<br />
 &nbsp;&nbsp;&nbsp;&nbsp; docker ---------------------------------------------------------- docker部署文件<br />
-&nbsp;&nbsp;&nbsp;&nbsp; sdk ------------------------------------------------------------- 硬件SDK<br />
+&nbsp;&nbsp;&nbsp;&nbsp; sdk -------------------------------------------------------------- 硬件SDK<br />
 &nbsp;&nbsp;&nbsp;&nbsp; download ------------------------------------------------------- 工具下载<br />
 
 
@@ -80,9 +80,36 @@
 * [演示地址>>](https://iot.wumei.live/)
 
 
-### 九、界面图片
-* web端
-
+### 九、部分图片
+<table>
+    <tr>
+        <td><img src="https://gitee.com/kerwincui/wumei-smart/raw/master/document/index.png"/></td>
+        <td><img src="https://gitee.com/kerwincui/wumei-smart/raw/master/document/model.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="https://gitee.com/kerwincui/wumei-smart/raw/master/document/product.png"/></td>
+        <td><img src="https://gitee.com/kerwincui/wumei-smart/raw/master/document/product-detail.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="https://gitee.com/kerwincui/wumei-smart/raw/master/document/device.png"/></td>
+        <td><img src="https://gitee.com/kerwincui/wumei-smart/raw/master/document/monitor.png"/></td>
+    </tr>
+        <tr>
+        <td><img src="https://gitee.com/kerwincui/wumei-smart/raw/master/document/device-detail.png"/></td>
+        <td><img src="https://gitee.com/kerwincui/wumei-smart/raw/master/document/device-status.png"/></td>
+    </tr>	 
+    <tr>
+        <td><img src="https://gitee.com/kerwincui/wumei-smart/raw/master/document/device-timer.png"/></td>
+        <td><img src="https://gitee.com/kerwincui/wumei-smart/raw/master/document/device-log.png"/></td>
+    </tr>
+        <tr>
+        <td><img src="https://gitee.com/kerwincui/wumei-smart/raw/master/document/device-statistic.png"/></td>
+        <td><img src="https://gitee.com/kerwincui/wumei-smart/raw/master/document/group.png"/></td>
+    </tr>
+        <td><img src="https://gitee.com/kerwincui/wumei-smart/raw/master/document/emqx-client.png"/></td>
+        <td><img src="https://gitee.com/kerwincui/wumei-smart/raw/master/document/emqx-plugin.png"/></td>
+    </tr>
+</table>
 
 
 
